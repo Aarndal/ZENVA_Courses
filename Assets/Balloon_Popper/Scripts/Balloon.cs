@@ -4,41 +4,56 @@ using UnityEngine;
 
 namespace BalloonPopper
 {
-    public class Balloon : MonoBehaviour
+    public class Balloon : MonoBehaviour, IClickable
     {
         [SerializeField]
-        private float scaleFactor = 0.2f;
-        [SerializeField]
-        private int clicksToPop = 5;
+        private BalloonData balloonData;
 
+        private int _counter = 0;
         private bool _isPopping = false;
+
+        private Renderer _renderer;
 
         public static event Action<Balloon> BalloonPopped;
 
-        private void OnMouseDown()
+        private void Awake()
         {
-            if (_isPopping) return;
+            _renderer = this.GetComponentInChildren<Renderer>();
 
-            clicksToPop--;
-
-            Vector3 scalteIncrease = new(scaleFactor, scaleFactor, scaleFactor);
-            this.transform.localScale += scalteIncrease;
-
-            if (clicksToPop <= 0)
+            if (_renderer == null)
             {
-                Pop();
+                Debug.LogErrorFormat("Renderer component not found on Balloon: {0} | ID: {1}",
+                    this.gameObject.name,
+                    this.gameObject.GetEntityId());
             }
         }
 
-        private void Pop()
+        private void OnEnable()
+        {
+            TrySetCounter();
+        }
+
+        private void Start()
+        {
+            _renderer.material = balloonData.BalloonMaterial;
+        }
+
+        public void OnClick()
         {
             if (this.gameObject.activeInHierarchy)
             {
-                _isPopping = true;
+                if (_isPopping) return;
 
-                BalloonPopped?.Invoke(this);
+                _counter--;
 
-                StartCoroutine(PopBalloon());
+                Vector3 scaleIncrease = new(balloonData.ScaleFactor, balloonData.ScaleFactor, balloonData.ScaleFactor);
+                this.transform.localScale += scaleIncrease;
+
+                if (_counter <= 0)
+                {
+                    _isPopping = true;
+                    StartCoroutine(PopBalloon());
+                }
             }
         }
 
@@ -63,11 +78,39 @@ namespace BalloonPopper
             // Snap exactly to the target to avoid tiny residual differences
             this.transform.localScale = popScale;
 
-            // Add pop animation or effects here if needed
-            // yield return new WaitForSeconds(0.5f); // Simulate some delay for popping effect
-
+            BalloonPopped?.Invoke(this);
+            
             this.gameObject.SetActive(false);
             _isPopping = false;
+            TrySetCounter();
+        }
+
+        private bool TrySetCounter()
+        {
+            if (balloonData == null)
+            {
+                Debug.LogErrorFormat("BalloonData is not assigned in Balloon script: {0} | ID: {1}", 
+                    this.gameObject.name, 
+                    this.gameObject.GetEntityId());
+
+                return false;
+            }
+
+            if (balloonData.ClicksToPop <= 0)
+            {
+                Debug.LogErrorFormat("BalloonData has invalid ClicksToPop value in Balloon script: {0} | ID: {1}",
+                    this.gameObject.name,
+                    this.gameObject.GetEntityId());
+
+                return false;
+            }
+
+            if (_counter != balloonData.ClicksToPop)
+            {
+                _counter = balloonData.ClicksToPop;
+            }
+
+            return true;
         }
     }
 }
