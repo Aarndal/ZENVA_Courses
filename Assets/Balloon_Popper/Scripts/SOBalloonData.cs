@@ -3,7 +3,7 @@ using UnityEngine;
 namespace BalloonPopper
 {
     [CreateAssetMenu(fileName = "BalloonData", menuName = "BalloonPopper/BalloonData")]
-    public class BalloonData : ScriptableObject
+    public class SOBalloonData : ScriptableObject
     {
         [SerializeField]
         private Material balloonMaterial;

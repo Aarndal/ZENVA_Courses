@@ -7,18 +7,26 @@ namespace BalloonPopper
     public class Balloon : MonoBehaviour, IClickable
     {
         [SerializeField]
-        private BalloonData balloonData;
+        private SOBalloonData balloonData;
 
         private int _counter = 0;
         private bool _isPopping = false;
 
         private Renderer _renderer;
 
-        public static event Action<Balloon> BalloonPopped;
+        public static event Action<Balloon, SOBalloonData> BalloonPopped;
 
         private void Awake()
         {
-            _renderer = this.GetComponentInChildren<Renderer>();
+            if (balloonData == null)
+            {
+                Debug.LogErrorFormat("BalloonData is not assigned in Balloon script: {0} | ID: {1}",
+                    this.gameObject.name,
+                    this.gameObject.GetEntityId());
+            }
+
+            // The Renderer should be located on the Model child object
+            _renderer = this.GetComponentInChildren<Renderer>(true);
 
             if (_renderer == null)
             {
@@ -30,25 +38,37 @@ namespace BalloonPopper
 
         private void OnEnable()
         {
-            TrySetCounter();
+            // If we fail to set the counter, deactivate the balloon
+            if (!TrySetCounter())
+            {
+                this.gameObject.SetActive(false);
+            }
         }
 
         private void Start()
         {
-            _renderer.material = balloonData.BalloonMaterial;
+            // Initialize the balloon's material and scale
+            if (balloonData != null && _renderer != null)
+            {
+                _renderer.material = balloonData.BalloonMaterial;
+                this.transform.localScale = Vector3.one * balloonData.InitialScale;
+            }
         }
 
         public void OnClick()
         {
+            // Check if the balloon is active
             if (this.gameObject.activeInHierarchy)
             {
-                if (_isPopping) return;
+                // Ignore clicks if the balloon is already popping
+                if (_isPopping) 
+                    return;
 
                 _counter--;
 
-                Vector3 scaleIncrease = new(balloonData.ScaleFactor, balloonData.ScaleFactor, balloonData.ScaleFactor);
-                this.transform.localScale += scaleIncrease;
+                this.transform.localScale += Vector3.one * balloonData.ScaleFactor;
 
+                // Check if the balloon should start popping
                 if (_counter <= 0)
                 {
                     _isPopping = true;
@@ -78,8 +98,8 @@ namespace BalloonPopper
             // Snap exactly to the target to avoid tiny residual differences
             this.transform.localScale = popScale;
 
-            BalloonPopped?.Invoke(this);
-            
+            BalloonPopped?.Invoke(this, balloonData);
+
             this.gameObject.SetActive(false);
             _isPopping = false;
             TrySetCounter();
@@ -87,15 +107,6 @@ namespace BalloonPopper
 
         private bool TrySetCounter()
         {
-            if (balloonData == null)
-            {
-                Debug.LogErrorFormat("BalloonData is not assigned in Balloon script: {0} | ID: {1}", 
-                    this.gameObject.name, 
-                    this.gameObject.GetEntityId());
-
-                return false;
-            }
-
             if (balloonData.ClicksToPop <= 0)
             {
                 Debug.LogErrorFormat("BalloonData has invalid ClicksToPop value in Balloon script: {0} | ID: {1}",
