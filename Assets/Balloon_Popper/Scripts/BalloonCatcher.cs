@@ -1,16 +1,34 @@
 using UnityEngine;
 
-public class BalloonCatcher : MonoBehaviour
+namespace BalloonPopper
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    // Catches balloons that have not been popped and returns them to the BalloonPool.
+    public class BalloonCatcher : MonoBehaviour
     {
-        
-    }
+        [SerializeField]
+        private bool logCaughtBalloonsInEditor = false;
 
-    // Update is called once per frame
-    void Update()
-    {
-        
+        private void OnCollisionEnter(Collision collision)
+        {
+            if (!TryGetCaughtBalloon(collision, out var caughtBalloon))
+                return;
+
+#if UNITY_EDITOR
+            if (logCaughtBalloonsInEditor)
+            {
+                Debug.LogFormat("Balloon entered BalloonCatcher: {0} | ID: {1}",
+                        caughtBalloon.gameObject.name,
+                        caughtBalloon.gameObject.GetEntityId());
+            }
+#endif
+
+            BalloonPool.Instance.ReturnBalloon(caughtBalloon);
+        }
+
+        private bool TryGetCaughtBalloon(Collision collision, out Balloon caughtBalloon)
+        {
+            caughtBalloon = collision.gameObject.GetComponentInParent<Balloon>(true);
+            return caughtBalloon != null;
+        }
     }
 }

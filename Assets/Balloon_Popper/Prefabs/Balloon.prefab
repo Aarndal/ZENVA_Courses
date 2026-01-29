@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6366801479318172042}
   - component: {fileID: 4947741518031838475}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Balloon_BottomCollider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -66,7 +66,7 @@ GameObject:
   - component: {fileID: 5126128791561512694}
   - component: {fileID: 1237476385562170359}
   - component: {fileID: 3660444596000964375}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Balloon
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -116,6 +116,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1f6add6990e2acb499aaf8060d14e5dc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BalloonMovement
+  floatSpeed: 0.5
+  horizontalFloatAmplitude: 0.2
+  horizontalFloatFrequenze: 2
 --- !u!1 &5996557633432035572
 GameObject:
   m_ObjectHideFlags: 0
@@ -127,7 +130,7 @@ GameObject:
   - component: {fileID: 201828582487206830}
   - component: {fileID: 4857833408440221567}
   - component: {fileID: 3709915118594947779}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Balloon_Model
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -216,7 +219,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8145242304426654745}
   - component: {fileID: 723270337725658957}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Balloon_TopCollider
   m_TagString: Untagged
   m_Icon: {fileID: 0}

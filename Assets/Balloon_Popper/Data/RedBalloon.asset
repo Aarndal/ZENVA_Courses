@@ -16,3 +16,6 @@ MonoBehaviour:
   clicksToPop: 5
   initialScale: 1
   scaleFactor: 0.2
+  scoreValue: 1
+  inflateSound: {fileID: 0}
+  popSound: {fileID: 0}

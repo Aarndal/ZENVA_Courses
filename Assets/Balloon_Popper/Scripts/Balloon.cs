@@ -6,6 +6,8 @@ namespace BalloonPopper
 {
     public class Balloon : MonoBehaviour, IClickable
     {
+        public static event Action<Balloon, SOBalloonData> BalloonPopped;
+        
         [SerializeField]
         private SOBalloonData balloonData;
 
@@ -14,7 +16,8 @@ namespace BalloonPopper
 
         private Renderer _renderer;
 
-        public static event Action<Balloon, SOBalloonData> BalloonPopped;
+        public SOBalloonData BalloonData => balloonData;
+
 
         private void Awake()
         {
@@ -42,7 +45,10 @@ namespace BalloonPopper
             if (!TrySetCounter())
             {
                 this.gameObject.SetActive(false);
+                return;
             }
+
+            this.transform.localScale = Vector3.one * balloonData.InitialScale;
         }
 
         private void Start()
@@ -61,7 +67,7 @@ namespace BalloonPopper
             if (this.gameObject.activeInHierarchy)
             {
                 // Ignore clicks if the balloon is already popping
-                if (_isPopping) 
+                if (_isPopping)
                     return;
 
                 _counter--;
@@ -101,6 +107,9 @@ namespace BalloonPopper
             BalloonPopped?.Invoke(this, balloonData);
 
             this.gameObject.SetActive(false);
+
+            BalloonPool.Instance.ReturnBalloon(this);
+
             _isPopping = false;
             TrySetCounter();
         }
