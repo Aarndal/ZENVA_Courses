@@ -8,6 +8,7 @@ namespace BalloonPopper
         [SerializeField]
         private bool logCaughtBalloonsInEditor = false;
 
+
         private void OnCollisionEnter(Collision collision)
         {
             if (!TryGetCaughtBalloon(collision, out var caughtBalloon))
@@ -21,9 +22,9 @@ namespace BalloonPopper
                         caughtBalloon.gameObject.GetEntityId());
             }
 #endif
-
-            BalloonPool.Instance.ReturnBalloon(caughtBalloon);
+            caughtBalloon.Despawn();
         }
+
 
         private bool TryGetCaughtBalloon(Collision collision, out Balloon caughtBalloon)
         {

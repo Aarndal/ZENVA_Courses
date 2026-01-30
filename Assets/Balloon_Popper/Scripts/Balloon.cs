@@ -4,30 +4,27 @@ using UnityEngine;
 
 namespace BalloonPopper
 {
-    public class Balloon : MonoBehaviour, IClickable
+    public class Balloon : MonoBehaviour, IClickable, ISpawn
     {
         public static event Action<Balloon, SOBalloonData> BalloonPopped;
-        
+
+
         [SerializeField]
-        private SOBalloonData balloonData;
+        private SOBalloonData data;
+
 
         private int _counter = 0;
+        private bool _isInitialized = false;
         private bool _isPopping = false;
 
         private Renderer _renderer;
 
-        public SOBalloonData BalloonData => balloonData;
+
+        public SOBalloonData Data => data;
 
 
         private void Awake()
         {
-            if (balloonData == null)
-            {
-                Debug.LogErrorFormat("BalloonData is not assigned in Balloon script: {0} | ID: {1}",
-                    this.gameObject.name,
-                    this.gameObject.GetEntityId());
-            }
-
             // The Renderer should be located on the Model child object
             _renderer = this.GetComponentInChildren<Renderer>(true);
 
@@ -37,34 +34,24 @@ namespace BalloonPopper
                     this.gameObject.name,
                     this.gameObject.GetEntityId());
             }
-        }
 
-        private void OnEnable()
-        {
-            // If we fail to set the counter, deactivate the balloon
-            if (!TrySetCounter())
+            // Auto-initialize if data is already assigned
+            if (data != null && !_isInitialized)
             {
-                this.gameObject.SetActive(false);
-                return;
-            }
-
-            this.transform.localScale = Vector3.one * balloonData.InitialScale;
-        }
-
-        private void Start()
-        {
-            // Initialize the balloon's material and scale
-            if (balloonData != null && _renderer != null)
-            {
-                _renderer.material = balloonData.BalloonMaterial;
-                this.transform.localScale = Vector3.one * balloonData.InitialScale;
+                TryInitialize(data);
             }
         }
+
+        private void OnDestroy()
+        {
+            _counter = 0;
+        }
+
 
         public void OnClick()
         {
-            // Check if the balloon is active
-            if (this.gameObject.activeInHierarchy)
+            // Check if the balloon is active and initialized
+            if (this.gameObject.activeInHierarchy && _isInitialized)
             {
                 // Ignore clicks if the balloon is already popping
                 if (_isPopping)
@@ -72,7 +59,7 @@ namespace BalloonPopper
 
                 _counter--;
 
-                this.transform.localScale += Vector3.one * balloonData.ScaleFactor;
+                this.transform.localScale += Vector3.one * data.ScaleFactor;
 
                 // Check if the balloon should start popping
                 if (_counter <= 0)
@@ -82,6 +69,70 @@ namespace BalloonPopper
                 }
             }
         }
+
+
+        public void Despawn()
+        {
+            BalloonPool.Instance.ReturnToPool(this);
+        }
+
+        public void Spawn(Vector3 spawnPosition)
+        {
+            // If we fail to reset the counter, return the balloon to the pool
+            if (!TryResetCounter())
+            {
+                Despawn();
+                return;
+            }
+            
+            this.transform.position = spawnPosition;
+
+            // Reset scale to initial value
+            if (data != null && _isInitialized)
+            {
+                this.transform.localScale = Vector3.one * data.InitialScale;
+            }
+        }
+        
+        public bool TryInitialize(SOBalloonData balloonData)
+        {
+            // Don't allow re-initialization
+            if (_isInitialized)
+            {
+                Debug.LogWarningFormat("Balloon is already initialized: {0} | ID: {1}",
+                    this.gameObject.name,
+                    this.gameObject.GetEntityId());
+                return false;
+            }
+
+            if (balloonData == null)
+            {
+                Debug.LogErrorFormat("Balloon initialization failed, missing data: {0} | ID: {1}",
+                    this.gameObject.name,
+                    this.gameObject.GetEntityId());
+                return false;
+            }
+
+            if (_renderer == null)
+            {
+                Debug.LogErrorFormat("Balloon initialization failed, missing Renderer: {0} | ID: {1}",
+                    this.gameObject.name,
+                    this.gameObject.GetEntityId());
+                return false;
+            }
+
+            data = balloonData;
+            _renderer.material = data.Material;
+            this.transform.localScale = Vector3.one * data.InitialScale;
+            _isInitialized = true;
+
+            //Debug.LogFormat("Balloon initialized successfully: {0} | ID: {1}",
+            //    this.gameObject.name,
+            //    this.gameObject.GetEntityId());
+
+            return true;
+        }
+
 
         private IEnumerator PopBalloon()
         {
@@ -104,33 +155,31 @@ namespace BalloonPopper
             // Snap exactly to the target to avoid tiny residual differences
             this.transform.localScale = popScale;
 
-            BalloonPopped?.Invoke(this, balloonData);
+            BalloonPopped?.Invoke(this, data);
 
-            this.gameObject.SetActive(false);
-
-            BalloonPool.Instance.ReturnBalloon(this);
+            BalloonPool.Instance.ReturnToPool(this);
 
             _isPopping = false;
-            TrySetCounter();
         }
 
-        private bool TrySetCounter()
+        private bool TryResetCounter()
         {
-            if (balloonData.ClicksToPop <= 0)
+            if (data.ClicksToPop <= 0)
             {
-                Debug.LogErrorFormat("BalloonData has invalid ClicksToPop value in Balloon script: {0} | ID: {1}",
+                Debug.LogErrorFormat("Data has invalid ClicksToPop value in Balloon script: {0} | ID: {1}",
                     this.gameObject.name,
                     this.gameObject.GetEntityId());
 
                 return false;
             }
 
-            if (_counter != balloonData.ClicksToPop)
+            if (_counter != data.ClicksToPop)
             {
-                _counter = balloonData.ClicksToPop;
+                _counter = data.ClicksToPop;
             }
 
             return true;
         }
+        
     }
 }

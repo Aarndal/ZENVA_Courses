@@ -12,7 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bca2f6de3f85c3d4d9657ce0d02f23fe, type: 3}
   m_Name: RedBalloon
   m_EditorClassIdentifier: Assembly-CSharp::BalloonPopper.BalloonData
-  balloonMaterial: {fileID: 2100000, guid: a97edbddc08506449803c75ea13c2214, type: 2}
+  material: {fileID: 2100000, guid: a97edbddc08506449803c75ea13c2214, type: 2}
+  prefab: {fileID: 5967428061742147401, guid: a9bfe28427824654998e68c2196c298a, type: 3}
   clicksToPop: 5
   initialScale: 1
   scaleFactor: 0.2

@@ -11,17 +11,9 @@ namespace BalloonPopper
             remove { _scoreUpdated -= value; }
         }
 
-        private Action<int> _scoreUpdated;
-
-
         private void OnEnable()
         {
             Balloon.BalloonPopped += OnBalloonPopped;
-        }
-
-        private void Start()
-        {
-            _scoreUpdated?.Invoke(_currentScore);
         }
 
         private void OnDisable()
@@ -39,7 +31,7 @@ namespace BalloonPopper
 
         protected override void IncreaseScore(SOBalloonData data)
         {
-            _currentScore += data.ScoreValue; // Increase score by 10 for each balloon popped
+            _currentScore += data.ScoreValue;
             Debug.Log("Score: " + _currentScore);
 
             _scoreUpdated?.Invoke(_currentScore);

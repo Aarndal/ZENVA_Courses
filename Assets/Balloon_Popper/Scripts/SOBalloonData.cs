@@ -5,11 +5,15 @@ namespace BalloonPopper
     [CreateAssetMenu(fileName = "BalloonData", menuName = "BalloonPopper/BalloonData")]
     public class SOBalloonData : ScriptableObject
     {
+        [Header("Model Data")]
         [SerializeField]
-        private Material balloonMaterial = default;
+        private Material material = default;
+        [SerializeField]
+        private GameObject prefab = default;
 
         [Space(10)]
 
+        [Header("Gameplay Data")]
         [SerializeField]
         private int clicksToPop = 5;
         [SerializeField]
@@ -21,12 +25,15 @@ namespace BalloonPopper
 
         [Space(10)]
 
+        [Header("Audio Data")]
         [SerializeField]
         private AudioClip inflateSound = default;
         [SerializeField]
         private AudioClip popSound = default;
 
-        public Material BalloonMaterial => balloonMaterial;
+
+        public Material Material => material;
+        public GameObject Prefab => prefab;
 
         public int ClicksToPop => clicksToPop;
         public float InitialScale => initialScale;
