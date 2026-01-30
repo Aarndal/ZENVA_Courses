@@ -8,11 +8,10 @@ namespace BalloonPopper
     public class BalloonSpawner : MonoBehaviour
     {
         [SerializeField]
-        private SOBalloonData balloonData;
-        [SerializeField]
-        private float spawnInterval = 2f;
+        private SOBalloonSpawnerInstructions instructions;
         
         private bool _isSpawning = false;
+
 
         private void Start()
         {
@@ -21,10 +20,10 @@ namespace BalloonPopper
 
         private async void Update()
         {
-            if (balloonData == null)
+            if (instructions == null)
                 return;
 
-            if (BalloonPool.Instance.Balloons[balloonData.name].Count == 0)
+            if (BalloonPool.Instance.Balloons[instructions.Data.name].Count == 0)
                 return;
 
             if (_isSpawning)
@@ -33,9 +32,10 @@ namespace BalloonPopper
             await DelayedSpawn();
         }
 
+
         private UniTask SpawnBalloon()
         {
-            if (BalloonPool.Instance.TryRetrieveFromPool(balloonData, out GameObject balloon))
+            if (BalloonPool.Instance.TryRetrieveFromPool(instructions.Data, out GameObject balloon))
             {
                 balloon.GetComponent<Balloon>().Spawn(this.transform.position);
             }
@@ -46,7 +46,7 @@ namespace BalloonPopper
         {
             _isSpawning = true;
 
-            await UniTask.Delay(TimeSpan.FromSeconds(spawnInterval), ignoreTimeScale: false);
+            await UniTask.Delay(TimeSpan.FromSeconds(instructions.SpawnInterval.GetNextInterval()), ignoreTimeScale: false);
 
             await SpawnBalloon();
 

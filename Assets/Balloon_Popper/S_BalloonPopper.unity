@@ -919,6 +919,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 11400000, guid: 09919b817a0b5664d807cb1262fb012f, type: 2}
     - target: {fileID: 1733791813628435644, guid: a1a41d1a473e83741a670cf712ffd6fb, type: 3}
+      propertyPath: instructions
+      value: 
+      objectReference: {fileID: 11400000, guid: a965d722a79e91640b95d76e59fb833e, type: 2}
+    - target: {fileID: 1733791813628435644, guid: a1a41d1a473e83741a670cf712ffd6fb, type: 3}
       propertyPath: spawnInterval
       value: 5
       objectReference: {fileID: 0}
@@ -1061,6 +1065,6 @@ SceneRoots:
   - {fileID: 473580391}
   - {fileID: 8105738012346536854}
   - {fileID: 7048012977306544332}
-  - {fileID: 156792774}
   - {fileID: 982941537}
+  - {fileID: 156792774}
   - {fileID: 1023804197}

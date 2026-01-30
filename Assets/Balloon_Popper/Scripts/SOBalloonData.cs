@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace BalloonPopper
 {
-    [CreateAssetMenu(fileName = "BalloonData", menuName = "BalloonPopper/BalloonData")]
+    [CreateAssetMenu(fileName = "newBalloonData", menuName = "BalloonPopper/Data", order = 0)]
     public class SOBalloonData : ScriptableObject
     {
         [Header("Model Data")]
