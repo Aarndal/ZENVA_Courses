@@ -41,6 +41,7 @@ namespace BalloonPopper
             }
             return UniTask.CompletedTask;
         }
+
         private async UniTask DelayedSpawn()
         {
             _isSpawning = true;
