@@ -1,4 +1,5 @@
-using System.Collections;
+using Cysharp.Threading.Tasks;
+using System;
 using UnityEngine;
 
 namespace BalloonPopper
@@ -18,7 +19,7 @@ namespace BalloonPopper
             _isSpawning = false;
         }
 
-        private void Update()
+        private async void Update()
         {
             if (balloonData == null)
                 return;
@@ -29,23 +30,24 @@ namespace BalloonPopper
             if (_isSpawning)
                 return;
 
-            StartCoroutine(DelayedSpawn());
+            await DelayedSpawn();
         }
 
-        private void SpawnBalloon()
+        private UniTask SpawnBalloon()
         {
             if (BalloonPool.Instance.TryRetrieveBalloon(balloonData, out GameObject balloon))
             {
                 balloon.transform.position = this.transform.position;
             }
+            return UniTask.CompletedTask;
         }
-        private IEnumerator DelayedSpawn()
+        private async UniTask DelayedSpawn()
         {
             _isSpawning = true;
 
-            yield return new WaitForSeconds(spawnInterval);
+            await UniTask.Delay(TimeSpan.FromSeconds(spawnInterval), ignoreTimeScale: false);
 
-            SpawnBalloon();
+            await SpawnBalloon();
 
             _isSpawning = false;
         }
