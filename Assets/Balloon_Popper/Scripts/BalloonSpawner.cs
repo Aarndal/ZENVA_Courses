@@ -10,6 +10,13 @@ namespace BalloonPopper
         private SOBalloonData balloonData;
         [SerializeField]
         private float spawnInterval = 2f;
+        
+        private bool _isSpawning = false;
+
+        private void Start()
+        {
+            _isSpawning = false;
+        }
 
         private void Update()
         {
@@ -19,9 +26,10 @@ namespace BalloonPopper
             if (BalloonPool.Instance.Balloons[balloonData.name].Count == 0)
                 return;
 
-            StartCoroutine(DelaySpawn());
+            if (_isSpawning)
+                return;
 
-            SpawnBalloon();
+            StartCoroutine(DelayedSpawn());
         }
 
         private void SpawnBalloon()
@@ -31,9 +39,15 @@ namespace BalloonPopper
                 balloon.transform.position = this.transform.position;
             }
         }
-        private IEnumerator DelaySpawn()
+        private IEnumerator DelayedSpawn()
         {
+            _isSpawning = true;
+
             yield return new WaitForSeconds(spawnInterval);
+
+            SpawnBalloon();
+
+            _isSpawning = false;
         }
     }
 }

@@ -30,6 +30,12 @@ namespace BalloonPopper
                 Destroy(this.gameObject);
             }
 
+            // Make sure the balloon pool is clean before instantiation.
+            if (Balloons.Count != 0)
+            {
+                Balloons.Clear();
+            }
+
             if (!InstanciatePool())
             {
                 Debug.LogErrorFormat("Failed to instantiate BalloonPool: {0} | ID: {1}",
@@ -117,8 +123,8 @@ namespace BalloonPopper
                         return false;
                     }
 
-                    newBalloon.name = $"{balloonType}_Pooled_{i}";
                     newBalloon.SetActive(false);
+                    newBalloon.name = $"{balloonType}_Pooled_{i}";
                     Balloons[balloonType].Enqueue(newBalloon);
                 }
 
