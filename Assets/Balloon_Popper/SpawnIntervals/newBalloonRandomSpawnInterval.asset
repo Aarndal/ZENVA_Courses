@@ -9,12 +9,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 33af3211911942345b8046df8345d1a2, type: 3}
-  m_Name: newBalloonFixedSpawnInterval
-  m_EditorClassIdentifier: Assembly-CSharp::SOBalloonFixedSpawnInterval
-  fixedIntervals:
-  - 2
-  - 5
-  - 2
-  - 3
-  - 4
+  m_Script: {fileID: 11500000, guid: 2536ac6ed82eb1a4381f826a9035e3da, type: 3}
+  m_Name: newBalloonRandomSpawnInterval
+  m_EditorClassIdentifier: Assembly-CSharp::SOBalloonRandomSpawnInterval
+  minInterval: 2
+  maxInterval: 5

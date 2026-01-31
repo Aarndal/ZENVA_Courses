@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bca2f6de3f85c3d4d9657ce0d02f23fe, type: 3}
+  m_Name: BlueBalloon
+  m_EditorClassIdentifier: Assembly-CSharp::BalloonPopper.BalloonData
+  material: {fileID: 2100000, guid: 175847d7ac4bcc44c8c1eaf8b456f761, type: 2}
+  prefab: {fileID: 5967428061742147401, guid: a9bfe28427824654998e68c2196c298a, type: 3}
+  clicksToPop: 10
+  initialScale: 0.5
+  scaleFactor: 0.1
+  scoreValue: 3
+  inflateSound: {fileID: 0}
+  popSound: {fileID: 0}
