@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace BalloonPopper
 {
-    public class Balloon : MonoBehaviour, IClickable, ISpawn
+    public class Balloon : MonoBehaviour, IClickable, ISpawnable
     {
         public static event Action<Balloon, SOBalloonData> BalloonPopped;
 
@@ -73,7 +73,7 @@ namespace BalloonPopper
 
         public void Despawn()
         {
-            BalloonPool.Instance.ReturnToPool(this);
+            BalloonPool.Instance.Return(this);
         }
 
         public void Spawn(Vector3 spawnPosition)
@@ -157,7 +157,7 @@ namespace BalloonPopper
 
             BalloonPopped?.Invoke(this, data);
 
-            BalloonPool.Instance.ReturnToPool(this);
+            BalloonPool.Instance.Return(this);
 
             _isPopping = false;
         }

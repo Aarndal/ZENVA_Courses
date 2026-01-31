@@ -14,7 +14,7 @@ namespace BalloonPopper
         private List<SOBalloonData> balloonsToGenerate = new();
 
 
-        public readonly Dictionary<string, Queue<GameObject>> Balloons = new();
+        public readonly Dictionary<string, Stack<Balloon>> Balloons = new();
 
 
         public static BalloonPool Instance { get; private set; }
@@ -57,21 +57,21 @@ namespace BalloonPopper
         }
 
 
-        public void ReturnToPool(Balloon balloon)
+        public void Return(Balloon balloon)
         {
             string balloonType = balloon.Data.name;
 
             // Ensure the balloon type exists in the pool.
             if (!Balloons.ContainsKey(balloonType))
             {
-                Balloons[balloonType] = new Queue<GameObject>();
+                Balloons[balloonType] = new ();
             }
 
-            // Deactivate and enqueue the balloon back into the pool.
+            // Deactivate and push the balloon back into the pool.
             if (balloon.gameObject.activeInHierarchy)
                 balloon.gameObject.SetActive(false);
 
-            Balloons[balloonType].Enqueue(balloon.gameObject);
+            Balloons[balloonType].Push(balloon);
 
             // Reparent the balloon to the pool and reset its position for organization.
             if (balloon.transform.parent != this.transform)
@@ -80,7 +80,7 @@ namespace BalloonPopper
             balloon.transform.localPosition = Vector3.zero;
         }
 
-        public bool TryRetrieveFromPool(SOBalloonData balloonData, out GameObject balloon)
+        public bool TryGet(SOBalloonData balloonData, out Balloon balloon)
         {
             balloon = null;
             string balloonType = balloonData.name;
@@ -103,9 +103,9 @@ namespace BalloonPopper
                 return false;
             }
 
-            // Dequeue a balloon from the pool and activate it.
-            balloon = Balloons[balloonType].Dequeue();
-            balloon.SetActive(true);
+            // Get a balloon from the pool and activate it.
+            balloon = Balloons[balloonType].Pop();
+            balloon.gameObject.SetActive(true);
             return true;
         }
 
@@ -117,26 +117,26 @@ namespace BalloonPopper
                 //! Balloon type is defined by the name of the BalloonData scriptable object.
                 string balloonType = balloonData.name;
 
-                Balloons[balloonType] = new Queue<GameObject>();
+                Balloons[balloonType] = new ();
 
                 for (int i = 0; i < initialPoolSizePerType; i++)
                 {
                     // Create a new balloon using the factory.
-                    if (!factory.TryCreate(balloonData, out GameObject newBalloonObject))
+                    if (!factory.TryCreate(balloonData, out Balloon newBalloon))
                     {
                         break;
                     }
 
                     // Make sure the balloon is inactive when added to the pool.
-                    newBalloonObject.SetActive(false);
+                    newBalloon.gameObject.SetActive(false);
 
                     // Name and parent the balloon for organization.
-                    newBalloonObject.name = $"{balloonType}_Pooled_{i}";
-                    newBalloonObject.transform.SetParent(this.transform);
-                    newBalloonObject.transform.localPosition = Vector3.zero;
+                    newBalloon.name = $"{balloonType}_Pooled_{i}";
+                    newBalloon.transform.SetParent(this.transform);
+                    newBalloon.transform.localPosition = Vector3.zero;
 
                     // Enqueue the new balloon into the pool.
-                    Balloons[balloonType].Enqueue(newBalloonObject);
+                    Balloons[balloonType].Push(newBalloon);
                 }
             }
 

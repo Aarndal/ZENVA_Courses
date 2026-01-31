@@ -35,9 +35,9 @@ namespace BalloonPopper
 
         private UniTask SpawnBalloon()
         {
-            if (BalloonPool.Instance.TryRetrieveFromPool(instructions.Data, out GameObject balloon))
+            if (BalloonPool.Instance.TryGet(instructions.Data, out Balloon balloon))
             {
-                balloon.GetComponent<Balloon>().Spawn(this.transform.position);
+                balloon.Spawn(this.transform.position);
             }
             return UniTask.CompletedTask;
         }

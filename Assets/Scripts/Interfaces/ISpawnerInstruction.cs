@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public interface ISpawnerInstruction<T> where T : ScriptableObject
+public interface ISpawnerInstruction<T>
 {
     T Data { get; }
     int Amount { get; }
