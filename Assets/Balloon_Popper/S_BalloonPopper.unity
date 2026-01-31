@@ -396,7 +396,7 @@ PrefabInstance:
     - target: {fileID: 6059549604894736199, guid: f8c36e86ef8b2f745bea8361b1089d30, type: 3}
       propertyPath: instructions
       value: 
-      objectReference: {fileID: 11400000, guid: 29337ba99b47be14bb2a6de3fdee21d6, type: 2}
+      objectReference: {fileID: 11400000, guid: dee3aba559f2ff149aafa7e449ba8c8c, type: 2}
     - target: {fileID: 8096049015483223616, guid: f8c36e86ef8b2f745bea8361b1089d30, type: 3}
       propertyPath: m_LocalPosition.x
       value: -5
@@ -511,7 +511,7 @@ PrefabInstance:
     - target: {fileID: 6059549604894736199, guid: f8c36e86ef8b2f745bea8361b1089d30, type: 3}
       propertyPath: instructions
       value: 
-      objectReference: {fileID: 11400000, guid: a965d722a79e91640b95d76e59fb833e, type: 2}
+      objectReference: {fileID: 11400000, guid: 4814802ec8f56e8479e20f8ed924e53f, type: 2}
     - target: {fileID: 8096049015483223616, guid: f8c36e86ef8b2f745bea8361b1089d30, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -577,7 +577,7 @@ PrefabInstance:
     - target: {fileID: 6059549604894736199, guid: f8c36e86ef8b2f745bea8361b1089d30, type: 3}
       propertyPath: instructions
       value: 
-      objectReference: {fileID: 11400000, guid: 29337ba99b47be14bb2a6de3fdee21d6, type: 2}
+      objectReference: {fileID: 11400000, guid: dee3aba559f2ff149aafa7e449ba8c8c, type: 2}
     - target: {fileID: 8096049015483223616, guid: f8c36e86ef8b2f745bea8361b1089d30, type: 3}
       propertyPath: m_LocalPosition.x
       value: 2
@@ -881,8 +881,8 @@ Camera:
   m_GameObject: {fileID: 1241748226}
   m_Enabled: 1
   serializedVersion: 2
-  m_ClearFlags: 1
-  m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
+  m_ClearFlags: 2
+  m_BackGroundColor: {r: 0.19215688, g: 0.41380975, b: 0.4745098, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
@@ -1029,7 +1029,7 @@ PrefabInstance:
     - target: {fileID: 6059549604894736199, guid: f8c36e86ef8b2f745bea8361b1089d30, type: 3}
       propertyPath: instructions
       value: 
-      objectReference: {fileID: 11400000, guid: a965d722a79e91640b95d76e59fb833e, type: 2}
+      objectReference: {fileID: 11400000, guid: 4814802ec8f56e8479e20f8ed924e53f, type: 2}
     - target: {fileID: 8096049015483223616, guid: f8c36e86ef8b2f745bea8361b1089d30, type: 3}
       propertyPath: m_LocalPosition.x
       value: -2
@@ -1095,7 +1095,7 @@ PrefabInstance:
     - target: {fileID: 6059549604894736199, guid: f8c36e86ef8b2f745bea8361b1089d30, type: 3}
       propertyPath: instructions
       value: 
-      objectReference: {fileID: 11400000, guid: a965d722a79e91640b95d76e59fb833e, type: 2}
+      objectReference: {fileID: 11400000, guid: 4814802ec8f56e8479e20f8ed924e53f, type: 2}
     - target: {fileID: 8096049015483223616, guid: f8c36e86ef8b2f745bea8361b1089d30, type: 3}
       propertyPath: m_LocalPosition.x
       value: 5
@@ -1319,7 +1319,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 2128264591}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2ed4b4fdb535b1c4aa6c4e7ea02dab51, type: 3}
+  m_Script: {fileID: 11500000, guid: a0aeee350e08c1a4f8a4f674a9890235, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ScoreDisplay
   scoreManager: {fileID: 542079084}

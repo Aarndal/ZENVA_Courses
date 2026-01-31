@@ -1,7 +1,7 @@
 ﻿
-public interface ISpawner<T>
+public interface ISpawner<T> where T : IDataProvider
 {
-    void Configure(ISpawnerInstruction<T> instructions);
+    void Configure(ISpawnInstruction<T> instructions);
     void StartSpawning();
     void StopSpawning();
 }
