@@ -2,17 +2,17 @@
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "newBalloonSpawnerInstructions", menuName = "BalloonPopper/SpawnerInstructions", order = 3)]
-public class SOBalloonSpawnerInstructions : ScriptableObject, ISpawnerInstruction<SOBalloonData>
+public class SOBalloonSpawnerInstructions : ScriptableObject, ISpawnerInstruction<BalloonDataSO>
 {
     [SerializeField]
-    private SOBalloonData data = null;
+    private BalloonDataSO data = null;
     [SerializeField]
     private int amount = 0;
     [SerializeField]
-    private SOBalloonSpawnInterval spawnInterval = null;
+    private SpawnIntervalSO spawnInterval = null;
 
 
-    public SOBalloonData Data => data;
+    public BalloonDataSO Data => data;
     public int Amount => amount;
     public ISpawnInterval SpawnInterval => spawnInterval;
 }

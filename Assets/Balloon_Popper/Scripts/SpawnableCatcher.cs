@@ -3,7 +3,7 @@ using UnityEngine;
 namespace BalloonPopper
 {
     // Catches balloons that have not been popped and returns them to the BalloonPool.
-    public class BalloonCatcher : MonoBehaviour
+    public class SpawnableCatcher : MonoBehaviour
     {
         [SerializeField]
         private bool logCaughtBalloonsInEditor = false;
@@ -11,24 +11,26 @@ namespace BalloonPopper
 
         private void OnCollisionEnter(Collision collision)
         {
-            if (!TryGetCaughtBalloon(collision, out var caughtBalloon))
+            if (!TryGetSpawnable(collision, out var caughtBalloon))
                 return;
 
 #if UNITY_EDITOR
             if (logCaughtBalloonsInEditor)
             {
-                Debug.LogFormat("Balloon entered BalloonCatcher: {0} | ID: {1}",
-                        caughtBalloon.gameObject.name,
-                        caughtBalloon.gameObject.GetEntityId());
+                Debug.LogFormat("Spawnable entered Catcher: {0}",
+                        caughtBalloon.GetType().Name);
             }
 #endif
             caughtBalloon.Despawn();
         }
 
 
-        private bool TryGetCaughtBalloon(Collision collision, out Balloon caughtBalloon)
+        private bool TryGetSpawnable(Collision collision, out ISpawnable caughtBalloon)
         {
-            caughtBalloon = collision.gameObject.GetComponentInParent<Balloon>(true);
+            if (!collision.transform.parent.TryGetComponent(out caughtBalloon))
+            {
+                caughtBalloon = collision.gameObject.GetComponentInParent<ISpawnable>(true);
+            }
             return caughtBalloon != null;
         }
     }

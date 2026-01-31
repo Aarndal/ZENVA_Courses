@@ -67,7 +67,7 @@ GameObject:
   - component: {fileID: 1237476385562170359}
   - component: {fileID: 3660444596000964375}
   m_Layer: 10
-  m_Name: Balloon
+  m_Name: Prefab_Balloon
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

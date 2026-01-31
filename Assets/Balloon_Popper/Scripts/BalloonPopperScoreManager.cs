@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace BalloonPopper
 {
-    public sealed class BalloonPopperScoreManager : ScoreManager<SOBalloonData>
+    public sealed class BalloonPopperScoreManager : ScoreManager<BalloonDataSO>
     {
         public override event Action<int> ScoreUpdated
         {
@@ -21,7 +21,7 @@ namespace BalloonPopper
             Balloon.BalloonPopped -= OnBalloonPopped;
         }
 
-        void OnBalloonPopped(Balloon balloon, SOBalloonData balloonData)
+        void OnBalloonPopped(Balloon balloon, BalloonDataSO balloonData)
         {
             if (balloon == null || balloonData == null)
                 return;
@@ -29,7 +29,7 @@ namespace BalloonPopper
             IncreaseScore(balloonData);
         }
 
-        protected override void IncreaseScore(SOBalloonData data)
+        protected override void IncreaseScore(BalloonDataSO data)
         {
             _currentScore += data.ScoreValue;
             Debug.Log("Score: " + _currentScore);

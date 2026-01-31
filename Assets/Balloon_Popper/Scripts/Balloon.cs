@@ -1,26 +1,23 @@
+using Cysharp.Threading.Tasks;
 using System;
-using System.Collections;
 using UnityEngine;
 
 namespace BalloonPopper
 {
     public class Balloon : MonoBehaviour, IClickable, ISpawnable
     {
-        public static event Action<Balloon, SOBalloonData> BalloonPopped;
-
-
-        [SerializeField]
-        private SOBalloonData data;
-
+        public static event Action<Balloon, BalloonDataSO> BalloonPopped;
 
         private int _counter = 0;
         private bool _isInitialized = false;
         private bool _isPopping = false;
 
+        private BalloonDataSO _data;
         private Renderer _renderer;
 
 
-        public SOBalloonData Data => data;
+        public BalloonDataSO Data => _data;
+        public IObjectPool Pool { get; private set; }
 
 
         private void Awake()
@@ -30,25 +27,21 @@ namespace BalloonPopper
 
             if (_renderer == null)
             {
-                Debug.LogErrorFormat("Renderer component not found on Balloon: {0} | ID: {1}",
+                Debug.LogErrorFormat("Renderer component not found on Spawnable: {0} | ID: {1}",
                     this.gameObject.name,
                     this.gameObject.GetEntityId());
-            }
-
-            // Auto-initialize if data is already assigned
-            if (data != null && !_isInitialized)
-            {
-                TryInitialize(data);
             }
         }
 
         private void OnDestroy()
         {
             _counter = 0;
+            _isInitialized = false;
+            _isPopping = false;
         }
 
 
-        public void OnClick()
+        public async void OnClick()
         {
             // Check if the balloon is active and initialized
             if (this.gameObject.activeInHierarchy && _isInitialized)
@@ -59,21 +52,18 @@ namespace BalloonPopper
 
                 _counter--;
 
-                this.transform.localScale += Vector3.one * data.ScaleFactor;
+                this.transform.localScale += Vector3.one * _data.ScaleFactor;
 
                 // Check if the balloon should start popping
                 if (_counter <= 0)
-                {
-                    _isPopping = true;
-                    StartCoroutine(PopBalloon());
-                }
+                    await PopBalloon();
             }
         }
 
 
         public void Despawn()
         {
-            BalloonPool.Instance.Return(this);
+            Pool.TryReturn(this);
         }
 
         public void Spawn(Vector3 spawnPosition)
@@ -84,17 +74,17 @@ namespace BalloonPopper
                 Despawn();
                 return;
             }
-            
+
             this.transform.position = spawnPosition;
 
             // Reset scale to initial value
-            if (data != null && _isInitialized)
+            if (_data != null && _isInitialized)
             {
-                this.transform.localScale = Vector3.one * data.InitialScale;
+                this.transform.localScale = Vector3.one * _data.InitialScale;
             }
         }
-        
-        public bool TryInitialize(SOBalloonData balloonData)
+
+        public bool TryInitialize(BalloonDataSO balloonData)
         {
             // Don't allow re-initialization
             if (_isInitialized)
@@ -121,9 +111,9 @@ namespace BalloonPopper
                 return false;
             }
 
-            data = balloonData;
-            _renderer.material = data.Material;
-            this.transform.localScale = Vector3.one * data.InitialScale;
+            _data = balloonData;
+            _renderer.material = _data.Material;
+            this.transform.localScale = Vector3.one * _data.InitialScale;
             _isInitialized = true;
 
             //Debug.LogFormat("Balloon initialized successfully: {0} | ID: {1}",
@@ -134,8 +124,10 @@ namespace BalloonPopper
         }
 
 
-        private IEnumerator PopBalloon()
+        private async UniTask PopBalloon()
         {
+            _isPopping = true;
+
             // Compute the target scale
             Vector3 popScale = this.transform.localScale * 1.25f;
 
@@ -149,22 +141,24 @@ namespace BalloonPopper
             while (Vector3.SqrMagnitude(this.transform.localScale - popScale) > sqrEpsilon)
             {
                 this.transform.localScale = Vector3.MoveTowards(this.transform.localScale, popScale, scaleSpeed * Time.deltaTime);
-                yield return null;
+                await UniTask.Yield();
             }
 
             // Snap exactly to the target to avoid tiny residual differences
             this.transform.localScale = popScale;
 
-            BalloonPopped?.Invoke(this, data);
+            BalloonPopped?.Invoke(this, _data);
 
-            BalloonPool.Instance.Return(this);
+            BalloonPool.Instance.TryReturn(this);
 
             _isPopping = false;
+
+            await UniTask.CompletedTask;
         }
 
         private bool TryResetCounter()
         {
-            if (data.ClicksToPop <= 0)
+            if (_data.ClicksToPop <= 0)
             {
                 Debug.LogErrorFormat("Data has invalid ClicksToPop value in Balloon script: {0} | ID: {1}",
                     this.gameObject.name,
@@ -173,13 +167,34 @@ namespace BalloonPopper
                 return false;
             }
 
-            if (_counter != data.ClicksToPop)
+            if (_counter != _data.ClicksToPop)
             {
-                _counter = data.ClicksToPop;
+                _counter = _data.ClicksToPop;
             }
 
             return true;
         }
-        
+
+        public bool TryAssignPool(IObjectPool pool)
+        {
+            if (pool == null)
+            {
+                Debug.LogErrorFormat("Cannot assign null pool to Balloon: {0} | ID: {1}",
+                    this.gameObject.name,
+                    this.gameObject.GetEntityId());
+                return false;
+            }
+
+            if (pool is not IObjectPool<Balloon, BalloonDataSO>)
+            {
+                Debug.LogErrorFormat("Assigned pool is of incorrect type for Balloon: {0} | ID: {1}",
+                    this.gameObject.name,
+                    this.gameObject.GetEntityId());
+                return false;
+            }
+
+            Pool = pool;
+            return true;
+        }
     }
 }

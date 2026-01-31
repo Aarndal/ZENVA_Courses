@@ -2,7 +2,7 @@
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "newBalloonFixedSpawnInterval", menuName = "BalloonPopper/FixedSpawnInterval", order = 1)]
-public class SOBalloonFixedSpawnInterval : SOBalloonSpawnInterval, IFixedSpawnInterval
+public class FixedSpawnIntervalSO : SpawnIntervalSO, IFixedSpawnInterval
 {
     private const float DEFAULT_INTERVAL = 1f;
 

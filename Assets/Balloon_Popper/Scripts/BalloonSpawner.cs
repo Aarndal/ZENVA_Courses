@@ -32,16 +32,6 @@ namespace BalloonPopper
             await DelayedSpawn();
         }
 
-
-        private UniTask SpawnBalloon()
-        {
-            if (BalloonPool.Instance.TryGet(instructions.Data, out Balloon balloon))
-            {
-                balloon.Spawn(this.transform.position);
-            }
-            return UniTask.CompletedTask;
-        }
-
         private async UniTask DelayedSpawn()
         {
             _isSpawning = true;
@@ -51,6 +41,17 @@ namespace BalloonPopper
             await SpawnBalloon();
 
             _isSpawning = false;
+
+            await UniTask.CompletedTask;
+        }
+
+        private async UniTask SpawnBalloon()
+        {
+            if (BalloonPool.Instance.TryGet(instructions.Data, out Balloon balloon))
+            {
+                balloon.Spawn(this.transform.position);
+            }
+            await UniTask.CompletedTask;
         }
     }
 }

@@ -4,14 +4,14 @@ using UnityEngine;
 namespace BalloonPopper
 {
     // Manages a pool of balloon objects for efficient reuse.
-    public class BalloonPool : MonoBehaviour
+    public class BalloonPool : MonoBehaviour, IObjectPool<Balloon, BalloonDataSO>
     {
         [SerializeField]
         private BalloonFactory factory = null;
         [SerializeField]
         private int initialPoolSizePerType = 10;
         [SerializeField]
-        private List<SOBalloonData> balloonsToGenerate = new();
+        private List<BalloonDataSO> balloonsToGenerate = new();
 
 
         public readonly Dictionary<string, Stack<Balloon>> Balloons = new();
@@ -20,6 +20,7 @@ namespace BalloonPopper
         public static BalloonPool Instance { get; private set; }
 
 
+        #region Unity
         private void Awake()
         {
             // Ensure only one instance of BalloonPool exists.
@@ -50,21 +51,42 @@ namespace BalloonPopper
             // Instantiate the balloon pool.
             if (!TryInstantiatePool())
             {
-                Debug.LogErrorFormat("Failed to instantiate BalloonPool: {0} | ID: {1}",
+                Debug.LogErrorFormat("Failed to instantiate Pool: {0} | ID: {1}",
                     this.gameObject.name,
                     this.gameObject.GetEntityId());
             }
         }
+        #endregion
 
 
-        public void Return(Balloon balloon)
+        #region Public Methods
+        public bool TryReturn<T>(T obj) where T : class
+        {
+            if (obj is Balloon balloon)
+            {
+                return TryReturn(balloon);
+            }
+
+            Debug.LogErrorFormat("Invalid object type ({0}) returned to Pool: {1} | ID: {2}",
+                obj.GetType().Name,
+                this.gameObject.name,
+                this.gameObject.GetEntityId());
+
+            return false;
+        }
+
+        public bool TryReturn(Balloon balloon)
         {
             string balloonType = balloon.Data.name;
 
             // Ensure the balloon type exists in the pool.
             if (!Balloons.ContainsKey(balloonType))
             {
-                Balloons[balloonType] = new ();
+                Debug.LogErrorFormat("Balloon type ({0}) not found in Pool: {1} | ID: {2}",
+                    balloonType,
+                    this.gameObject.name,
+                    this.gameObject.GetEntityId());
+                return false;
             }
 
             // Deactivate and push the balloon back into the pool.
@@ -78,9 +100,11 @@ namespace BalloonPopper
                 balloon.transform.SetParent(this.transform);
 
             balloon.transform.localPosition = Vector3.zero;
+
+            return true;
         }
 
-        public bool TryGet(SOBalloonData balloonData, out Balloon balloon)
+        public bool TryGet(BalloonDataSO balloonData, out Balloon balloon)
         {
             balloon = null;
             string balloonType = balloonData.name;
@@ -88,8 +112,9 @@ namespace BalloonPopper
             // Check if the balloon type exists in the pool.
             if (!Balloons.ContainsKey(balloonType))
             {
-                Debug.LogErrorFormat("Balloon type not found in Balloon Pool: {0} | ID: {1}",
+                Debug.LogErrorFormat("Balloon type ({0}) not found in Pool: {1} | ID: {2}",
                     balloonType,
+                    this.gameObject.name,
                     this.gameObject.GetEntityId());
                 return false;
             }
@@ -97,8 +122,9 @@ namespace BalloonPopper
             // Check if the balloon type has available balloons.
             if (Balloons[balloonType].Count == 0)
             {
-                Debug.LogWarningFormat("No available balloons of type: {0} | ID: {1}",
+                Debug.LogWarningFormat("No available balloons of type ({0}) in Pool: {1} | ID: {2}",
                     balloonType,
+                    this.gameObject.name,
                     this.gameObject.GetEntityId());
                 return false;
             }
@@ -108,8 +134,10 @@ namespace BalloonPopper
             balloon.gameObject.SetActive(true);
             return true;
         }
+        #endregion
 
 
+        #region Private Methods
         private bool TryInstantiatePool()
         {
             foreach (var balloonData in balloonsToGenerate)
@@ -117,21 +145,33 @@ namespace BalloonPopper
                 //! Balloon type is defined by the name of the BalloonData scriptable object.
                 string balloonType = balloonData.name;
 
-                Balloons[balloonType] = new ();
+                Balloons[balloonType] = new();
 
                 for (int i = 0; i < initialPoolSizePerType; i++)
                 {
                     // Create a new balloon using the factory.
                     if (!factory.TryCreate(balloonData, out Balloon newBalloon))
                     {
+                        Debug.LogErrorFormat("Failed to create Spawnable: {0} | ID: {1}\nfor Pool: {2} | ID: {3}",
+                            balloonData.name,
+                            balloonData.GetEntityId(),
+                            this.gameObject.name,
+                            this.gameObject.GetEntityId());
                         break;
+                    }
+
+                    if (!newBalloon.TryAssignPool(this))
+                    {
+                        Debug.LogErrorFormat("Failed to assign Pool to Spawnable (): {0} | ID: {1}",
+                            newBalloon.gameObject.name,
+                            newBalloon.gameObject.GetEntityId());
                     }
 
                     // Make sure the balloon is inactive when added to the pool.
                     newBalloon.gameObject.SetActive(false);
 
                     // Name and parent the balloon for organization.
-                    newBalloon.name = $"{balloonType}_Pooled_{i}";
+                    newBalloon.name = $"{balloonType}_{this.gameObject.name}_{i}";
                     newBalloon.transform.SetParent(this.transform);
                     newBalloon.transform.localPosition = Vector3.zero;
 
@@ -143,5 +183,6 @@ namespace BalloonPopper
             // Return true if all balloon types were instantiated.
             return Balloons.Count == balloonsToGenerate.Count;
         }
+        #endregion
     }
 }

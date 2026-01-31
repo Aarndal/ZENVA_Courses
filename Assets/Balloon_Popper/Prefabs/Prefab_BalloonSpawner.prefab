@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 8096049015483223616}
   - component: {fileID: 6059549604894736199}
   m_Layer: 2
-  m_Name: BalloonSpawner
+  m_Name: Prefab_BalloonSpawner
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -26,7 +26,7 @@ Transform:
   m_GameObject: {fileID: 2554803838148388640}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 2.5, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -44,3 +44,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7ed66b8e1ed5e6a44a8a97aaa170e439, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BalloonSpawner
+  instructions: {fileID: 0}

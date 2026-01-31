@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 
 [CreateAssetMenu(fileName = "newBalloonRandomSpawnInterval", menuName = "BalloonPopper/RandomSpawnInterval", order = 2)]
-public class SOBalloonRandomSpawnInterval : SOBalloonSpawnInterval, IRandomSpawnInterval
+public class RandomSpawnIntervalSO : SpawnIntervalSO, IRandomSpawnInterval
 {
     [SerializeField]
     private float minInterval = 0f;
