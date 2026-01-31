@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Unity.RenderPipelines.Universal.Runtime::UnityEngine.Rendering.Universal.ChannelMixer
   active: 1
   redOutRedIn:
-    m_OverrideState: 0
+    m_OverrideState: 1
     m_Value: 100
   redOutGreenIn:
     m_OverrideState: 0
@@ -67,7 +67,7 @@ MonoBehaviour:
     m_Value: 0
   saturation:
     m_OverrideState: 1
-    m_Value: 14
+    m_Value: 30
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -104,8 +104,8 @@ MonoBehaviour:
     m_OverrideState: 0
     m_Value: {x: 1, y: 1, z: 1, w: 0}
   highlights:
-    m_OverrideState: 0
-    m_Value: {x: 1, y: 1, z: 1, w: 0}
+    m_OverrideState: 1
+    m_Value: {x: 0.9823257, y: 1, z: 0.94836354, w: 0.21653548}
   shadowsStart:
     m_OverrideState: 0
     m_Value: 0

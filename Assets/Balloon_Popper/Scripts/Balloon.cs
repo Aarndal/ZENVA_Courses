@@ -17,6 +17,7 @@ namespace BalloonPopper
 
 
         public BalloonDataSO Data => _data;
+        public string Name => this.gameObject.name;
         public IObjectPool Pool { get; private set; }
 
 

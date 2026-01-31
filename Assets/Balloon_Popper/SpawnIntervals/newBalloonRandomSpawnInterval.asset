@@ -12,5 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2536ac6ed82eb1a4381f826a9035e3da, type: 3}
   m_Name: newBalloonRandomSpawnInterval
   m_EditorClassIdentifier: Assembly-CSharp::SOBalloonRandomSpawnInterval
-  minInterval: 2
-  maxInterval: 5
+  minInterval: 1
+  maxInterval: 2

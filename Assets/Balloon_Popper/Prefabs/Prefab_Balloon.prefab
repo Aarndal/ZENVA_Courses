@@ -103,7 +103,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 27e6de0d13c3f664ba70d7e1b2828932, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Balloon
-  balloonData: {fileID: 11400000, guid: 09919b817a0b5664d807cb1262fb012f, type: 2}
 --- !u!114 &3660444596000964375
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -116,7 +115,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1f6add6990e2acb499aaf8060d14e5dc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BalloonMovement
-  floatSpeed: 0.5
+  verticalFloatSpeed: 1
   horizontalFloatAmplitude: 0.2
   horizontalFloatFrequenze: 2
 --- !u!1 &5996557633432035572

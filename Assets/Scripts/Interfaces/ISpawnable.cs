@@ -2,6 +2,7 @@
 
 public interface ISpawnable
 {
+    string Name { get; }
     IObjectPool Pool { get; }
 
     void Spawn(Vector3 spawnPosition);
