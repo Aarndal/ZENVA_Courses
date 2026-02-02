@@ -9,14 +9,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e5aaa1a967667bc45a9fc439102d88ea, type: 3}
+  m_Script: {fileID: 11500000, guid: 486b9b6678218484d8a11756cf7ac597, type: 3}
   m_Name: BlueBalloon
   m_EditorClassIdentifier: Assembly-CSharp::BalloonPopper.BalloonData
   material: {fileID: 2100000, guid: 175847d7ac4bcc44c8c1eaf8b456f761, type: 2}
   prefab: {fileID: 5967428061742147401, guid: a9bfe28427824654998e68c2196c298a, type: 3}
   clicksToPop: 5
-  initialScale: 0.25
-  scaleFactor: 0.25
+  initialScale: 0.2
+  scaleFactor: 0.2
   scoreValue: 3
   inflateSound: {fileID: 0}
   popSound: {fileID: 0}

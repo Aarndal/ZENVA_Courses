@@ -4,20 +4,20 @@ using UnityEngine;
 namespace BalloonPopper
 {
     // Manages a pool of balloon objects for efficient reuse.
-    public class BalloonPool : MonoBehaviour, IObjectPool<Balloon, BalloonDataProviderSO>
+    public class SpawnablePool : MonoBehaviour, IObjectPool<ISpawnable, SpawnableDataProviderSO>
     {
         [SerializeField]
-        private BalloonFactory factory = null;
+        private IFactory<ISpawnable, SpawnableDataProviderSO> factory = null;
         [SerializeField]
         private int initialPoolSizePerType = 10;
         [SerializeField]
-        private List<BalloonDataProviderSO> balloonsToGenerate = new();
+        private List<SpawnableDataProviderSO> spawnableDataProviders = new();
 
 
-        public readonly Dictionary<string, Stack<Balloon>> Balloons = new();
+        public readonly Dictionary<string, Stack<ISpawnable>> Spawnables = new();
 
 
-        public static BalloonPool Instance { get; private set; }
+        public static SpawnablePool Instance { get; private set; }
 
 
         #region Unity
@@ -33,7 +33,7 @@ namespace BalloonPopper
                 Destroy(this.gameObject);
             }
 
-            factory = factory == null ? this.GetComponentInParent<BalloonFactory>() : factory;
+            factory ??= this.GetComponentInChildren<IFactory<ISpawnable, SpawnableDataProviderSO>>();
 
             if (factory == null)
             {
@@ -43,9 +43,9 @@ namespace BalloonPopper
             }
 
             // Make sure the balloon pool is clean before instantiation.
-            if (Balloons.Count != 0)
+            if (Spawnables.Count != 0)
             {
-                Balloons.Clear();
+                Spawnables.Clear();
             }
 
             // Instantiate the balloon pool.
@@ -62,9 +62,9 @@ namespace BalloonPopper
         #region Public Methods
         public bool TryReturn<T>(T obj) where T : class
         {
-            if (obj is Balloon balloon)
+            if (obj is ISpawnable spawnable)
             {
-                return TryReturn(balloon);
+                return TryReturn(spawnable);
             }
 
             Debug.LogErrorFormat("Invalid object type ({0}) returned to Pool: {1} | ID: {2}",
@@ -75,63 +75,63 @@ namespace BalloonPopper
             return false;
         }
 
-        public bool TryReturn(Balloon balloon)
+        public bool TryReturn(ISpawnable spawnable)
         {
-            string balloonType = balloon.Data.name;
+            string spawnableType = spawnable.TypeName;
 
             // Ensure the balloon type exists in the pool.
-            if (!Balloons.ContainsKey(balloonType))
+            if (!Spawnables.ContainsKey(spawnableType))
             {
                 Debug.LogErrorFormat("Balloon type ({0}) not found in Pool: {1} | ID: {2}",
-                    balloonType,
+                    spawnableType,
                     this.gameObject.name,
                     this.gameObject.GetEntityId());
                 return false;
             }
 
             // Deactivate and push the balloon back into the pool.
-            if (balloon.gameObject.activeInHierarchy)
-                balloon.gameObject.SetActive(false);
+            if (spawnable.GameObject.activeInHierarchy)
+                spawnable.GameObject.SetActive(false);
 
-            Balloons[balloonType].Push(balloon);
+            Spawnables[spawnableType].Push(spawnable);
 
             // Reparent the balloon to the pool and reset its position for organization.
-            if (balloon.transform.parent != this.transform)
-                balloon.transform.SetParent(this.transform);
+            if (spawnable.GameObject.transform.parent != this.transform)
+                spawnable.GameObject.transform.SetParent(this.transform);
 
-            balloon.transform.localPosition = Vector3.zero;
+            spawnable.GameObject.transform.localPosition = Vector3.zero;
 
             return true;
         }
 
-        public bool TryGet(BalloonDataProviderSO balloonData, out Balloon balloon)
+        public bool TryGet(SpawnableDataProviderSO spawnableData, out ISpawnable spawnable)
         {
-            balloon = null;
-            string balloonType = balloonData.name;
+            spawnable = null;
+            string spawnableType = spawnableData.Name;
 
             // Check if the balloon type exists in the pool.
-            if (!Balloons.ContainsKey(balloonType))
+            if (!Spawnables.ContainsKey(spawnableType))
             {
                 Debug.LogErrorFormat("Balloon type ({0}) not found in Pool: {1} | ID: {2}",
-                    balloonType,
+                    spawnableType,
                     this.gameObject.name,
                     this.gameObject.GetEntityId());
                 return false;
             }
 
             // Check if the balloon type has available balloons.
-            if (Balloons[balloonType].Count == 0)
+            if (Spawnables[spawnableType].Count == 0)
             {
                 Debug.LogWarningFormat("No available balloons of type ({0}) in Pool: {1} | ID: {2}",
-                    balloonType,
+                    spawnableType,
                     this.gameObject.name,
                     this.gameObject.GetEntityId());
                 return false;
             }
 
             // Get a balloon from the pool and activate it.
-            balloon = Balloons[balloonType].Pop();
-            balloon.gameObject.SetActive(true);
+            spawnable = Spawnables[spawnableType].Pop();
+            spawnable.GameObject.SetActive(true);
             return true;
         }
         #endregion
@@ -140,48 +140,48 @@ namespace BalloonPopper
         #region Private Methods
         private bool TryInstantiatePool()
         {
-            foreach (var balloonData in balloonsToGenerate)
+            foreach (var spawnableData in spawnableDataProviders)
             {
                 //! Balloon type is defined by the name of the BalloonData scriptable object.
-                string balloonType = balloonData.name;
+                string spawnableType = spawnableData.Name;
 
-                Balloons[balloonType] = new();
+                Spawnables[spawnableType] = new();
 
                 for (int i = 0; i < initialPoolSizePerType; i++)
                 {
                     // Create a new balloon using the factory.
-                    if (!factory.TryCreate(balloonData, out Balloon newBalloon))
+                    if (!factory.TryCreate(spawnableData, out ISpawnable newSpawnable))
                     {
                         Debug.LogErrorFormat("Failed to create Spawnable: {0} | ID: {1}\nfor Pool: {2} | ID: {3}",
-                            balloonData.name,
-                            balloonData.GetEntityId(),
+                            spawnableData.name,
+                            spawnableData.GetEntityId(),
                             this.gameObject.name,
                             this.gameObject.GetEntityId());
                         break;
                     }
 
-                    if (!newBalloon.TryAssignPool(this))
+                    if (!newSpawnable.TryAssignPool(this))
                     {
                         Debug.LogErrorFormat("Failed to assign Pool to Spawnable (): {0} | ID: {1}",
-                            newBalloon.gameObject.name,
-                            newBalloon.gameObject.GetEntityId());
+                            newSpawnable.GameObject.name,
+                            newSpawnable.GameObject.GetEntityId());
                     }
 
                     // Make sure the balloon is inactive when added to the pool.
-                    newBalloon.gameObject.SetActive(false);
+                    newSpawnable.GameObject.SetActive(false);
 
                     // Name and parent the balloon for organization.
-                    newBalloon.name = $"{balloonType}_{this.gameObject.name}_{i}";
-                    newBalloon.transform.SetParent(this.transform);
-                    newBalloon.transform.localPosition = Vector3.zero;
+                    newSpawnable.GameObject.name = $"{spawnableType}_{this.gameObject.name}_{i}";
+                    newSpawnable.GameObject.transform.SetParent(this.transform);
+                    newSpawnable.GameObject.transform.localPosition = Vector3.zero;
 
                     // Enqueue the new balloon into the pool.
-                    Balloons[balloonType].Push(newBalloon);
+                    Spawnables[spawnableType].Push(newSpawnable);
                 }
             }
 
             // Return true if all balloon types were instantiated.
-            return Balloons.Count == balloonsToGenerate.Count;
+            return Spawnables.Count == spawnableDataProviders.Count;
         }
         #endregion
     }

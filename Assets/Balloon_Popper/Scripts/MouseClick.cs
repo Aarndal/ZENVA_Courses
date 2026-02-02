@@ -17,7 +17,7 @@ public class MouseClick : MonoBehaviour
             Vector3 currentCoordinates = Mouse.current.position.ReadValue();
             if (Physics.Raycast(gameCamera.ScreenPointToRay(currentCoordinates), out RaycastHit hit))
             {
-                hit.collider.GetComponentInParent<IClickable>()?.OnClick();
+                hit.collider.GetComponentInParent<IClickable>()?.Click();
             }
         };
         _click = new InputAction(binding: "<Mouse>/leftButton");

@@ -2,11 +2,14 @@
 
 public interface ISpawnable
 {
-    string Name { get; }
+    string TypeName { get; }
+    GameObject GameObject { get; }
     IObjectPool Pool { get; }
 
     void Spawn(Vector3 spawnPosition);
     void Despawn();
 
     bool TryAssignPool(IObjectPool pool);
+
+    bool TryInitialize(IDataProvider<ISpawnable> data);
 }

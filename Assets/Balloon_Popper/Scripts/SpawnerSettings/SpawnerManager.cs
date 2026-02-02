@@ -8,10 +8,10 @@ namespace BalloonPopper
     public class SpawnerManager : MonoBehaviour
     {
         [SerializeField]
-        private BalloonSpawner[] spawners;
+        private Spawner[] spawners;
 
         [SerializeField]
-        private SpawnerSettingsSO<BalloonDataProviderSO> spawnerSettings;
+        private SpawnerSettingsSO<SpawnableDataProviderSO> spawnerSettings;
 
         private void Awake()
         {
@@ -25,7 +25,7 @@ namespace BalloonPopper
                 Debug.LogError("Failed to configure spawners.");
             }
         }
-        void AddSpawner(int value)
+        private void AddSpawner(int value)
         {
             throw new NotImplementedException();
         }
@@ -34,14 +34,14 @@ namespace BalloonPopper
         {
             for (int i = 0; i < spawnerSettings.NumberOfSpawners; i++)
             {
-                if(!spawnerSettings.SpawnerSettings.TryGetValue(i, out List<SpawnInstructionSO<BalloonDataProviderSO>> instructions))
+                if(!spawnerSettings.SpawnerSettings.TryGetValue(i, out List<SpawnInstructionSO<SpawnableDataProviderSO>> instructions))
                 {
                     Debug.LogError($"No spawn instructions found for spawner index {i}.");
                     break;
                 }
 
-                //! Currently, we cannot directly use List<SpawnInstructionSO<BalloonDataProviderSO>> where List<ISpawnInstruction<BalloonDataProviderSO>> is expected.
-                List<ISpawnInstruction<BalloonDataProviderSO>> castInstructions = instructions.Cast<ISpawnInstruction<BalloonDataProviderSO>>().ToList();
+                //! Currently, we cannot directly use List<SpawnInstructionSO<SpawnableDataProviderSO>> where List<ISpawnInstruction<SpawnableDataProviderSO>> is expected.
+                List<ISpawnInstruction<SpawnableDataProviderSO>> castInstructions = instructions.Cast<ISpawnInstruction<SpawnableDataProviderSO>>().ToList();
 
                 if (!spawners[i].TrySetInstructions(castInstructions))
                 {

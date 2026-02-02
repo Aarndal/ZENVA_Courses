@@ -19,7 +19,7 @@ namespace BalloonPopper
             if (logCaughtBalloonsInEditor)
             {
                 Debug.LogFormat("Spawnable entered Catcher: {0}",
-                        caughtBalloon.Name);
+                        caughtBalloon.TypeName);
             }
 #endif
             caughtBalloon.Despawn();

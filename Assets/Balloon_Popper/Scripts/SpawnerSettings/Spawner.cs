@@ -6,8 +6,7 @@ using UnityEngine;
 
 namespace BalloonPopper
 {     
-    // Spawns balloons from the BalloonPool at the spawner's position.
-    public class BalloonSpawner : SpawnerComponent<BalloonDataProviderSO>
+    public class Spawner : SpawnerComponent<SpawnableDataProviderSO>
     {
         private bool _isConfigured = false;
         private bool _isSpawnInProcess = false;
@@ -15,7 +14,7 @@ namespace BalloonPopper
         private int _spawnedCount = 0;
         
 
-        public List<ISpawnInstruction<BalloonDataProviderSO>> Instructions { get; private set; }
+        public List<ISpawnInstruction<SpawnableDataProviderSO>> Instructions { get; private set; }
 
 
         private void Start()
@@ -66,7 +65,7 @@ namespace BalloonPopper
 
         private async UniTask SpawnBalloon()
         {
-            if (BalloonPool.Instance.TryGet(Instructions[_currentInstructionIndex].Data, out Balloon balloon))
+            if (SpawnablePool.Instance.TryGet(Instructions[_currentInstructionIndex].Data, out global::ISpawnable balloon))
             {
                 balloon.Spawn(this.transform.position);
                 _spawnedCount++;
@@ -88,7 +87,7 @@ namespace BalloonPopper
             return false;
         }
 
-        public override bool TrySetInstructions(List<ISpawnInstruction<BalloonDataProviderSO>> instructions)
+        public override bool TrySetInstructions(List<ISpawnInstruction<SpawnableDataProviderSO>> instructions)
         {
             _isConfigured = false;
 

@@ -1,6 +1,4 @@
-﻿using BalloonPopper;
-
-public interface ISpawnInstruction
+﻿public interface ISpawnInstruction
 {
     int AmountToSpawn { get; }
     ISpawnInterval SpawnInterval { get; }

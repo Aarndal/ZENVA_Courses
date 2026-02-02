@@ -1,5 +1,5 @@
 ﻿
 public interface IClickable
 {
-    void OnClick();
+    void Click();
 }

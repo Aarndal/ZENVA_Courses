@@ -1,26 +1,31 @@
 using Cysharp.Threading.Tasks;
 using System;
+using Unity.VisualScripting;
 using UnityEngine;
 
 namespace BalloonPopper
 {
-    public class Balloon : MonoBehaviour, IClickable, ISpawnable
+    public class Balloon : MonoBehaviour, ISpawnable, IClickable
     {
-        public static event Action<Balloon, BalloonDataProviderSO> BalloonPopped;
+        // Public Static Events
+        public static event Action<ISpawnable, SpawnableDataProviderSO> BalloonPopped;
 
+        // Private Member Variables
         private int _counter = 0;
         private bool _isInitialized = false;
         private bool _isPopping = false;
 
-        private BalloonDataProviderSO _data;
-        private Renderer _renderer;
+        private SpawnableDataProviderSO _data = null;
+        private Renderer _renderer = null;
 
-
-        public BalloonDataProviderSO Data => _data;
-        public string Name => this.gameObject.name;
+        // Properties
+        public SpawnableDataProviderSO Data => _data;
+        public GameObject GameObject => this.gameObject;
+        public string TypeName { get; private set; }
         public IObjectPool Pool { get; private set; }
 
 
+        #region Unity Lifecycle Methods
         private void Awake()
         {
             // The Renderer should be located on the Model child object
@@ -40,9 +45,11 @@ namespace BalloonPopper
             _isInitialized = false;
             _isPopping = false;
         }
+        #endregion
 
 
-        public async void OnClick()
+        #region Public Methods
+        public async void Click()
         {
             // Check if the balloon is active and initialized
             if (this.gameObject.activeInHierarchy && _isInitialized)
@@ -60,7 +67,6 @@ namespace BalloonPopper
                     await PopBalloon();
             }
         }
-
 
         public void Despawn()
         {
@@ -85,7 +91,29 @@ namespace BalloonPopper
             }
         }
 
-        public bool TryInitialize(BalloonDataProviderSO balloonData)
+        public bool TryAssignPool(IObjectPool pool)
+        {
+            if (pool == null)
+            {
+                Debug.LogErrorFormat("Cannot assign null pool to Balloon: {0} | ID: {1}",
+                    this.gameObject.name,
+                    this.gameObject.GetEntityId());
+                return false;
+            }
+
+            if (pool is not IObjectPool<ISpawnable, SpawnableDataProviderSO>)
+            {
+                Debug.LogErrorFormat("Assigned pool is of incorrect type for Balloon: {0} | ID: {1}",
+                    this.gameObject.name,
+                    this.gameObject.GetEntityId());
+                return false;
+            }
+
+            Pool = pool;
+            return true;
+        }
+
+        public bool TryInitialize(IDataProvider<ISpawnable> dataProvider)
         {
             // Don't allow re-initialization
             if (_isInitialized)
@@ -96,11 +124,11 @@ namespace BalloonPopper
                 return false;
             }
 
-            if (balloonData == null)
+            if (dataProvider == null)
             {
-                Debug.LogErrorFormat("Balloon initialization failed, missing data: {0} | ID: {1}",
-                    this.gameObject.name,
-                    this.gameObject.GetEntityId());
+                Debug.LogErrorFormat("Balloon initialization failed, missing data: {0} | Type: {1}",
+                    dataProvider.Name,
+                    dataProvider.ObjectType);
                 return false;
             }
 
@@ -112,19 +140,33 @@ namespace BalloonPopper
                 return false;
             }
 
-            _data = balloonData;
-            _renderer.material = _data.Material;
-            this.transform.localScale = Vector3.one * _data.InitialScale;
-            _isInitialized = true;
-
-            //Debug.LogFormat("Balloon initialized successfully: {0} | ID: {1}",
-            //    this.gameObject.name,
-            //    this.gameObject.GetEntityId());
-
-            return true;
+            return TryInitializeBalloon(dataProvider);
         }
 
+        private bool TryInitializeBalloon(IDataProvider<ISpawnable> dataProvider)
+        {
+            
+            _data = (SpawnableDataProviderSO)dataProvider;
 
+            if (_data == null)
+            {
+                Debug.LogErrorFormat("Balloon initialization failed, incorrect data type: {0} | Type: {1}",
+                    dataProvider.Name,
+                    dataProvider.ObjectType);
+                return false;
+            }
+
+            this.TypeName = dataProvider.Name;
+
+            _renderer.material = _data.Material;
+            this.transform.localScale = Vector3.one * _data.InitialScale;
+            
+            return _isInitialized = true;
+        }
+        #endregion
+
+
+        #region Private Methods
         private async UniTask PopBalloon()
         {
             _isPopping = true;
@@ -150,7 +192,7 @@ namespace BalloonPopper
 
             BalloonPopped?.Invoke(this, _data);
 
-            BalloonPool.Instance.TryReturn(this);
+            SpawnablePool.Instance.TryReturn(this);
 
             _isPopping = false;
 
@@ -175,27 +217,6 @@ namespace BalloonPopper
 
             return true;
         }
-
-        public bool TryAssignPool(IObjectPool pool)
-        {
-            if (pool == null)
-            {
-                Debug.LogErrorFormat("Cannot assign null pool to Balloon: {0} | ID: {1}",
-                    this.gameObject.name,
-                    this.gameObject.GetEntityId());
-                return false;
-            }
-
-            if (pool is not IObjectPool<Balloon, BalloonDataProviderSO>)
-            {
-                Debug.LogErrorFormat("Assigned pool is of incorrect type for Balloon: {0} | ID: {1}",
-                    this.gameObject.name,
-                    this.gameObject.GetEntityId());
-                return false;
-            }
-
-            Pool = pool;
-            return true;
-        }
+        #endregion
     }
 }
