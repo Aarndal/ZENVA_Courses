@@ -6,17 +6,17 @@ namespace BalloonPopper
 {
     public class Balloon : MonoBehaviour, IClickable, ISpawnable
     {
-        public static event Action<Balloon, BalloonDataSO> BalloonPopped;
+        public static event Action<Balloon, BalloonDataProviderSO> BalloonPopped;
 
         private int _counter = 0;
         private bool _isInitialized = false;
         private bool _isPopping = false;
 
-        private BalloonDataSO _data;
+        private BalloonDataProviderSO _data;
         private Renderer _renderer;
 
 
-        public BalloonDataSO Data => _data;
+        public BalloonDataProviderSO Data => _data;
         public string Name => this.gameObject.name;
         public IObjectPool Pool { get; private set; }
 
@@ -85,7 +85,7 @@ namespace BalloonPopper
             }
         }
 
-        public bool TryInitialize(BalloonDataSO balloonData)
+        public bool TryInitialize(BalloonDataProviderSO balloonData)
         {
             // Don't allow re-initialization
             if (_isInitialized)
@@ -186,7 +186,7 @@ namespace BalloonPopper
                 return false;
             }
 
-            if (pool is not IObjectPool<Balloon, BalloonDataSO>)
+            if (pool is not IObjectPool<Balloon, BalloonDataProviderSO>)
             {
                 Debug.LogErrorFormat("Assigned pool is of incorrect type for Balloon: {0} | ID: {1}",
                     this.gameObject.name,

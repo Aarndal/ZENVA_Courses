@@ -3,9 +3,9 @@ using UnityEngine;
 namespace BalloonPopper
 {
     // Factory responsible for creating Balloon GameObjects from SOBalloonData.
-    public class BalloonFactory : MonoBehaviour, IFactory<Balloon, BalloonDataSO>
+    public class BalloonFactory : MonoBehaviour, IFactory<Balloon, BalloonDataProviderSO>
     {
-        public bool TryCreate(BalloonDataSO data, out Balloon newBalloon)
+        public bool TryCreate(BalloonDataProviderSO data, out Balloon newBalloon)
         {
             newBalloon = null;
 

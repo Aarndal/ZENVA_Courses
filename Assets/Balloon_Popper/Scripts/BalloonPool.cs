@@ -4,14 +4,14 @@ using UnityEngine;
 namespace BalloonPopper
 {
     // Manages a pool of balloon objects for efficient reuse.
-    public class BalloonPool : MonoBehaviour, IObjectPool<Balloon, BalloonDataSO>
+    public class BalloonPool : MonoBehaviour, IObjectPool<Balloon, BalloonDataProviderSO>
     {
         [SerializeField]
         private BalloonFactory factory = null;
         [SerializeField]
         private int initialPoolSizePerType = 10;
         [SerializeField]
-        private List<BalloonDataSO> balloonsToGenerate = new();
+        private List<BalloonDataProviderSO> balloonsToGenerate = new();
 
 
         public readonly Dictionary<string, Stack<Balloon>> Balloons = new();
@@ -104,7 +104,7 @@ namespace BalloonPopper
             return true;
         }
 
-        public bool TryGet(BalloonDataSO balloonData, out Balloon balloon)
+        public bool TryGet(BalloonDataProviderSO balloonData, out Balloon balloon)
         {
             balloon = null;
             string balloonType = balloonData.name;

@@ -3,7 +3,7 @@ using UnityEngine;
 namespace BalloonPopper
 {
     [CreateAssetMenu(fileName = "newBalloonData", menuName = "BalloonPopper/Data/BalloonData", order = 0)]
-    public class BalloonDataSO : ScriptableObject, IDataProvider<Balloon>
+    public class BalloonDataProviderSO : ScriptableObject, IDataProvider<Balloon>
     {
         [Header("Model Data")]
         [SerializeField]
