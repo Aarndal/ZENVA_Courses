@@ -11,7 +11,7 @@ namespace BalloonPopper
         private Spawner[] spawners;
 
         [SerializeField]
-        private SpawnerSettingsSO<SpawnableDataProviderSO> spawnerSettings;
+        private SpawnerSettingsSO<IDataProvider<ISpawnable>> spawnerSettings;
 
         private void Awake()
         {
@@ -34,14 +34,13 @@ namespace BalloonPopper
         {
             for (int i = 0; i < spawnerSettings.NumberOfSpawners; i++)
             {
-                if(!spawnerSettings.SpawnerSettings.TryGetValue(i, out List<SpawnInstructionSO<SpawnableDataProviderSO>> instructions))
+                if(!spawnerSettings.SpawnerSettings.TryGetValue(i, out List<ISpawnInstruction<IDataProvider<ISpawnable>>> instructions))
                 {
                     Debug.LogError($"No spawn instructions found for spawner index {i}.");
                     break;
                 }
 
-                //! Currently, we cannot directly use List<SpawnInstructionSO<SpawnableDataProviderSO>> where List<ISpawnInstruction<SpawnableDataProviderSO>> is expected.
-                List<ISpawnInstruction<SpawnableDataProviderSO>> castInstructions = instructions.Cast<ISpawnInstruction<SpawnableDataProviderSO>>().ToList();
+                List<ISpawnInstruction<IDataProvider<ISpawnable>>> castInstructions = instructions.Cast<ISpawnInstruction<IDataProvider<ISpawnable>>>().ToList();
 
                 if (!spawners[i].TrySetInstructions(castInstructions))
                 {

@@ -1,8 +1,8 @@
 ﻿using UnityEngine;
 
-public abstract class SpawnInstructionSO<T> : ScriptableObject, ISpawnInstruction<T> where T : IDataProvider
+public abstract class SpawnInstructionSO : ScriptableObject, ISpawnInstruction<IDataProvider<ISpawnable>>
 {
-    public abstract T Data { get; }
+    public abstract IDataProvider<ISpawnable> Data { get; }
     public abstract int AmountToSpawn { get; }
     public abstract ISpawnInterval SpawnInterval { get; }
 }

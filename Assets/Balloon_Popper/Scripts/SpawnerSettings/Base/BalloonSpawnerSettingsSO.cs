@@ -5,20 +5,43 @@ using UnityEngine;
 namespace BalloonPopper
 {
     /// <summary>
-    /// ScriptableObject that defines the spawner settings for balloon levels.
+    /// ScriptableObject that defines the spawner settings for levels.
     /// </summary>
-    [CreateAssetMenu(fileName = "newBalloonSpawnerSettings", menuName = "BalloonPopper/SpawnerSettings/BalloonSpawnerSettings")]
-    public class BalloonSpawnerSettingsSO : SpawnerSettingsSO<SpawnableDataProviderSO>
+    [CreateAssetMenu(fileName = "newSpawnerSettings", menuName = "BalloonPopper/Spawner/SpawnerSettings")]
+    public class BalloonSpawnerSettingsSO : SpawnerSettingsSO<IDataProvider<ISpawnable>>
     {
         [SerializeField, Min(1)]
         private int numberOfSpawners = 1;
         [SerializeField]
-        private SerializableDictionary<int, List<SpawnInstructionSO<SpawnableDataProviderSO>>> spawnerSettings = new();
+        private SerializableDictionary<int, List<SpawnInstructionSO>> spawnerSettings = new();
 
         private int _cachedNumberOfSpawners = 0;
 
         public override int NumberOfSpawners => numberOfSpawners;
-        public override SerializableDictionary<int, List<SpawnInstructionSO<SpawnableDataProviderSO>>> SpawnerSettings => spawnerSettings;
+        //public override SerializableDictionary<int, List<ISpawnInstruction<IDataProvider<ISpawnable>>>> SpawnerSettings => spawnerSettings;
+
+        public override SerializableDictionary<int, List<ISpawnInstruction<IDataProvider<ISpawnable>>>> SpawnerSettings
+        {
+            get
+            {
+                var result = new SerializableDictionary<int, List<ISpawnInstruction<IDataProvider<ISpawnable>>>>();
+                foreach (var kvp in spawnerSettings)
+                {
+                    var list = new List<ISpawnInstruction<IDataProvider<ISpawnable>>>();
+                    foreach (var item in kvp.Value)
+                    {
+                        list.Add(item);
+                    }
+                    result.TryAdd(kvp.Key, list);
+                }
+                return result;
+            }
+        }
+
+
+
+
+
 
         private void OnValidate()
         {
@@ -28,7 +51,7 @@ namespace BalloonPopper
             {
                 for (int i = _cachedNumberOfSpawners; i < numberOfSpawners; i++)
                 {
-                    spawnerSettings.TryAdd(i, new List<SpawnInstructionSO<SpawnableDataProviderSO>>());
+                    spawnerSettings.TryAdd(i, new ());
                 }
             }
 

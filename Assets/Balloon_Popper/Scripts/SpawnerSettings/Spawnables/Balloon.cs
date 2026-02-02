@@ -101,7 +101,7 @@ namespace BalloonPopper
                 return false;
             }
 
-            if (pool is not IObjectPool<ISpawnable, SpawnableDataProviderSO>)
+            if (pool is not IObjectPool<ISpawnable, IDataProvider<ISpawnable>>)
             {
                 Debug.LogErrorFormat("Assigned pool is of incorrect type for Balloon: {0} | ID: {1}",
                     this.gameObject.name,

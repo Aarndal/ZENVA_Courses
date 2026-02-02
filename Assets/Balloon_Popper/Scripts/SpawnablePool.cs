@@ -4,10 +4,10 @@ using UnityEngine;
 namespace BalloonPopper
 {
     // Manages a pool of balloon objects for efficient reuse.
-    public class SpawnablePool : MonoBehaviour, IObjectPool<ISpawnable, SpawnableDataProviderSO>
+    public class SpawnablePool : MonoBehaviour, IObjectPool<ISpawnable, IDataProvider<ISpawnable>>
     {
         [SerializeField]
-        private IFactory<ISpawnable, SpawnableDataProviderSO> factory = null;
+        private SpawnableFactory factory = null;
         [SerializeField]
         private int initialPoolSizePerType = 10;
         [SerializeField]
@@ -33,7 +33,8 @@ namespace BalloonPopper
                 Destroy(this.gameObject);
             }
 
-            factory ??= this.GetComponentInChildren<IFactory<ISpawnable, SpawnableDataProviderSO>>();
+            factory =
+            factory != null ? factory : this.GetComponentInChildren<SpawnableFactory>();
 
             if (factory == null)
             {
@@ -104,7 +105,7 @@ namespace BalloonPopper
             return true;
         }
 
-        public bool TryGet(SpawnableDataProviderSO spawnableData, out ISpawnable spawnable)
+        public bool TryGet(IDataProvider<ISpawnable> spawnableData, out ISpawnable spawnable)
         {
             spawnable = null;
             string spawnableType = spawnableData.Name;

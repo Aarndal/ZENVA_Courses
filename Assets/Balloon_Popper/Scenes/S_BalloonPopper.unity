@@ -1443,6 +1443,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 71c51dde906b756479dfd707185474a1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BalloonPool
+  factory: {fileID: 6628900414014658268}
   initialPoolSizePerType: 50
   spawnableDataProviders:
   - {fileID: 11400000, guid: 09919b817a0b5664d807cb1262fb012f, type: 2}

@@ -1,17 +1,17 @@
 ﻿using BalloonPopper;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "newBalloonSpawnInstruction", menuName = "BalloonPopper/SpawnInstructions/BalloonSpawnInstruction")]
-public class BalloonSpawnInstructionSO : SpawnInstructionSO<BalloonPopper.SpawnableDataProviderSO>
+[CreateAssetMenu(fileName = "newSpawnInstruction", menuName = "BalloonPopper/SpawnInstructions/SpawnInstruction")]
+public class BalloonSpawnInstructionSO : SpawnInstructionSO
 {
     [SerializeField]
-    private BalloonPopper.SpawnableDataProviderSO data = null;
+    private SpawnableDataProviderSO data = null;
     [SerializeField]
     private int amount = 0;
     [SerializeField]
     private SpawnIntervalSO spawnInterval = null;
 
-    public override BalloonPopper.SpawnableDataProviderSO Data => data;
+    public override IDataProvider<ISpawnable> Data => data;
     public override int AmountToSpawn => amount;
     public override ISpawnInterval SpawnInterval => spawnInterval;
 }
