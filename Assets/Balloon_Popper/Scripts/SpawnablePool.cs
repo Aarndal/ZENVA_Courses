@@ -1,60 +1,33 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace BalloonPopper
 {
     // Manages a pool of balloon objects for efficient reuse.
+    [RequireComponent(typeof(SpawnableFactory))]
+    [DisallowMultipleComponent]
     public class SpawnablePool : MonoBehaviour, IObjectPool<ISpawnable, IDataProvider<ISpawnable>>
     {
-        [SerializeField]
-        private SpawnableFactory factory = null;
-        [SerializeField]
-        private int initialPoolSizePerType = 10;
-        [SerializeField]
-        private List<SpawnableDataProviderSO> spawnableDataProviders = new();
-
+        private const int DefaultPoolCapacityPerType = 10;
 
         public readonly Dictionary<string, Stack<ISpawnable>> Spawnables = new();
 
-
-        public static SpawnablePool Instance { get; private set; }
+        private bool _isInitialized = false;
+        private SpawnableFactory _factory = null;
 
 
         #region Unity
         private void Awake()
         {
-            // Ensure only one instance of BalloonPool exists.
-            if (Instance == null)
+            if (_factory == null)
             {
-                Instance = this;
-            }
-            else
-            {
-                Destroy(this.gameObject);
-            }
-
-            factory =
-            factory != null ? factory : this.GetComponentInChildren<SpawnableFactory>();
-
-            if (factory == null)
-            {
-                Debug.LogErrorFormat("BalloonFactory reference is missing in BalloonPool: {0} | ID: {1}",
-                this.gameObject.name,
-                this.gameObject.GetEntityId());
-            }
-
-            // Make sure the balloon pool is clean before instantiation.
-            if (Spawnables.Count != 0)
-            {
-                Spawnables.Clear();
-            }
-
-            // Instantiate the balloon pool.
-            if (!TryInstantiatePool())
-            {
-                Debug.LogErrorFormat("Failed to instantiate Pool: {0} | ID: {1}",
-                    this.gameObject.name,
-                    this.gameObject.GetEntityId());
+                if (!this.TryGetComponent(out _factory))
+                {
+                    Debug.LogErrorFormat("No Factory reference or component in ObjectPool: {0} | ID: {1}",
+                        this.gameObject.name,
+                        this.gameObject.GetEntityId());
+                }
             }
         }
         #endregion
@@ -63,6 +36,14 @@ namespace BalloonPopper
         #region Public Methods
         public bool TryReturn<T>(T obj) where T : class
         {
+            if (!_isInitialized)
+            {
+                Debug.LogErrorFormat("Attempted to return object to uninitialized Pool: {0} | ID: {1}",
+                    this.gameObject.name,
+                    this.gameObject.GetEntityId());
+                return false;
+            }
+
             if (obj is ISpawnable spawnable)
             {
                 return TryReturn(spawnable);
@@ -78,6 +59,14 @@ namespace BalloonPopper
 
         public bool TryReturn(ISpawnable spawnable)
         {
+            if (!_isInitialized)
+            {
+                Debug.LogErrorFormat("Attempted to return object to uninitialized Pool: {0} | ID: {1}",
+                    this.gameObject.name,
+                    this.gameObject.GetEntityId());
+                return false;
+            }
+
             string spawnableType = spawnable.TypeName;
 
             // Ensure the balloon type exists in the pool.
@@ -108,6 +97,15 @@ namespace BalloonPopper
         public bool TryGet(IDataProvider<ISpawnable> spawnableData, out ISpawnable spawnable)
         {
             spawnable = null;
+
+            if (!_isInitialized)
+            {
+                Debug.LogErrorFormat("Attempted to get object from uninitialized Pool: {0} | ID: {1}",
+                    this.gameObject.name,
+                    this.gameObject.GetEntityId());
+                return false;
+            }
+
             string spawnableType = spawnableData.Name;
 
             // Check if the balloon type exists in the pool.
@@ -135,12 +133,17 @@ namespace BalloonPopper
             spawnable.GameObject.SetActive(true);
             return true;
         }
-        #endregion
 
-
-        #region Private Methods
-        private bool TryInstantiatePool()
+        public bool TryInitializePool(IEnumerable<SpawnableDataProviderSO> spawnableDataProviders)
         {
+            // Make sure the balloon pool is clean before initialization.
+            if (Spawnables.Count != 0)
+            {
+                Spawnables.Clear();
+            }
+
+            _isInitialized = false;
+
             foreach (var spawnableData in spawnableDataProviders)
             {
                 //! Balloon type is defined by the name of the BalloonData scriptable object.
@@ -148,10 +151,10 @@ namespace BalloonPopper
 
                 Spawnables[spawnableType] = new();
 
-                for (int i = 0; i < initialPoolSizePerType; i++)
+                for (int i = 0; i < DefaultPoolCapacityPerType; i++)
                 {
                     // Create a new balloon using the factory.
-                    if (!factory.TryCreate(spawnableData, out ISpawnable newSpawnable))
+                    if (!_factory.TryCreate(spawnableData, out ISpawnable newSpawnable))
                     {
                         Debug.LogErrorFormat("Failed to create Spawnable: {0} | ID: {1}\nfor Pool: {2} | ID: {3}",
                             spawnableData.name,
@@ -181,9 +184,12 @@ namespace BalloonPopper
                 }
             }
 
-            // Return true if all balloon types were instantiated.
-            return Spawnables.Count == spawnableDataProviders.Count;
+            // Is initialized if all balloon types were instantiated.
+            _isInitialized = Spawnables.Count == spawnableDataProviders.Count();
+
+            return _isInitialized;
         }
+     
         #endregion
     }
 }

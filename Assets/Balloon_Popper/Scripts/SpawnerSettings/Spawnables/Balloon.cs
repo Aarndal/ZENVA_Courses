@@ -192,7 +192,7 @@ namespace BalloonPopper
 
             BalloonPopped?.Invoke(this, _data);
 
-            SpawnablePool.Instance.TryReturn(this);
+            Pool.TryReturn(this);
 
             _isPopping = false;
 

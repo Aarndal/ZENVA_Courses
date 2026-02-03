@@ -8,7 +8,7 @@ public interface IGenericFactory : IFactory
     bool TryCreate<T>(out T obj) where T : class;
 }
 
-public interface IFactory<TObject, TData> : IFactory where TObject : class where TData : IDataProvider
+public interface IFactory<TObject, TData> : IFactory where TObject : class
 {
     bool TryCreate(TData data, out TObject obj);
 }

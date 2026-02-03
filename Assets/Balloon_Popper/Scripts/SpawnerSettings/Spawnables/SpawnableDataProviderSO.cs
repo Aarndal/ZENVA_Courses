@@ -1,3 +1,4 @@
+using UnityEditor;
 using UnityEngine;
 
 namespace BalloonPopper
@@ -7,9 +8,9 @@ namespace BalloonPopper
     {
         [Header("Model Data")]
         [SerializeField]
-        private Material material = default;
+        private Material material = null;
         [SerializeField]
-        private GameObject prefab = default;
+        private GameObject prefab = null;
 
         [Space(10)]
 
@@ -27,14 +28,15 @@ namespace BalloonPopper
 
         [Header("Audio Data")]
         [SerializeField]
-        private AudioClip inflateSound = default;
+        private AudioClip inflateSound = null;
         [SerializeField]
-        private AudioClip popSound = default;
+        private AudioClip popSound = null;
 
         public string Name => this.name;
 
         public Material Material => material;
         public GameObject Prefab => prefab;
+        public IObjectPool<ISpawnable, IDataProvider<ISpawnable>> Pool { get; set; }
 
         public int ClicksToPop => clicksToPop;
         public float InitialScale => initialScale;
@@ -44,5 +46,23 @@ namespace BalloonPopper
         public AudioClip InflateSound => inflateSound;
         public AudioClip PopSound => popSound;
 
+
+        private void Awake()
+        {
+#if UNITY_EDITOR
+            if (prefab == null)
+            {
+                Debug.LogErrorFormat("Prefab reference is not assigned in SpawnableDataProvider: {0} | ID: {1}", 
+                    this.name, 
+                    this.GetEntityId());
+            }
+            else if (PrefabUtility.GetPrefabAssetType(prefab) == PrefabAssetType.NotAPrefab)
+            {
+                Debug.LogErrorFormat("Assigned GameObject is not a Prefab asset in SpawnableDataProvider: {0} | ID: {1}",
+                    this.name,
+                    this.GetEntityId());
+            }
+#endif
+        }
     }
 }

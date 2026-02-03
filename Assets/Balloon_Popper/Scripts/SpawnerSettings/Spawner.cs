@@ -2,17 +2,15 @@ using Cysharp.Threading.Tasks;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 
 namespace BalloonPopper
-{     
+{
     public class Spawner : SpawnerComponent<IDataProvider<ISpawnable>>
     {
         private bool _isConfigured = false;
         private bool _isSpawnInProcess = false;
         private int _currentInstructionIndex = 0;
         private int _spawnedCount = 0;
-        
 
         public List<ISpawnInstruction<IDataProvider<ISpawnable>>> Instructions { get; private set; }
 
@@ -24,7 +22,7 @@ namespace BalloonPopper
 
         private async void Update()
         {
-            if(!_isConfigured)
+            if (!_isConfigured)
                 return;
 
             if (_isSpawnInProcess)
@@ -32,7 +30,7 @@ namespace BalloonPopper
 
             await DelayedSpawn();
 
-            if(!TryAdvanceToNextInstruction())
+            if (!TryAdvanceToNextInstruction())
                 return;
 
             if (HasCompletedAllInstructions())
@@ -56,20 +54,22 @@ namespace BalloonPopper
 
             await UniTask.Delay(TimeSpan.FromSeconds(Instructions[_currentInstructionIndex].SpawnInterval.GetNextInterval()), ignoreTimeScale: false);
 
-            await SpawnBalloon();
+            var data = Instructions[_currentInstructionIndex].Data as SpawnableDataProviderSO;
+
+            if (data.Pool.TryGet(Instructions[_currentInstructionIndex].Data, out ISpawnable spawnable))
+            {
+                await Spawn(spawnable);
+            }
 
             _isSpawnInProcess = false;
 
             await UniTask.CompletedTask;
         }
 
-        private async UniTask SpawnBalloon()
+        private async UniTask Spawn(ISpawnable spawnable)
         {
-            if (SpawnablePool.Instance.TryGet(Instructions[_currentInstructionIndex].Data, out ISpawnable balloon))
-            {
-                balloon.Spawn(this.transform.position);
-                _spawnedCount++;
-            }
+            spawnable.Spawn(this.transform.position);
+            _spawnedCount++;
 
             await UniTask.CompletedTask;
         }

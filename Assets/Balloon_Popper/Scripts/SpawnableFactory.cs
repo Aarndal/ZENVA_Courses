@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace BalloonPopper
 {
-    // Factory responsible for creating Balloon GameObjects from SOBalloonData.
+    // Factory responsible for creating Balloon GameObjects from SpawnableDataProviderSO.
     public class SpawnableFactory : MonoBehaviour, IFactory<ISpawnable, SpawnableDataProviderSO>
     {
         public bool TryCreate(SpawnableDataProviderSO data, out ISpawnable newSpawnable)
