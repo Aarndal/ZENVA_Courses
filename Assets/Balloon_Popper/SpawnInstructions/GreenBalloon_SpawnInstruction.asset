@@ -1,0 +1,17 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 50f37e646dad18f4bb3f8b3af321cb98, type: 3}
+  m_Name: GreenBalloon_SpawnInstruction
+  m_EditorClassIdentifier: Assembly-CSharp::BalloonSpawnInstructionSO
+  data: {fileID: 11400000, guid: d5ddcb7210a27294cabf41066957b59a, type: 2}
+  amount: 1
+  spawnInterval: {fileID: 11400000, guid: c14bbecc25968a440bfd1c2df5a38eef, type: 2}

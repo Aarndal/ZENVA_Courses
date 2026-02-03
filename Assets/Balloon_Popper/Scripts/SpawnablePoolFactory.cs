@@ -29,7 +29,7 @@ namespace BalloonPopper
                 {
 #if UNITY_EDITOR
                     Debug.LogErrorFormat("SpawnableDataProviderSO has no Prefab assigned: {0} | ID: {1}",
-                        data.Name,
+                        data.InstanceName,
                         data.GetEntityId());
 #endif
                     continue;

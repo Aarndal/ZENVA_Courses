@@ -1,12 +1,18 @@
 ﻿using System;
-using UnityEngine;
 
-public interface IDataProvider
+public interface IDataProvider 
+    //: IEquatable<IDataProvider>
 {
-    string Name { get; }
+    Guid Id { get; }
+    string InstanceName { get; }
 }
 
 public interface IDataProvider<T> : IDataProvider where T : class
 {
-    Type ObjectType => typeof(T);
+    Type ProvidedType => typeof(T);
+}
+
+public interface ISpawnableDataProvider: IDataProvider<ISpawnable>
+{
+    IObjectPool<ISpawnable> Pool { get; }
 }

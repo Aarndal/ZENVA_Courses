@@ -13,7 +13,7 @@ namespace BalloonPopper
             if (data == null || data.Prefab == null)
             {
                 Debug.LogErrorFormat("Cannot create Spawnable. Provided data is invalid: {0} | ID: {1}",
-                   data.Name,
+                   data.InstanceName,
                    data.GetEntityId());
                 return false;
             }

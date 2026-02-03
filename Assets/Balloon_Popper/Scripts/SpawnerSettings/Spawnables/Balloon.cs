@@ -1,6 +1,5 @@
 using Cysharp.Threading.Tasks;
 using System;
-using Unity.VisualScripting;
 using UnityEngine;
 
 namespace BalloonPopper
@@ -19,9 +18,9 @@ namespace BalloonPopper
         private Renderer _renderer = null;
 
         // Properties
-        public SpawnableDataProviderSO Data => _data;
+        public IDataProvider<ISpawnable> Data => _data;
         public GameObject GameObject => this.gameObject;
-        public string TypeName { get; private set; }
+        public string SpawnableType { get; private set; }
         public IObjectPool Pool { get; private set; }
 
 
@@ -127,8 +126,8 @@ namespace BalloonPopper
             if (dataProvider == null)
             {
                 Debug.LogErrorFormat("Balloon initialization failed, missing data: {0} | Type: {1}",
-                    dataProvider.Name,
-                    dataProvider.ObjectType);
+                    dataProvider.InstanceName,
+                    dataProvider.ProvidedType);
                 return false;
             }
 
@@ -145,18 +144,17 @@ namespace BalloonPopper
 
         private bool TryInitializeBalloon(IDataProvider<ISpawnable> dataProvider)
         {
-            
             _data = (SpawnableDataProviderSO)dataProvider;
 
             if (_data == null)
             {
                 Debug.LogErrorFormat("Balloon initialization failed, incorrect data type: {0} | Type: {1}",
-                    dataProvider.Name,
-                    dataProvider.ObjectType);
+                    dataProvider.InstanceName,
+                    dataProvider.ProvidedType);
                 return false;
             }
 
-            this.TypeName = dataProvider.Name;
+            this.SpawnableType = dataProvider.InstanceName;
 
             _renderer.material = _data.Material;
             this.transform.localScale = Vector3.one * _data.InitialScale;
@@ -192,7 +190,7 @@ namespace BalloonPopper
 
             BalloonPopped?.Invoke(this, _data);
 
-            Pool.TryReturn(this);
+            Despawn();
 
             _isPopping = false;
 

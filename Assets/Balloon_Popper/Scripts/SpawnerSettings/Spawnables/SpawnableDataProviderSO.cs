@@ -1,3 +1,4 @@
+using System;
 using UnityEditor;
 using UnityEngine;
 
@@ -6,6 +7,9 @@ namespace BalloonPopper
     [CreateAssetMenu(fileName = "newBalloonData", menuName = "BalloonPopper/Data/BalloonData", order = 0)]
     public class SpawnableDataProviderSO : ScriptableObject, IDataProvider<ISpawnable>
     {
+        [SerializeField, HideInInspector]
+        private string id = null;
+
         [Header("Model Data")]
         [SerializeField]
         private Material material = null;
@@ -32,7 +36,18 @@ namespace BalloonPopper
         [SerializeField]
         private AudioClip popSound = null;
 
-        public string Name => this.name;
+        public Guid Id
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(id))
+                {
+                    id = Guid.NewGuid().ToString();
+                }
+                return Guid.Parse(id);
+            }
+        }
+        public string InstanceName => this.name;
 
         public Material Material => material;
         public GameObject Prefab => prefab;
@@ -52,8 +67,8 @@ namespace BalloonPopper
 #if UNITY_EDITOR
             if (prefab == null)
             {
-                Debug.LogErrorFormat("Prefab reference is not assigned in SpawnableDataProvider: {0} | ID: {1}", 
-                    this.name, 
+                Debug.LogErrorFormat("Prefab reference is not assigned in SpawnableDataProvider: {0} | ID: {1}",
+                    this.name,
                     this.GetEntityId());
             }
             else if (PrefabUtility.GetPrefabAssetType(prefab) == PrefabAssetType.NotAPrefab)

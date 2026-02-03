@@ -1082,6 +1082,7 @@ MonoBehaviour:
   spawnableData:
   - {fileID: 11400000, guid: 09919b817a0b5664d807cb1262fb012f, type: 2}
   - {fileID: 11400000, guid: 28e928deb5385cb42b1ed34716244043, type: 2}
+  - {fileID: 11400000, guid: d5ddcb7210a27294cabf41066957b59a, type: 2}
 --- !u!1001 &1944635420
 PrefabInstance:
   m_ObjectHideFlags: 0

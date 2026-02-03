@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cdc73085d1d770c418964bc4b11e29ee, type: 3}
   m_Name: Level01_SpawnerSettings
   m_EditorClassIdentifier: Assembly-CSharp::BalloonPopper.BalloonSpawnerSettingsSO
-  numberOfSpawners: 2
+  numberOfSpawners: 5
   spawnerSettings:
     dictionaryList:
     - Key: 0
@@ -24,5 +24,24 @@ MonoBehaviour:
     - Key: 1
       Value:
       - {fileID: 11400000, guid: dee3aba559f2ff149aafa7e449ba8c8c, type: 2}
+      - {fileID: 11400000, guid: e432ace2b6e30324ca7e5e4cec9ececd, type: 2}
       index: 1
+      isKeyDuplicated: 0
+    - Key: 2
+      Value:
+      - {fileID: 11400000, guid: 4814802ec8f56e8479e20f8ed924e53f, type: 2}
+      - {fileID: 11400000, guid: dee3aba559f2ff149aafa7e449ba8c8c, type: 2}
+      - {fileID: 11400000, guid: dee3aba559f2ff149aafa7e449ba8c8c, type: 2}
+      index: 2
+      isKeyDuplicated: 0
+    - Key: 3
+      Value:
+      - {fileID: 11400000, guid: dee3aba559f2ff149aafa7e449ba8c8c, type: 2}
+      index: 3
+      isKeyDuplicated: 0
+    - Key: 4
+      Value:
+      - {fileID: 11400000, guid: dee3aba559f2ff149aafa7e449ba8c8c, type: 2}
+      - {fileID: 11400000, guid: 4814802ec8f56e8479e20f8ed924e53f, type: 2}
+      index: 4
       isKeyDuplicated: 0

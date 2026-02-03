@@ -71,7 +71,7 @@ namespace BalloonPopper
                 return false;
             }
 
-            string spawnableType = spawnable.TypeName;
+            string spawnableType = spawnable.Data.InstanceName;
 
             // Ensure the balloon type exists in the pool.
             if (!Spawnables.ContainsKey(spawnableType))
@@ -110,7 +110,7 @@ namespace BalloonPopper
                 return false;
             }
 
-            string spawnableType = spawnableData.Name;
+            string spawnableType = spawnableData.InstanceName;
 
             // Check if the balloon type exists in the pool.
             if (!Spawnables.ContainsKey(spawnableType))
@@ -153,9 +153,9 @@ namespace BalloonPopper
             foreach (var spawnableData in spawnableDataProviders)
             {
                 //! Balloon type is defined by the name of the BalloonData scriptable object.
-                string spawnableType = spawnableData.Name;
+                string spawnableType = spawnableData.InstanceName;
 
-                Spawnables[spawnableData.Name] = new();
+                Spawnables[spawnableData.InstanceName] = new();
 
                 if(!TryPopulateSpawnablePool(spawnableData))
                     return false;
@@ -181,7 +181,7 @@ namespace BalloonPopper
                 if (!_factory.TryCreate(spawnableData, out ISpawnable newSpawnable))
                 {
                     Debug.LogErrorFormat("Failed to create Spawnable: {0} | ID: {1}\nfor Pool: {2} | ID: {3}",
-                        spawnableData.Name,
+                        spawnableData.InstanceName,
                         spawnableData.GetEntityId(),
                         this.gameObject.name,
                         this.gameObject.GetEntityId());
@@ -201,11 +201,11 @@ namespace BalloonPopper
                 newSpawnable.GameObject.SetActive(false);
 
                 // Name and parent the balloon for organization.
-                newSpawnable.GameObject.name = $"{spawnableData.Name}_{this.gameObject.name}_{i}";
+                newSpawnable.GameObject.name = $"{spawnableData.InstanceName}_{this.gameObject.name}_{i}";
                 newSpawnable.GameObject.transform.SetParent(this.transform, false);
 
                 // Enqueue the new balloon into the pool.
-                Spawnables[spawnableData.Name].Push(newSpawnable);
+                Spawnables[spawnableData.InstanceName].Push(newSpawnable);
             }
             return true;
         }
