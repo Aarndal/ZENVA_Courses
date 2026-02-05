@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class BalloonMovement : MonoBehaviour
+public class BalloonMovement : MonoBehaviour, IHorizontalMoveable, IVerticalMoveable
 {
     [SerializeField, Range (0.01f, 1.5f)]
     private float verticalFloatSpeed = 1.0f;
@@ -12,21 +12,25 @@ public class BalloonMovement : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if(this.gameObject.activeInHierarchy == false)
+        Move();
+    }
+
+    public void Move()
+    {
+        if (!this.gameObject.activeInHierarchy)
             return;
 
         MoveVertical();
         MoveHorizontal();
     }
 
-
-    private void MoveHorizontal()
+    public void MoveHorizontal()
     {
         transform.Translate(Mathf.Sin(2 * Mathf.PI * Time.time / horizontalFloatFrequenze) *
                     horizontalFloatAmplitude * Time.fixedDeltaTime * Vector3.right);
     }
 
-    private void MoveVertical()
+    public void MoveVertical()
     {
         transform.Translate(Time.fixedDeltaTime * verticalFloatSpeed * Vector3.up);
     }
