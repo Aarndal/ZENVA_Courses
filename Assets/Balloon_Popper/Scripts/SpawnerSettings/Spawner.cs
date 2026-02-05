@@ -2,6 +2,7 @@ using Cysharp.Threading.Tasks;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 
 namespace BalloonPopper
 {
@@ -12,7 +13,7 @@ namespace BalloonPopper
         private int _currentInstructionIndex = 0;
         private int _spawnedCount = 0;
 
-        public List<ISpawnInstruction<IDataProvider<ISpawnable>>> Instructions { get; private set; }
+        public List<ISpawnInstruction<IDataProvider<ISpawnable>>> Instructions { get; private set; } = new();
 
 
         private void Start()
@@ -89,15 +90,27 @@ namespace BalloonPopper
 
         public override bool TrySetInstructions(List<ISpawnInstruction<IDataProvider<ISpawnable>>> instructions)
         {
-            _isConfigured = false;
-
             if (instructions == null)
+            {
+#if UNITY_EDITOR
+                Debug.LogErrorFormat("Failed to set instructions for spawner because of null reference: {0} | ID: {1}",
+                    this.gameObject.name,
+                    this.gameObject.GetEntityId());
+#endif
                 return false;
+            }
 
             if (instructions.Any(instruction => instruction == null))
+            {
+#if UNITY_EDITOR
+                Debug.LogErrorFormat("Failed to set instructions for spawner because of null reference in instructions: {0} | ID: {1}",
+                    this.gameObject.name,
+                    this.gameObject.GetEntityId());
+#endif
                 return false;
+            }
 
-            Instructions = instructions;
+            Instructions.AddRange(instructions);
             return _isConfigured = true;
         }
 

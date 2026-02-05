@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace BalloonPopper
 {
-    // Factory responsible for creating Object Pools for Spawnables.
+    // Factory responsible for creating Object Pools for ISpawnables.
     public class SpawnablePoolFactory : MonoBehaviour, IFactory<SpawnablePool, KeyValuePair<GameObject, Stack<SpawnableDataProviderSO>>>
     {
         [SerializeField]

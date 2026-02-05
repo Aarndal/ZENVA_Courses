@@ -15,13 +15,13 @@ namespace BalloonPopper
             if (!TryGetSpawnable(otherCollider, out var caughtBalloon))
                 return;
 
-//#if UNITY_EDITOR
-//            if (logCaughtBalloonsInEditor)
-//            {
-//                Debug.LogFormat("Spawnable entered Catcher: {0}",
-//                        caughtBalloon.SpawnableType);
-//            }
-//#endif
+#if UNITY_EDITOR
+            if (logCaughtBalloonsInEditor)
+            {
+                Debug.LogFormat("Spawnable entered Catcher: {0}",
+                        caughtBalloon.SpawnableType);
+            }
+#endif
             caughtBalloon.Despawn();
         }
 

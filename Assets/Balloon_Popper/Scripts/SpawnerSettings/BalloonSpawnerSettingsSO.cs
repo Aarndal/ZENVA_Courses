@@ -20,7 +20,7 @@ namespace BalloonPopper
         public override int NumberOfSpawners => numberOfSpawners;
         //public override SerializableDictionary<int, List<ISpawnInstruction<IDataProvider<ISpawnable>>>> SpawnerSettings => spawnerSettings;
 
-        public override SerializableDictionary<int, List<ISpawnInstruction<IDataProvider<ISpawnable>>>> SpawnerSettings
+        public override SerializableDictionary<int, List<ISpawnInstruction<IDataProvider<ISpawnable>>>> Instructions
         {
             get
             {

@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using Unity.VisualScripting;
 using UnityEngine;
 
 namespace BalloonPopper
@@ -152,9 +151,6 @@ namespace BalloonPopper
 
             foreach (var spawnableData in spawnableDataProviders)
             {
-                //! Balloon type is defined by the name of the BalloonData scriptable object.
-                string spawnableType = spawnableData.InstanceName;
-
                 Spawnables[spawnableData.InstanceName] = new();
 
                 if(!TryPopulateSpawnablePool(spawnableData))
@@ -185,15 +181,6 @@ namespace BalloonPopper
                         spawnableData.GetEntityId(),
                         this.gameObject.name,
                         this.gameObject.GetEntityId());
-                    return false;
-                }
-
-                // Try to assign this pool to the new balloon for future returns.
-                if (!newSpawnable.TryAssignPool(this))
-                {
-                    Debug.LogErrorFormat("Failed to assign Pool to Spawnable (): {0} | ID: {1}",
-                        newSpawnable.GameObject.name,
-                        newSpawnable.GameObject.GetEntityId());
                     return false;
                 }
 

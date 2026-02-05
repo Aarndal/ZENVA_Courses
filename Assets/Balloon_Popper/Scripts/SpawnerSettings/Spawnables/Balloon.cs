@@ -21,8 +21,6 @@ namespace BalloonPopper
         public IDataProvider<ISpawnable> Data => _data;
         public GameObject GameObject => this.gameObject;
         public string SpawnableType { get; private set; }
-        public IObjectPool Pool { get; private set; }
-
 
         #region Unity Lifecycle Methods
         private void Awake()
@@ -69,7 +67,7 @@ namespace BalloonPopper
 
         public void Despawn()
         {
-            Pool.TryReturn(this);
+            _data.Pool.TryReturn(this);
         }
 
         public void Spawn(Vector3 spawnPosition)
@@ -88,28 +86,6 @@ namespace BalloonPopper
             {
                 this.transform.localScale = Vector3.one * _data.InitialScale;
             }
-        }
-
-        public bool TryAssignPool(IObjectPool pool)
-        {
-            if (pool == null)
-            {
-                Debug.LogErrorFormat("Cannot assign null pool to Balloon: {0} | ID: {1}",
-                    this.gameObject.name,
-                    this.gameObject.GetEntityId());
-                return false;
-            }
-
-            if (pool is not IObjectPool<ISpawnable, IDataProvider<ISpawnable>>)
-            {
-                Debug.LogErrorFormat("Assigned pool is of incorrect type for Balloon: {0} | ID: {1}",
-                    this.gameObject.name,
-                    this.gameObject.GetEntityId());
-                return false;
-            }
-
-            Pool = pool;
-            return true;
         }
 
         public bool TryInitialize(IDataProvider<ISpawnable> dataProvider)
