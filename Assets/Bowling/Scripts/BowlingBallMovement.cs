@@ -46,10 +46,10 @@ public class BowlingBallMovement : MonoBehaviour, IMoveable
 
     private void OnShoot(InputAction.CallbackContext context)
     {
-        Move();
+        Move(Vector3.forward);
     }
 
-    public void Move()
+    public void Move(Vector3 direction)
     {
         if (!this.gameObject.activeInHierarchy)
             return;

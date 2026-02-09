@@ -12,25 +12,25 @@ public class BalloonMovement : MonoBehaviour, IHorizontalMoveable, IVerticalMove
 
     private void FixedUpdate()
     {
-        Move();
+        Move(Vector3.up);
     }
 
-    public void Move()
+    public void Move( Vector3 direction)
     {
         if (!this.gameObject.activeInHierarchy)
             return;
 
-        MoveVertical();
-        MoveHorizontal();
+        MoveVertical(new ( direction.z, direction.y ));
+        MoveHorizontal(new ( direction.x, direction.y ));
     }
 
-    public void MoveHorizontal()
+    public void MoveHorizontal(Vector2 horizontalDirection)
     {
         transform.Translate(Mathf.Sin(2 * Mathf.PI * Time.time / horizontalFloatFrequenze) *
                     horizontalFloatAmplitude * Time.fixedDeltaTime * Vector3.right);
     }
 
-    public void MoveVertical()
+    public void MoveVertical(Vector2 verticalDirection)
     {
         transform.Translate(Time.fixedDeltaTime * verticalFloatSpeed * Vector3.up);
     }
