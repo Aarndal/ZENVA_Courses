@@ -25,15 +25,19 @@ namespace BalloonPopper
             get
             {
                 var result = new SerializableDictionary<int, List<ISpawnInstruction<IDataProvider<ISpawnable>>>>();
+                
                 foreach (var kvp in spawnerSettings)
                 {
                     var list = new List<ISpawnInstruction<IDataProvider<ISpawnable>>>();
+                    
                     foreach (var item in kvp.Value)
                     {
                         list.Add(item);
                     }
+
                     result.TryAdd(kvp.Key, list);
                 }
+
                 return result;
             }
         }

@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(Collider2D))]
-public class GroundChecker : MonoBehaviour, ICheckable
+public class GroundChecker : MonoBehaviour, IChecker
 {
     [SerializeField]
-    private Collider2D _collider = null;
+    private Collider2D checkerCollider = null;
     [SerializeField]
-    private LayerMask groundLayerMask;
+    private LayerMask groundLayer;
     [SerializeField, Range(0.01f, 0.1f)]
-    private float circleCastDistance = 0.01f;
+    private float castDistance = 0.01f;
 
     private bool _isGrounded = false;
 
@@ -39,7 +39,7 @@ public class GroundChecker : MonoBehaviour, ICheckable
 
     private void Awake()
     {
-        if (_collider == null && !this.TryGetComponent(out _collider))
+        if (checkerCollider == null && !this.TryGetComponent(out checkerCollider))
         {
             Debug.LogError("Collider2D component is missing on " + this.gameObject.name);
             this.enabled = false;
@@ -48,7 +48,7 @@ public class GroundChecker : MonoBehaviour, ICheckable
         _hitBuffer = new RaycastHit2D[8];
         _contactFilter = new ContactFilter2D
         {
-            layerMask = groundLayerMask,
+            layerMask = groundLayer,
             useTriggers = false,
             useLayerMask = true
         };
@@ -56,7 +56,9 @@ public class GroundChecker : MonoBehaviour, ICheckable
 
     private void Start()
     {
-        _collider.isTrigger = true;
+        if (checkerCollider != null)
+            checkerCollider.isTrigger = true;
+
         CheckForStateChange();
     }
 
@@ -73,7 +75,7 @@ public class GroundChecker : MonoBehaviour, ICheckable
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if ((groundLayerMask & (1 << other.gameObject.layer)) == 0 || other.isTrigger)
+        if ((groundLayer & (1 << other.gameObject.layer)) == 0 || other.isTrigger)
             return;
 
         _groundContactColliders.Add(other);
@@ -82,7 +84,7 @@ public class GroundChecker : MonoBehaviour, ICheckable
 
     private void OnTriggerExit2D(Collider2D other)
     {
-        if ((groundLayerMask & (1 << other.gameObject.layer)) == 0 || other.isTrigger)
+        if ((groundLayer & (1 << other.gameObject.layer)) == 0 || other.isTrigger)
             return;
 
         _groundContactColliders.Remove(other);
@@ -93,18 +95,18 @@ public class GroundChecker : MonoBehaviour, ICheckable
 
     private void OnDrawGizmos()
     {
-        if (_collider == null)
+        if (checkerCollider == null)
             return;
 
         Gizmos.color = _isGrounded ? Color.green : Color.red;
         Gizmos.DrawWireSphere(
-            _collider.bounds.center + Vector3.down * circleCastDistance,
-            _collider.bounds.extents.x);
+            checkerCollider.bounds.center + Vector3.down * castDistance,
+            checkerCollider.bounds.extents.x);
     }
 
     public void CheckForStateChange()
     {
-        int hitCount = Physics2D.CircleCast(_collider.bounds.center, _collider.bounds.extents.x, Vector2.down, _contactFilter, _hitBuffer, circleCastDistance);
+        int hitCount = Physics2D.CircleCast(checkerCollider.bounds.center, checkerCollider.bounds.extents.x, Vector2.down, _contactFilter, _hitBuffer, castDistance);
 
         IsGrounded = hitCount > 0;
     }
