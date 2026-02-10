@@ -1524,7 +1524,7 @@ GameObject:
   - component: {fileID: 2044062585}
   - component: {fileID: 2044062584}
   m_Layer: 0
-  m_Name: block_exclamation_active
+  m_Name: Block_Exclamation
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
