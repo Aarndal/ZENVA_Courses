@@ -1434,11 +1434,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c3a3942e22b23d543ab9c0e5d9e7c01e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GroundChecker
+  _collider: {fileID: 1765505384}
   groundLayerMask:
     serializedVersion: 2
     m_Bits: 1
-  _collider: {fileID: 1765505384}
-  circleCastDistance: 0.033
+  circleCastDistance: 0.03
 --- !u!58 &1765505384
 CircleCollider2D:
   m_ObjectHideFlags: 0

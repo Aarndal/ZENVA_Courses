@@ -6,12 +6,13 @@ using UnityEngine;
 public class GroundChecker : MonoBehaviour, ICheckable
 {
     [SerializeField]
+    private Collider2D _collider = null;
+    [SerializeField]
     private LayerMask groundLayerMask;
     [SerializeField, Range(0.01f, 0.1f)]
     private float circleCastDistance = 0.01f;
 
     private bool _isGrounded = false;
-    private Collider2D _collider = null;
 
     private RaycastHit2D[] _hitBuffer;
     private ContactFilter2D _contactFilter;
