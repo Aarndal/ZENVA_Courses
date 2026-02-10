@@ -24,7 +24,7 @@ public class PCMovement : MonoBehaviour, IHorizontalMoveable
     private void FixedUpdate()
     {
         var moveInput = _input.actions["Move"].ReadValue<Vector2>();
-        Move(moveInput);
+        Move(moveInput.normalized);
     }
 
 
