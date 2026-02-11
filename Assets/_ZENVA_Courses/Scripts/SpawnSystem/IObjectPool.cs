@@ -1,22 +1,22 @@
 ﻿public interface IObjectPool
 {
-    bool TryReturn<T>(T obj) where T : class;
+    bool TryReturn<T>(T obj);
 }
 
 public interface IGenericObjectPool : IObjectPool
 {
-    bool TryGet<T>(out T obj) where T : class;
-    bool TryGetByData<TData, TObj>(TData data, out TObj obj) where TObj : class;
+    bool TryGetOrCreate<TObj>(out TObj obj);
+    bool TryGetOrCreateByData<TData, TObj>(TData data, out TObj obj);
 }
 
-public interface IObjectPool<T1, T2> : IObjectPool where T1 : class
+public interface IObjectPool<TObj, TData> : IObjectPool
 {
-    bool TryGet(T2 key, out T1 obj);
-    bool TryReturn(T1 obj);
+    bool TryGetOrCreate(TData data, out TObj obj);
+    bool TryReturn(TObj obj);
 }
 
-public interface IObjectPool<T> : IObjectPool where T : class
+public interface IObjectPool<T> : IObjectPool
 {
-    bool TryGet(out T obj);
+    bool TryGetOrCreate(out T obj);
     bool TryReturn(T obj);
 }

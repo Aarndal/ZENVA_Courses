@@ -1,13 +1,12 @@
 ﻿using UnityEngine;
 
-public interface ISpawnable
+public interface ISpawnable: IActivatable
 {
-    IDataProvider<ISpawnable> Data { get; }
+    ISpawnableDataProvider Data { get; }
     GameObject GameObject { get; }
-    string SpawnableType { get; }
 
     void Despawn();
-    void Spawn(Vector3 spawnPosition);
+    void Spawn(Vector3 spawnPosition, ISpawnContext context);
 
-    bool TryInitialize(IDataProvider<ISpawnable> data);
+    bool TryInitialize(ISpawnableDataProvider data);
 }
