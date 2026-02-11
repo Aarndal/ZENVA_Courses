@@ -3,10 +3,14 @@ using UnityEngine;
 
 public class PCJump : MonoBehaviour, IVerticalMoveable
 {
+    private const float STANDARD_GRAVITY_SCALE = 1.0f;
+
     [SerializeField]
     private JumpnRunInputReader inputReader = null;
-    [SerializeField]
+    [SerializeField, Min(0.1f)]
     private float jumpImpulse = 5.0f;
+    [SerializeField, Min(STANDARD_GRAVITY_SCALE)]
+    private float fallGravityScale = 2.0f;
 
     private Rigidbody2D _rigidbody = null;
     private GroundChecker _groundChecker = null;
@@ -39,14 +43,14 @@ public class PCJump : MonoBehaviour, IVerticalMoveable
 
     private void FixedUpdate()
     {
-        if (_rigidbody.linearVelocityY < 0.0f && _rigidbody.gravityScale < 1.5f)
+        if (_rigidbody.linearVelocityY < 0.0f && _rigidbody.gravityScale < fallGravityScale)
         {
-            _rigidbody.gravityScale = 1.5f;
+            _rigidbody.gravityScale = fallGravityScale;
         }
 
-        if (_rigidbody.linearVelocityY >= 0.0f && _rigidbody.gravityScale > 1.0f)
+        if (_rigidbody.linearVelocityY >= 0.0f && _rigidbody.gravityScale > STANDARD_GRAVITY_SCALE)
         {
-            _rigidbody.gravityScale = 1.0f;
+            _rigidbody.gravityScale = STANDARD_GRAVITY_SCALE;
         }
     }
 

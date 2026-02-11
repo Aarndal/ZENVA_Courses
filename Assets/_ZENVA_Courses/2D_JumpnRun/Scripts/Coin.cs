@@ -3,6 +3,7 @@ using CollectibleSystem;
 using InteractableSystem;
 using UnityEngine;
 
+[RequireComponent(typeof(Collider2D))]
 public class Coin : MonoBehaviour, ICollectible, ISpawnable, IInteractable
 {
     [SerializeField]
@@ -44,7 +45,7 @@ public class Coin : MonoBehaviour, ICollectible, ISpawnable, IInteractable
 
     public bool TryInteract<T>(IInteractor interactor, T data = default)
     {
-        if ((interactor.InteractorLayer & (1 << LayerMask.NameToLayer("Player"))) == 0)
+        if ((interactor.InteractorLayer & (1 << LayerMask.NameToLayer("PlayerCharacter"))) == 0)
         {
             return false;
         }
