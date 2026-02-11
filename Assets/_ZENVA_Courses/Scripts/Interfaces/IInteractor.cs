@@ -1,6 +1,9 @@
 ﻿using UnityEngine;
 
-public interface IInteractor
+namespace InteractableSystem
 {
-    LayerMask InteractorLayer { get; }
+    public interface IInteractor
+    {
+        LayerMask InteractorLayer { get; }
+    }
 }

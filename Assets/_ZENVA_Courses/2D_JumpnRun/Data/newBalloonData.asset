@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: newBalloonData
   m_EditorClassIdentifier: Assembly-CSharp::BalloonPopper.SpawnableDataProviderSO
   id: 
-  material: {fileID: 0}
-  prefab: {fileID: 0}
+  material: {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
+  prefab: {fileID: 1302833291252398042, guid: f81f75a968e6c874a88756ba77fa5a5b, type: 3}
   clicksToPop: 5
   initialScale: 1
   scaleFactor: 0.2

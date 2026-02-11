@@ -1,5 +1,6 @@
 ﻿using BalloonPopper;
-using TMPro;
+using CollectibleSystem;
+using InteractableSystem;
 using UnityEngine;
 
 public class Coin : MonoBehaviour, ICollectible, ISpawnable, IInteractable
@@ -55,5 +56,10 @@ public class Coin : MonoBehaviour, ICollectible, ISpawnable, IInteractable
     {
         Debug.Log("Coin collected!");
         return true;
+    }
+
+    public bool TryCollect<T>(ICollector<T> collector)
+    {
+        throw new System.NotImplementedException();
     }
 }

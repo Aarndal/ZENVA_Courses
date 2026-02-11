@@ -1,6 +1,7 @@
+using InteractableSystem;
 using UnityEngine;
 
-public class CoinSpawner : MonoBehaviour, ISpawner, IInteractable
+internal class CoinSpawner : MonoBehaviour, ISpawner, IInteractable
 {
     [SerializeField]
     private Coin coin = null;
