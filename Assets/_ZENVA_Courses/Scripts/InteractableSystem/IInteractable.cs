@@ -1,12 +1,9 @@
 ﻿namespace InteractableSystem
 {
-    public interface IInteractable
+    public interface IInteractable 
     {
-        bool TryInteract<T>(IInteractor interactor, T data = default);
-    }
+        bool CanBeInteractedWith { get; }
 
-    public interface IInteractable<T> : IInteractable where T : IDataProvider
-    {
-        bool TryInteract(IInteractor interactor, T data);
+        bool TryInteract(IInteractor interactor);
     }
 }

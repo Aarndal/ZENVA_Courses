@@ -39,13 +39,13 @@ namespace BalloonPopper
         {
             for (int i = 0; i < spawnerSettings.NumberOfSpawners; i++)
             {
-                if(!spawnerSettings.Instructions.TryGetValue(i, out List<ISpawnInstruction<IDataProvider<ISpawnable>>> instructions))
+                if(!spawnerSettings.Instructions.TryGetValue(i, out List<ISpawnerInstruction<IDataProvider<ISpawnable>>> instructions))
                 {
                     Debug.LogErrorFormat("No SpawnInstructions found for spawner index {0}.", i);
                     break;
                 }
 
-                List<ISpawnInstruction<IDataProvider<ISpawnable>>> castInstructions = instructions.Cast<ISpawnInstruction<IDataProvider<ISpawnable>>>().ToList();
+                List<ISpawnerInstruction<IDataProvider<ISpawnable>>> castInstructions = instructions.Cast<ISpawnerInstruction<IDataProvider<ISpawnable>>>().ToList();
 
                 var spawnerIndex = i % spawners.Length;
 

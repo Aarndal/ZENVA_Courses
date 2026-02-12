@@ -9,5 +9,5 @@ public abstract class SpawnerComponent : MonoBehaviour, ISpawner
 
 public abstract class SpawnerComponent<T> : SpawnerComponent, ISpawner<T> where T : IDataProvider<ISpawnable>
 {
-    public abstract bool TrySetInstructions(List<ISpawnInstruction<T>> instructions);
+    public abstract bool TrySetInstructions(List<ISpawnerInstruction<T>> instructions);
 }

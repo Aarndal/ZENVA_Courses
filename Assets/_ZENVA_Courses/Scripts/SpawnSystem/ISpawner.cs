@@ -1,12 +1,18 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.ObjectModel;
 
-public interface ISpawner<T> : ISpawner where T : IDataProvider
+namespace SpawnSystem
 {
-    bool TrySetInstructions(List<ISpawnInstruction<T>> instructions);
-}
+    public interface ISpawner
+    {
+        ReadOnlyCollection<ISpawnerInstruction> Instructions { get; }
+        
+        event Action SpawningStarted;
+        event Action SpawningStopped;
 
-public interface ISpawner
-{
-    void StartSpawning();
-    void StopSpawning();
+        void StartSpawning();
+        void StopSpawning();
+
+        bool TrySetInstructions(Collection<ISpawnerInstruction> instructions);
+    }
 }

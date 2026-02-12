@@ -13,5 +13,5 @@ public class BalloonSpawnInstructionSO : SpawnInstructionSO
 
     public override IDataProvider<ISpawnable> Data => data;
     public override int AmountToSpawn => amount;
-    public override ISpawnInterval SpawnInterval => spawnInterval;
+    public override IIntervalSequence SpawnInterval => spawnInterval;
 }

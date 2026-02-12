@@ -1,18 +1,19 @@
 ﻿using System;
 
-public interface IDataProvider 
-    //: IEquatable<IDataProvider>
+/// <summary>
+/// Base interface for all data providers.
+/// </summary>
+public interface IDataProvider : IEquatable<IDataProvider>
 {
     Guid Id { get; }
+}
+
+/// <summary>
+/// Typed data provider that provides data for a specific type.
+/// </summary>
+/// <typeparam name="T">The type this provider supplies data for.</typeparam>
+public interface IDataProvider<T> : IDataProvider
+{
     string InstanceName { get; }
-}
-
-public interface IDataProvider<T> : IDataProvider where T : class
-{
     Type ProvidedType => typeof(T);
-}
-
-public interface ISpawnableDataProvider: IDataProvider<ISpawnable>
-{
-    IObjectPool<ISpawnable> Pool { get; }
 }

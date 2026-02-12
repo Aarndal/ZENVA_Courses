@@ -20,15 +20,15 @@ namespace BalloonPopper
         public override int NumberOfSpawners => numberOfSpawners;
         //public override SerializableDictionary<int, List<ISpawnInstruction<IDataProvider<ISpawnable>>>> SpawnerSettings => spawnerSettings;
 
-        public override SerializableDictionary<int, List<ISpawnInstruction<IDataProvider<ISpawnable>>>> Instructions
+        public override SerializableDictionary<int, List<ISpawnerInstruction<IDataProvider<ISpawnable>>>> Instructions
         {
             get
             {
-                var result = new SerializableDictionary<int, List<ISpawnInstruction<IDataProvider<ISpawnable>>>>();
+                var result = new SerializableDictionary<int, List<ISpawnerInstruction<IDataProvider<ISpawnable>>>>();
                 
                 foreach (var kvp in spawnerSettings)
                 {
-                    var list = new List<ISpawnInstruction<IDataProvider<ISpawnable>>>();
+                    var list = new List<ISpawnerInstruction<IDataProvider<ISpawnable>>>();
                     
                     foreach (var item in kvp.Value)
                     {

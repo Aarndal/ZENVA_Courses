@@ -13,7 +13,7 @@ namespace BalloonPopper
         private int _currentInstructionIndex = 0;
         private int _spawnedCount = 0;
 
-        public List<ISpawnInstruction<IDataProvider<ISpawnable>>> Instructions { get; private set; } = new();
+        public List<ISpawnerInstruction<IDataProvider<ISpawnable>>> Instructions { get; private set; } = new();
 
 
         private void Start()
@@ -88,7 +88,7 @@ namespace BalloonPopper
             return false;
         }
 
-        public override bool TrySetInstructions(List<ISpawnInstruction<IDataProvider<ISpawnable>>> instructions)
+        public override bool TrySetInstructions(List<ISpawnerInstruction<IDataProvider<ISpawnable>>> instructions)
         {
             if (instructions == null)
             {

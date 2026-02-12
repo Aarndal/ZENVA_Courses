@@ -32,6 +32,6 @@ public class PC_Interaction : MonoBehaviour, IInteractor
             return;
         }
 
-        interactable?.TryInteract<IInteractor>(this);
+        interactable?.TryInteract(this);
     }
 }
