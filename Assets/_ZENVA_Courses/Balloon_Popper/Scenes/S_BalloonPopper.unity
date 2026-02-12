@@ -128,7 +128,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 156792774}
-  - component: {fileID: 156792773}
   m_Layer: 0
   m_Name: Input
   m_TagString: Untagged
@@ -136,19 +135,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &156792773
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 156792772}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6d56ecce57deb9d42a1ce83862f23041, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::MouseClick
-  gameCamera: {fileID: 1241748228}
 --- !u!4 &156792774
 Transform:
   m_ObjectHideFlags: 0
@@ -447,17 +433,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 8096049015483223616, guid: f8c36e86ef8b2f745bea8361b1089d30, type: 3}
   m_PrefabInstance: {fileID: 502824951}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &502824953 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 6059549604894736199, guid: f8c36e86ef8b2f745bea8361b1089d30, type: 3}
-  m_PrefabInstance: {fileID: 502824951}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7ed66b8e1ed5e6a44a8a97aaa170e439, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::BalloonSpawner
 --- !u!1 &542079081
 GameObject:
   m_ObjectHideFlags: 0
@@ -467,7 +442,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 542079082}
-  - component: {fileID: 542079084}
   m_Layer: 5
   m_Name: UI_ScoreManager
   m_TagString: Untagged
@@ -495,18 +469,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &542079084
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 542079081}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bec742ee6e862024db83d5aafbcdc7c3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::BalloonPopper.BalloonPopperScoreManager
 --- !u!1001 &550669706
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -573,17 +535,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 8096049015483223616, guid: f8c36e86ef8b2f745bea8361b1089d30, type: 3}
   m_PrefabInstance: {fileID: 550669706}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &550669708 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 6059549604894736199, guid: f8c36e86ef8b2f745bea8361b1089d30, type: 3}
-  m_PrefabInstance: {fileID: 550669706}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7ed66b8e1ed5e6a44a8a97aaa170e439, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::BalloonSpawner
 --- !u!1001 &682205805
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -650,17 +601,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 8096049015483223616, guid: f8c36e86ef8b2f745bea8361b1089d30, type: 3}
   m_PrefabInstance: {fileID: 682205805}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &682205807 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 6059549604894736199, guid: f8c36e86ef8b2f745bea8361b1089d30, type: 3}
-  m_PrefabInstance: {fileID: 682205805}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7ed66b8e1ed5e6a44a8a97aaa170e439, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::BalloonSpawner
 --- !u!1 &890381497
 GameObject:
   m_ObjectHideFlags: 0
@@ -670,9 +610,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 890381498}
-  - component: {fileID: 890381499}
   m_Layer: 0
-  m_Name: BalloonSpawnerManager
+  m_Name: BalloonSpawners
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -698,25 +637,6 @@ Transform:
   - {fileID: 1944635421}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &890381499
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 890381497}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 328c5e7d85ee03642ae3c57a55f08639, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::BalloonPopper.SpawnerManager
-  spawners:
-  - {fileID: 1951566245}
-  - {fileID: 502824953}
-  - {fileID: 550669708}
-  - {fileID: 682205807}
-  - {fileID: 1944635422}
-  spawnerSettings: {fileID: 11400000, guid: 6bf1a36fbe7ac9048a2b787769a15c36, type: 2}
 --- !u!1 &982941533
 GameObject:
   m_ObjectHideFlags: 0
@@ -1035,54 +955,6 @@ MonoBehaviour:
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
   m_Version: 2
---- !u!1 &1429527338
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1429527339}
-  - component: {fileID: 1429527340}
-  m_Layer: 0
-  m_Name: PoolFactory
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1429527339
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1429527338}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -10, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1429527340
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1429527338}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2fd76937a8959ad44ba2ad25f67a0c7e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::BalloonPopper.SpawnablePoolFactory
-  spawnableData:
-  - {fileID: 11400000, guid: 09919b817a0b5664d807cb1262fb012f, type: 2}
-  - {fileID: 11400000, guid: 28e928deb5385cb42b1ed34716244043, type: 2}
-  - {fileID: 11400000, guid: d5ddcb7210a27294cabf41066957b59a, type: 2}
 --- !u!1001 &1944635420
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1149,17 +1021,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 8096049015483223616, guid: f8c36e86ef8b2f745bea8361b1089d30, type: 3}
   m_PrefabInstance: {fileID: 1944635420}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &1944635422 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 6059549604894736199, guid: f8c36e86ef8b2f745bea8361b1089d30, type: 3}
-  m_PrefabInstance: {fileID: 1944635420}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7ed66b8e1ed5e6a44a8a97aaa170e439, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::BalloonSpawner
 --- !u!1001 &1951566243
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1216,7 +1077,8 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 6059549604894736199, guid: f8c36e86ef8b2f745bea8361b1089d30, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
@@ -1226,17 +1088,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 8096049015483223616, guid: f8c36e86ef8b2f745bea8361b1089d30, type: 3}
   m_PrefabInstance: {fileID: 1951566243}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &1951566245 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 6059549604894736199, guid: f8c36e86ef8b2f745bea8361b1089d30, type: 3}
-  m_PrefabInstance: {fileID: 1951566243}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7ed66b8e1ed5e6a44a8a97aaa170e439, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::BalloonSpawner
 --- !u!1 &2103470547
 GameObject:
   m_ObjectHideFlags: 0
@@ -1373,7 +1224,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2128264592}
-  - component: {fileID: 2128264593}
   m_Layer: 5
   m_Name: ScoreDisplay
   m_TagString: Untagged
@@ -1401,20 +1251,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: -50}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &2128264593
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2128264591}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a0aeee350e08c1a4f8a4f674a9890235, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ScoreDisplay
-  scoreManager: {fileID: 542079084}
-  scoreText: {fileID: 387674895}
 --- !u!1001 &8105738012346536854
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1480,7 +1316,6 @@ SceneRoots:
   - {fileID: 2103470549}
   - {fileID: 473580391}
   - {fileID: 8105738012346536854}
-  - {fileID: 1429527339}
   - {fileID: 890381498}
   - {fileID: 982941537}
   - {fileID: 156792774}

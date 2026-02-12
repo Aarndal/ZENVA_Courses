@@ -1,10 +1,43 @@
 using InteractableSystem;
+using SpawnSystem;
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 internal class CoinSpawner : MonoBehaviour, ISpawner, IInteractable
 {
     [SerializeField]
     private Coin coin = null;
+
+    public bool CanBeInteractedWith => throw new NotImplementedException();
+
+    Queue<ISpawnerInstruction> ISpawner.Instructions => throw new NotImplementedException();
+
+    event Action ISpawner.SpawningStarted
+    {
+        add
+        {
+            throw new NotImplementedException();
+        }
+
+        remove
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    event Action ISpawner.SpawningStopped
+    {
+        add
+        {
+            throw new NotImplementedException();
+        }
+
+        remove
+        {
+            throw new NotImplementedException();
+        }
+    }
 
     public void StartSpawning()
     {
@@ -24,6 +57,16 @@ internal class CoinSpawner : MonoBehaviour, ISpawner, IInteractable
         }
         StartSpawning();
         return true;
+    }
+
+    public bool TryInteract(IInteractor interactor)
+    {
+        throw new NotImplementedException();
+    }
+
+    bool ISpawner.TrySetInstructions(Queue<ISpawnerInstruction> instructions)
+    {
+        throw new NotImplementedException();
     }
 }
 

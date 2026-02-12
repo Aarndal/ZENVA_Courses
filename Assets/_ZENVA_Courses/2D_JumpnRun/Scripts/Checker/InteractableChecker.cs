@@ -40,6 +40,6 @@ public class InteractableChecker : MonoBehaviour, IChecker<IInteractable>, IInte
 
     public bool Check(IInteractable interactable)
     {
-        return interactable.TryInteract<Rigidbody2D>(this);
+        return interactable.TryInteract(this);
     }
 }

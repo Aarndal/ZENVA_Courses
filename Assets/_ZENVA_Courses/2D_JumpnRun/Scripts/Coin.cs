@@ -1,6 +1,6 @@
-﻿using BalloonPopper;
-using CollectibleSystem;
+﻿using CollectibleSystem;
 using InteractableSystem;
+using SpawnSystem;
 using UnityEngine;
 
 [RequireComponent(typeof(Collider2D))]
@@ -14,6 +14,12 @@ public class Coin : MonoBehaviour, ICollectible, ISpawnable, IInteractable
     public GameObject GameObject => this.gameObject;
 
     public string SpawnableType { get; private set; }
+
+    ISpawnableData ISpawnable.Data => throw new System.NotImplementedException();
+
+    IToggleable.ToggleState IToggleable.State => throw new System.NotImplementedException();
+
+    bool IInteractable.CanBeInteractedWith => throw new System.NotImplementedException();
 
     public void Despawn()
     {
@@ -60,6 +66,26 @@ public class Coin : MonoBehaviour, ICollectible, ISpawnable, IInteractable
     }
 
     public bool TryCollect<T>(ICollector<T> collector)
+    {
+        throw new System.NotImplementedException();
+    }
+
+    void ISpawnable.Spawn(Vector3 spawnPosition, ISpawnContext context)
+    {
+        throw new System.NotImplementedException();
+    }
+
+    bool ISpawnable.TryInitialize(ISpawnableData data)
+    {
+        throw new System.NotImplementedException();
+    }
+
+    bool IToggleable.TryToggle()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    bool IInteractable.TryInteract(IInteractor interactor)
     {
         throw new System.NotImplementedException();
     }

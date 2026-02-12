@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace BalloonPopper
+namespace SpawnSystem
 {
     // Catches balloons that have not been popped and returns them to the BalloonPool.
     [RequireComponent(typeof(Collider), typeof(Rigidbody))]
@@ -19,7 +19,7 @@ namespace BalloonPopper
             if (logCaughtBalloonsInEditor)
             {
                 Debug.LogFormat("Spawnable entered Catcher: {0}",
-                        caughtBalloon.SpawnableType);
+                        caughtBalloon.GameObject.name);
             }
 #endif
             caughtBalloon.Despawn();
