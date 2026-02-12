@@ -5,6 +5,7 @@ using UnityEngine;
 
 namespace SpawnSystem
 {
+    [Serializable]
     public abstract class SpawnableDataSO : ScriptableObject, ISpawnableData
     {
         [SerializeField, HideInInspector]

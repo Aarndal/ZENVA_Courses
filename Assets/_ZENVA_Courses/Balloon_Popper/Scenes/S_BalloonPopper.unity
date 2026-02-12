@@ -128,6 +128,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 156792774}
+  - component: {fileID: 156792775}
   m_Layer: 0
   m_Name: Input
   m_TagString: Untagged
@@ -142,6 +143,68 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 156792772}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &156792775
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 156792772}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d56ecce57deb9d42a1ce83862f23041, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MouseClick
+  gameCamera: {fileID: 1241748228}
+--- !u!1 &200010648
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 200010650}
+  - component: {fileID: 200010649}
+  m_Layer: 0
+  m_Name: SpawnablePool
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &200010649
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 200010648}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 71c51dde906b756479dfd707185474a1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SpawnSystem.SpawnablePool
+  scope: 1
+  spawnableTypes:
+  - {fileID: 11400000, guid: 6eeaad8df5bf24740affe7f890d7f144, type: 2}
+  - {fileID: 11400000, guid: 0299db07beb155e42a56e1464bdbcaf6, type: 2}
+  - {fileID: 11400000, guid: 3217ebeffcaed464e8f873021444aa25, type: 2}
+--- !u!4 &200010650
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 200010648}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
@@ -383,6 +446,22 @@ PrefabInstance:
       propertyPath: instructions
       value: 
       objectReference: {fileID: 11400000, guid: dee3aba559f2ff149aafa7e449ba8c8c, type: 2}
+    - target: {fileID: 8048518898471035705, guid: f8c36e86ef8b2f745bea8361b1089d30, type: 3}
+      propertyPath: instructionList.Array.size
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 8048518898471035705, guid: f8c36e86ef8b2f745bea8361b1089d30, type: 3}
+      propertyPath: 'instructionList.Array.data[0]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 533e847c60dc30b4fb0e1f38a852ac1d, type: 2}
+    - target: {fileID: 8048518898471035705, guid: f8c36e86ef8b2f745bea8361b1089d30, type: 3}
+      propertyPath: 'instructionList.Array.data[1]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 857ef7db780463c4e84312cb8773c2c2, type: 2}
+    - target: {fileID: 8048518898471035705, guid: f8c36e86ef8b2f745bea8361b1089d30, type: 3}
+      propertyPath: 'instructionList.Array.data[2]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 533e847c60dc30b4fb0e1f38a852ac1d, type: 2}
     - target: {fileID: 8096049015483223616, guid: f8c36e86ef8b2f745bea8361b1089d30, type: 3}
       propertyPath: m_LocalPosition.x
       value: -5
@@ -442,6 +521,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 542079082}
+  - component: {fileID: 542079083}
   m_Layer: 5
   m_Name: UI_ScoreManager
   m_TagString: Untagged
@@ -469,6 +549,18 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &542079083
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 542079081}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bec742ee6e862024db83d5aafbcdc7c3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BalloonPopper.BalloonPopperScoreManager
 --- !u!1001 &550669706
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -485,6 +577,22 @@ PrefabInstance:
       propertyPath: instructions
       value: 
       objectReference: {fileID: 11400000, guid: 4814802ec8f56e8479e20f8ed924e53f, type: 2}
+    - target: {fileID: 8048518898471035705, guid: f8c36e86ef8b2f745bea8361b1089d30, type: 3}
+      propertyPath: instructionList.Array.size
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 8048518898471035705, guid: f8c36e86ef8b2f745bea8361b1089d30, type: 3}
+      propertyPath: 'instructionList.Array.data[0]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 533e847c60dc30b4fb0e1f38a852ac1d, type: 2}
+    - target: {fileID: 8048518898471035705, guid: f8c36e86ef8b2f745bea8361b1089d30, type: 3}
+      propertyPath: 'instructionList.Array.data[1]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 533e847c60dc30b4fb0e1f38a852ac1d, type: 2}
+    - target: {fileID: 8048518898471035705, guid: f8c36e86ef8b2f745bea8361b1089d30, type: 3}
+      propertyPath: 'instructionList.Array.data[2]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 533e847c60dc30b4fb0e1f38a852ac1d, type: 2}
     - target: {fileID: 8096049015483223616, guid: f8c36e86ef8b2f745bea8361b1089d30, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -551,6 +659,22 @@ PrefabInstance:
       propertyPath: instructions
       value: 
       objectReference: {fileID: 11400000, guid: dee3aba559f2ff149aafa7e449ba8c8c, type: 2}
+    - target: {fileID: 8048518898471035705, guid: f8c36e86ef8b2f745bea8361b1089d30, type: 3}
+      propertyPath: instructionList.Array.size
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 8048518898471035705, guid: f8c36e86ef8b2f745bea8361b1089d30, type: 3}
+      propertyPath: 'instructionList.Array.data[0]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 533e847c60dc30b4fb0e1f38a852ac1d, type: 2}
+    - target: {fileID: 8048518898471035705, guid: f8c36e86ef8b2f745bea8361b1089d30, type: 3}
+      propertyPath: 'instructionList.Array.data[1]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 533e847c60dc30b4fb0e1f38a852ac1d, type: 2}
+    - target: {fileID: 8048518898471035705, guid: f8c36e86ef8b2f745bea8361b1089d30, type: 3}
+      propertyPath: 'instructionList.Array.data[2]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 857ef7db780463c4e84312cb8773c2c2, type: 2}
     - target: {fileID: 8096049015483223616, guid: f8c36e86ef8b2f745bea8361b1089d30, type: 3}
       propertyPath: m_LocalPosition.x
       value: 2
@@ -971,6 +1095,22 @@ PrefabInstance:
       propertyPath: instructions
       value: 
       objectReference: {fileID: 11400000, guid: 4814802ec8f56e8479e20f8ed924e53f, type: 2}
+    - target: {fileID: 8048518898471035705, guid: f8c36e86ef8b2f745bea8361b1089d30, type: 3}
+      propertyPath: instructionList.Array.size
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 8048518898471035705, guid: f8c36e86ef8b2f745bea8361b1089d30, type: 3}
+      propertyPath: 'instructionList.Array.data[0]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 857ef7db780463c4e84312cb8773c2c2, type: 2}
+    - target: {fileID: 8048518898471035705, guid: f8c36e86ef8b2f745bea8361b1089d30, type: 3}
+      propertyPath: 'instructionList.Array.data[1]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 533e847c60dc30b4fb0e1f38a852ac1d, type: 2}
+    - target: {fileID: 8048518898471035705, guid: f8c36e86ef8b2f745bea8361b1089d30, type: 3}
+      propertyPath: 'instructionList.Array.data[2]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 533e847c60dc30b4fb0e1f38a852ac1d, type: 2}
     - target: {fileID: 8096049015483223616, guid: f8c36e86ef8b2f745bea8361b1089d30, type: 3}
       propertyPath: m_LocalPosition.x
       value: -2
@@ -1037,6 +1177,22 @@ PrefabInstance:
       propertyPath: instructions
       value: 
       objectReference: {fileID: 11400000, guid: 4814802ec8f56e8479e20f8ed924e53f, type: 2}
+    - target: {fileID: 8048518898471035705, guid: f8c36e86ef8b2f745bea8361b1089d30, type: 3}
+      propertyPath: instructionList.Array.size
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 8048518898471035705, guid: f8c36e86ef8b2f745bea8361b1089d30, type: 3}
+      propertyPath: 'instructionList.Array.data[0]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 533e847c60dc30b4fb0e1f38a852ac1d, type: 2}
+    - target: {fileID: 8048518898471035705, guid: f8c36e86ef8b2f745bea8361b1089d30, type: 3}
+      propertyPath: 'instructionList.Array.data[1]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 533e847c60dc30b4fb0e1f38a852ac1d, type: 2}
+    - target: {fileID: 8048518898471035705, guid: f8c36e86ef8b2f745bea8361b1089d30, type: 3}
+      propertyPath: 'instructionList.Array.data[2]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 69618b5714aeb3b43ae85dfe3996ca55, type: 2}
     - target: {fileID: 8096049015483223616, guid: f8c36e86ef8b2f745bea8361b1089d30, type: 3}
       propertyPath: m_LocalPosition.x
       value: 5
@@ -1224,6 +1380,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2128264592}
+  - component: {fileID: 2128264593}
   m_Layer: 5
   m_Name: ScoreDisplay
   m_TagString: Untagged
@@ -1251,6 +1408,20 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: -50}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &2128264593
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2128264591}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a0aeee350e08c1a4f8a4f674a9890235, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ScoreDisplay
+  scoreManager: {fileID: 542079083}
+  scoreText: {fileID: 387674895}
 --- !u!1001 &8105738012346536854
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1316,6 +1487,7 @@ SceneRoots:
   - {fileID: 2103470549}
   - {fileID: 473580391}
   - {fileID: 8105738012346536854}
+  - {fileID: 200010650}
   - {fileID: 890381498}
   - {fileID: 982941537}
   - {fileID: 156792774}

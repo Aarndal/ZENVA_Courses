@@ -20,7 +20,7 @@ namespace SpawnSystem
         [SerializeField]
         private PoolScope scope = PoolScope.Global;
         [SerializeField]
-        private SerializableDictionary<SpawnableDataSO, int> PoolSizePerSpawnableType = default;
+        private List<SpawnableDataSO> spawnableTypes = default;
 
         public bool IsInitialized => _isInitialized;
         public PoolScope Scope => scope;
@@ -29,6 +29,7 @@ namespace SpawnSystem
         #region Unity Lifecycle Methods
         private void Awake()
         {
+            _spawnables.Clear();
             _factory ??= new(this);
             _isInitialized = TryInitializeAllTypePools();
         }
@@ -45,14 +46,14 @@ namespace SpawnSystem
         #region Private Methods
         private bool TryInitializeAllTypePools()
         {
-            foreach (var kvp in PoolSizePerSpawnableType)
+            foreach (var data in spawnableTypes)
             {
-                if (!TryInitializeTypePool(kvp.Key, kvp.Value))
+                if (!TryInitializeTypePool(data))
                 {
                     Debug.LogErrorFormat("Failed to initialize Spawnable type: {0} | ID: {1} " +
                         "\nin SpawnablePool: {2} | ID: {3}",
-                        kvp.Key.InstanceName,
-                        kvp.Key.ID,
+                        data.InstanceName,
+                        data.ID,
                         this.gameObject.name,
                         this.gameObject.GetEntityId());
                     return false;
@@ -141,7 +142,7 @@ namespace SpawnSystem
                 initialCapacity = Mathf.Max(initialCapacity, DefaultInitialCapacityPerSpawnableType);
             }
 
-            // Prevent duplicate initialization for the same Spawnable type by checking if the type already exists in the pool.
+            // Prevent duplicate initialization for the same Spawnable type
             if (!_spawnables.TryAdd(data.ID, new Stack<ISpawnable>(initialCapacity)))
             {
                 Debug.LogWarningFormat("Failed to initialize Spawnable type: {0} | ID: {1} " +
@@ -153,8 +154,8 @@ namespace SpawnSystem
                 return false;
             }
 
-            // Populate the pool with the initial capacity of balloons for the given type.
-            for (int i = 0; i < _spawnables[data.ID].Count; i++)
+            // Populate the pool with the initial capacity
+            for (int i = 0; i < initialCapacity; i++)
             {
                 if (!_factory.TryCreate(data, out ISpawnable spawnable))
                 {

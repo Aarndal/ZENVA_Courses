@@ -3,6 +3,7 @@ using UnityEngine;
 
 namespace SpawnSystem
 {
+    [CreateAssetMenu(fileName = "newSpawnContext", menuName = "Spawn System/Spawn Context", order = 0)]
     public class SpawnContextSO : ScriptableObject, ISpawnContext
     {
         [SerializeField, HideInInspector]
