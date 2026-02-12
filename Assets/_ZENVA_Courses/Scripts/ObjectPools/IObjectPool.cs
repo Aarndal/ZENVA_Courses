@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.ObjectModel;
 
 namespace ObjectPools
 {
@@ -14,7 +13,7 @@ namespace ObjectPools
     /// </summary>
     public interface IObjectPool
     {
-        int ActiveCount { get; }
+        bool IsInitialized { get; }
         PoolScope Scope { get; }
 
         bool TryReturnAll();
@@ -29,12 +28,10 @@ namespace ObjectPools
     {
         const int DefaultInitialCapacity = 10;
 
-        ReadOnlyDictionary<Guid, TObj> AvailableObjects { get; }
-
-        bool TryInitialize(int initialCapacity = DefaultInitialCapacity, TData data = default);
+        TObj GetOrCreate(TData data);
         bool TryGet(Guid id, out TObj obj);
         bool TryGet(TData data, out TObj obj);
-        TObj GetOrCreate(TData data);
+        bool TryInitializeTypePool(TData data, int initialCapacity = DefaultInitialCapacity);
         bool TryReturn(TObj obj);
     }
 

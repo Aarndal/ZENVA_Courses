@@ -1,4 +1,5 @@
 using Cysharp.Threading.Tasks;
+using SpawnSystem;
 using System;
 using UnityEngine;
 
@@ -7,20 +8,24 @@ namespace BalloonPopper
     public class Balloon : MonoBehaviour, ISpawnable, IClickable
     {
         // Public Static Events
-        public static event Action<ISpawnable, SpawnableDataProviderSO> BalloonPopped;
+        public static event Action<ISpawnable, BalloonDataSO> BalloonPopped;
 
         // Private Member Variables
         private int _counter = 0;
         private bool _isInitialized = false;
         private bool _isPopping = false;
 
-        private SpawnableDataProviderSO _data = null;
+        private BalloonDataSO _data = null;
         private Renderer _renderer = null;
 
         // Properties
         public IDataProvider<ISpawnable> Data => _data;
         public GameObject GameObject => this.gameObject;
         public string SpawnableType { get; private set; }
+
+        ISpawnableData ISpawnable.Data => throw new NotImplementedException();
+
+        public IToggleable.ToggleState State => throw new NotImplementedException();
 
         #region Unity Lifecycle Methods
         private void Awake()
@@ -67,10 +72,10 @@ namespace BalloonPopper
 
         public void Despawn()
         {
-            _data.Pool.TryReturn(this);
+            _data.SpawnPool.TryReturn(this);
         }
 
-        public void Spawn(Vector3 spawnPosition)
+        public void Spawn(Vector3 spawnPosition, ISpawnContext context = null)
         {
             // If we fail to reset the counter, return the balloon to the pool
             if (!TryResetCounter())
@@ -88,7 +93,7 @@ namespace BalloonPopper
             }
         }
 
-        public bool TryInitialize(IDataProvider<ISpawnable> dataProvider)
+        public bool TryInitialize(ISpawnableData dataProvider)
         {
             // Don't allow re-initialization
             if (_isInitialized)
@@ -118,19 +123,19 @@ namespace BalloonPopper
             return TryInitializeBalloon(dataProvider);
         }
 
-        private bool TryInitializeBalloon(IDataProvider<ISpawnable> dataProvider)
+        private bool TryInitializeBalloon(ISpawnableData data)
         {
-            _data = (SpawnableDataProviderSO)dataProvider;
+            _data = (BalloonDataSO)data;
 
             if (_data == null)
             {
                 Debug.LogErrorFormat("Balloon initialization failed, incorrect data type: {0} | Type: {1}",
-                    dataProvider.InstanceName,
-                    dataProvider.ProvidedType);
+                    data.InstanceName,
+                    data.ProvidedType);
                 return false;
             }
 
-            this.SpawnableType = dataProvider.InstanceName;
+            this.SpawnableType = data.InstanceName;
 
             _renderer.material = _data.Material;
             this.transform.localScale = Vector3.one * _data.InitialScale;
@@ -190,6 +195,11 @@ namespace BalloonPopper
             }
 
             return true;
+        }
+
+        public bool TryToggle()
+        {
+            throw new NotImplementedException();
         }
         #endregion
     }

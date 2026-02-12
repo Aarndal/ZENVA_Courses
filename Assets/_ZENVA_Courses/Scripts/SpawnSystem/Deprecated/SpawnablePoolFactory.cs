@@ -1,16 +1,19 @@
-﻿using System.Collections.Generic;
+﻿using SpawnSystem;
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
 namespace BalloonPopper
 {
+    [Obsolete("This class is deprecated and will be removed in future versions.", false)]
     // Factory responsible for creating Object Pools for ISpawnables.
-    public class SpawnablePoolFactory : MonoBehaviour, IFactory<SpawnablePool, KeyValuePair<GameObject, Stack<SpawnableDataProviderSO>>>
+    public class SpawnablePoolFactory : MonoBehaviour, IFactory<SpawnablePool, KeyValuePair<GameObject, Stack<SpawnableDataSO>>>
     {
         [SerializeField]
-        private List<SpawnableDataProviderSO> spawnableData = new();
+        private List<SpawnableDataSO> spawnableData = new();
 
-        public readonly Dictionary<GameObject, Stack<SpawnableDataProviderSO>> SpawnablesToPool = new();
+        public readonly Dictionary<GameObject, Stack<SpawnableDataSO>> SpawnablesToPool = new();
 
         private void Awake()
         {
@@ -23,7 +26,7 @@ namespace BalloonPopper
 #endif
             }
 
-            foreach (SpawnableDataProviderSO data in spawnableData)
+            foreach (SpawnableDataSO data in spawnableData)
             {
                 if (data.Prefab == null)
                 {
@@ -35,7 +38,7 @@ namespace BalloonPopper
                     continue;
                 }
 
-                SpawnablesToPool.TryAdd(data.Prefab, new Stack<SpawnableDataProviderSO>());
+                SpawnablesToPool.TryAdd(data.Prefab, new Stack<SpawnableDataSO>());
                 SpawnablesToPool[data.Prefab].Push(data);
             }
 
@@ -59,7 +62,7 @@ namespace BalloonPopper
         }
 
 
-        public bool TryCreate(KeyValuePair<GameObject, Stack<SpawnableDataProviderSO>> dataCollection, out SpawnablePool newSpawnablePool)
+        public bool TryCreate(KeyValuePair<GameObject, Stack<SpawnableDataSO>> dataCollection, out SpawnablePool newSpawnablePool)
         {
             newSpawnablePool = null;
 

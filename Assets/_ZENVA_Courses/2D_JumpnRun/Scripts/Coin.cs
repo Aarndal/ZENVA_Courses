@@ -7,7 +7,7 @@ using UnityEngine;
 public class Coin : MonoBehaviour, ICollectible, ISpawnable, IInteractable
 {
     [SerializeField]
-    private SpawnableDataProviderSO coinData = null;
+    private SpawnableDataSO coinData = null;
 
     public IDataProvider<ISpawnable> Data => coinData;
 
@@ -34,7 +34,7 @@ public class Coin : MonoBehaviour, ICollectible, ISpawnable, IInteractable
             return false;
         }
 
-        coinData = data as SpawnableDataProviderSO;
+        coinData = data as SpawnableDataSO;
         if (coinData == null)
         {
             return false;

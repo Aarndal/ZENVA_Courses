@@ -1,6 +1,4 @@
-﻿using ObjectPools;
-
-/// <summary>
+﻿/// <summary>
 /// Base interface for factories.
 /// </summary>
 public interface IFactory { }

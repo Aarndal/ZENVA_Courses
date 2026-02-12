@@ -1,11 +1,11 @@
 ﻿using System;
-using System.Collections.ObjectModel;
+using System.Collections.Generic;
 
 namespace SpawnSystem
 {
     public interface ISpawner
     {
-        ReadOnlyCollection<ISpawnerInstruction> Instructions { get; }
+        Queue<ISpawnerInstruction> Instructions { get; }
         
         event Action SpawningStarted;
         event Action SpawningStopped;
@@ -13,6 +13,6 @@ namespace SpawnSystem
         void StartSpawning();
         void StopSpawning();
 
-        bool TrySetInstructions(Collection<ISpawnerInstruction> instructions);
+        bool TrySetInstructions(Queue<ISpawnerInstruction> instructions);
     }
 }

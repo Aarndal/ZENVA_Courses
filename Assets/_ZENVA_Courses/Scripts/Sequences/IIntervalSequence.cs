@@ -26,7 +26,7 @@ public interface IIntervalSequence
     /// <summary>
     /// Resets the sequence to its initial state.
     /// </summary>
-    void Reset();
+    bool TryResetSequence();
 }
 
 /// <summary>

@@ -1,9 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace BalloonPopper
+namespace SpawnSystem
 {
+    [Obsolete("SpawnerManager is deprecated.", false)]
     public class SpawnerManager : MonoBehaviour
     {
         [SerializeField]

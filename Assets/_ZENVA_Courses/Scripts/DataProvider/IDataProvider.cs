@@ -5,7 +5,7 @@
 /// </summary>
 public interface IDataProvider : IEquatable<IDataProvider>
 {
-    Guid Id { get; }
+    Guid ID { get; }
 }
 
 /// <summary>
