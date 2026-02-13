@@ -74,6 +74,9 @@ namespace SpawnSystem
                 return false;
             }
 
+            newSpawnableObject.name = $"{data.InstanceName} ({newSpawnableObject.GetEntityId()})";
+            newSpawnableObject.SetActive(false);
+
             return true;
         }
 

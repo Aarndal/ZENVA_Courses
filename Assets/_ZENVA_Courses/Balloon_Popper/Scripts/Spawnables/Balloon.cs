@@ -46,6 +46,7 @@ namespace BalloonPopper
             _counter = 0;
             _isInitialized = false;
             _toggleState = ToggleState.Inactive;
+            this.gameObject.SetActive(false);
         }
         #endregion
 
@@ -75,12 +76,15 @@ namespace BalloonPopper
             if (_data.SpawnPool.TryReturn(this))
             {
                 _toggleState = ToggleState.Inactive;
+                this.gameObject.SetActive(false);
             }
         }
 
         public void Spawn(Vector3 spawnPosition, ISpawnContext context = null)
         {
             _toggleState = ToggleState.Active;
+
+            this.gameObject.SetActive(true);
 
             // If we fail to reset the counter, return the balloon to the pool
             if (!TryResetCounter())
@@ -199,7 +203,7 @@ namespace BalloonPopper
 
         public bool TryToggle()
         {
-            throw new NotImplementedException();
+            return true;
         }
         #endregion
     }

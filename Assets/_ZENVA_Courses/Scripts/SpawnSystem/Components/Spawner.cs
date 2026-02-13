@@ -63,9 +63,14 @@ namespace SpawnSystem
             }
         }
 
-        private void OnEnable()
+        private void Start()
         {
             StartSpawning();
+        }
+
+        private async void Update()
+        {
+            await ProcessSpawning();
         }
 
         private void OnDisable()
@@ -81,36 +86,21 @@ namespace SpawnSystem
 
 
         #region Private Methods
-        private async UniTaskVoid ProcessSpawning()
+        private async UniTask ProcessSpawning()
         {
-            try
-            {
-                while (_instructions.Count > 0 && !_cts.Token.IsCancellationRequested)
-                {
-                    await DelayedSpawn();
+            if (!_isConfigured)
+                return;
 
-                    TryAdvanceToNextInstruction();
-                }
-            }
-            catch (OperationCanceledException)
-            {
-                // Expected when cancelled, just exit gracefully
-            }
-            catch (Exception ex)
-            {
-#if UNITY_EDITOR
-                Debug.LogErrorFormat(
-                    "An error occurred during the spawning process: {0}" +
-                    "\nSpawner: {1} | ID: {2}",
-                    ex.Message,
-                    this.gameObject.name,
-                    this.gameObject.GetEntityId());
-#endif
-            }
-            finally
-            {
+            if (_isSpawnInProcess)
+                return;
+
+            await DelayedSpawn();
+
+            if (!TryAdvanceToNextInstruction())
+                return;
+
+            if (_instructions.Count == 0)
                 this.gameObject.SetActive(false);
-            }
         }
 
         private async UniTask DelayedSpawn()
@@ -123,6 +113,11 @@ namespace SpawnSystem
                     delayTimeSpan: TimeSpan.FromSeconds(_instructions.Peek().SpawnSequence.GetNextInterval()),
                     ignoreTimeScale: false,
                     cancellationToken: _cts.Token);
+
+                if (_disposed || _cts.Token.IsCancellationRequested)
+                {
+                    return;
+                }
 
                 await Spawn(_instructions.Peek());
             }
@@ -138,16 +133,24 @@ namespace SpawnSystem
 
         private async UniTask Spawn(ISpawnerInstruction instruction)
         {
+            if (_disposed || _cts.Token.IsCancellationRequested)
+                return;
+
             var spawnable = instruction.SpawnableTypeToSpawn.SpawnPool.GetOrCreate(instruction.SpawnableTypeToSpawn);
 
             spawnable.Spawn(this.transform.position);
             _spawnedCounter++;
 
-            await UniTask.Yield();
+            await UniTask.Yield(PlayerLoopTiming.Update, _cts.Token);
         }
 
         private bool TryAdvanceToNextInstruction()
         {
+            if (_disposed || _cts.Token.IsCancellationRequested)
+            {
+                return false;
+            }
+
             if (_spawnedCounter >= _instructions.Peek().AmountToSpawn)
             {
                 _spawnedCounter = 0;
@@ -257,28 +260,14 @@ namespace SpawnSystem
 
         public void StartSpawning()
         {
-            if (!_isConfigured)
-                return;
-
-            if (_isSpawnInProcess)
-                return;
-
-            _cts = new();
             _spawnedCounter = 0;
             _spawningStarted?.Invoke();
-
-            ProcessSpawning().Forget();
         }
 
         public void StopSpawning()
         {
-            _cts?.Cancel();
-            _cts?.Dispose();
-            _cts = null;
-
             _spawnedCounter = 0;
             _isSpawnInProcess = false;
-
 
             _spawningStopped?.Invoke();
         }
