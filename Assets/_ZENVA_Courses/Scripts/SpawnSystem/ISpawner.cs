@@ -13,6 +13,6 @@ namespace SpawnSystem
         void StartSpawning();
         void StopSpawning();
 
-        bool TrySetInstructions(Queue<ISpawnerInstruction> instructions);
+        bool TrySetInstructions(IEnumerable<ISpawnerInstruction> instructions);
     }
 }

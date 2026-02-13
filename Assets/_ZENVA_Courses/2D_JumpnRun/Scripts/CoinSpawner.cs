@@ -64,7 +64,7 @@ internal class CoinSpawner : MonoBehaviour, ISpawner, IInteractable
         throw new NotImplementedException();
     }
 
-    bool ISpawner.TrySetInstructions(Queue<ISpawnerInstruction> instructions)
+    bool ISpawner.TrySetInstructions(IEnumerable<ISpawnerInstruction> instructions)
     {
         throw new NotImplementedException();
     }

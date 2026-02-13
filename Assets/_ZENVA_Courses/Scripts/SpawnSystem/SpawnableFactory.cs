@@ -38,6 +38,8 @@ namespace SpawnSystem
                 return false;
             }
 
+            data.SpawnPool = _myClient;
+
             // Instantiate the prefab
             var newSpawnableObject = UnityEngine.Object.Instantiate(
                 original: data.Prefab,

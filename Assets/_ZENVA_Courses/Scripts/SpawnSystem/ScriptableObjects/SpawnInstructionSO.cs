@@ -14,9 +14,9 @@ namespace SpawnSystem
         [SerializeField]
         private IntervalSequenceSO spawnSequence = default;
 
-        public int AmountToSpawn { get; }
-        public ISpawnableData SpawnableTypeToSpawn { get; }
-        public ISpawnContext SpawnContext { get; }
-        public IIntervalSequence SpawnSequence { get; }
+        public int AmountToSpawn => amountToSpawn;
+        public ISpawnableData SpawnableTypeToSpawn => spawnableTypeToSpawn;
+        public ISpawnContext SpawnContext => spawnContext;
+        public IIntervalSequence SpawnSequence => spawnSequence;
     }
 }

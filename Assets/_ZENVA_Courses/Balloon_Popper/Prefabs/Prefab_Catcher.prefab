@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 4436478298698824390}
   - component: {fileID: 3834308593463349985}
   - component: {fileID: 6425971591786503394}
+  - component: {fileID: 1095647030326034575}
   m_Layer: 2
   m_Name: Prefab_Catcher
   m_TagString: Untagged
@@ -81,3 +82,16 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 126
   m_CollisionDetection: 0
+--- !u!114 &1095647030326034575
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4273237581792568281}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c356f4bcf212ab34e9c7b6cb8a7f10e5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SpawnSystem.SpawnableCatcher
+  logCaughtBalloonsInEditor: 0

@@ -13,7 +13,7 @@ namespace SpawnSystem
         /// <summary>
         /// The object pool used to manage instances of the spawnable.
         /// </summary>
-        IObjectPool<ISpawnable, ISpawnableData> SpawnPool { get; }
+        IObjectPool<ISpawnable, ISpawnableData> SpawnPool { get; set; }
     }
 
     public interface ISpawnable : IToggleable

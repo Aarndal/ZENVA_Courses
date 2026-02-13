@@ -6,31 +6,20 @@ namespace SpawnSystem
     [RequireComponent(typeof(Collider), typeof(Rigidbody))]
     public class SpawnableCatcher : MonoBehaviour
     {
-        [SerializeField]
-        private bool logCaughtBalloonsInEditor = false;
-
-
         private void OnTriggerEnter(Collider otherCollider)
         {
             if (!TryGetSpawnable(otherCollider, out var caughtBalloon))
                 return;
 
-#if UNITY_EDITOR
-            if (logCaughtBalloonsInEditor)
-            {
-                Debug.LogFormat("Spawnable entered Catcher: {0}",
-                        caughtBalloon.GameObject.name);
-            }
-#endif
             caughtBalloon.Despawn();
         }
 
 
         private bool TryGetSpawnable(Collider otherCollider, out ISpawnable caughtBalloon)
         {
-            if (!otherCollider.transform.parent.TryGetComponent(out caughtBalloon))
+            if (!otherCollider.TryGetComponent(out caughtBalloon))
             {
-                caughtBalloon = otherCollider.gameObject.GetComponentInParent<ISpawnable>(true);
+                caughtBalloon = otherCollider.GetComponentInChildren<ISpawnable>(true);
             }
             return caughtBalloon != null;
         }

@@ -3,6 +3,8 @@ using SpawnSystem;
 using System;
 using UnityEngine;
 
+using static IToggleable;
+
 namespace BalloonPopper
 {
     public class Balloon : MonoBehaviour, ISpawnable, IClickable
@@ -13,19 +15,17 @@ namespace BalloonPopper
         // Private Member Variables
         private int _counter = 0;
         private bool _isInitialized = false;
-        private bool _isPopping = false;
+        private ToggleState _toggleState = ToggleState.Inactive;
 
         private BalloonDataSO _data = null;
         private Renderer _renderer = null;
 
         // Properties
-        public IDataProvider<ISpawnable> Data => _data;
+        public ISpawnableData Data => _data;
         public GameObject GameObject => this.gameObject;
-        public string SpawnableType { get; private set; }
+        public string SpawnableType => _data.InstanceName;
 
-        ISpawnableData ISpawnable.Data => throw new NotImplementedException();
-
-        public IToggleable.ToggleState State => throw new NotImplementedException();
+        public ToggleState State => _toggleState;
 
         #region Unity Lifecycle Methods
         private void Awake()
@@ -45,7 +45,7 @@ namespace BalloonPopper
         {
             _counter = 0;
             _isInitialized = false;
-            _isPopping = false;
+            _toggleState = ToggleState.Inactive;
         }
         #endregion
 
@@ -57,7 +57,7 @@ namespace BalloonPopper
             if (this.gameObject.activeInHierarchy && _isInitialized)
             {
                 // Ignore clicks if the balloon is already popping
-                if (_isPopping)
+                if (_toggleState != ToggleState.Active)
                     return;
 
                 _counter--;
@@ -72,11 +72,16 @@ namespace BalloonPopper
 
         public void Despawn()
         {
-            _data.SpawnPool.TryReturn(this);
+            if (_data.SpawnPool.TryReturn(this))
+            {
+                _toggleState = ToggleState.Inactive;
+            }
         }
 
         public void Spawn(Vector3 spawnPosition, ISpawnContext context = null)
         {
+            _toggleState = ToggleState.Active;
+
             // If we fail to reset the counter, return the balloon to the pool
             if (!TryResetCounter())
             {
@@ -135,11 +140,9 @@ namespace BalloonPopper
                 return false;
             }
 
-            this.SpawnableType = data.InstanceName;
-
             _renderer.material = _data.Material;
             this.transform.localScale = Vector3.one * _data.InitialScale;
-            
+
             return _isInitialized = true;
         }
         #endregion
@@ -148,8 +151,7 @@ namespace BalloonPopper
         #region Private Methods
         private async UniTask PopBalloon()
         {
-            _isPopping = true;
-
+            _toggleState = ToggleState.Cooldown;
             // Compute the target scale
             Vector3 popScale = this.transform.localScale * 1.25f;
 
@@ -172,8 +174,6 @@ namespace BalloonPopper
             BalloonPopped?.Invoke(this, _data);
 
             Despawn();
-
-            _isPopping = false;
 
             await UniTask.CompletedTask;
         }
