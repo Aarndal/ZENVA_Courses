@@ -27,7 +27,7 @@ namespace SpawnSystem
         }
         public string InstanceName => this.name;
         public GameObject Prefab => prefab;
-        public IObjectPool<ISpawnable, ISpawnableData> SpawnPool { get; set; }
+        public IObjectPool<ISpawnable, ISpawnableData> GlobalPool { get; set; }
 
 
         private void Awake()

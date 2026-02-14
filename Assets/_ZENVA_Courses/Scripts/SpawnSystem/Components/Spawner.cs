@@ -7,16 +7,24 @@ using UnityEngine;
 
 namespace SpawnSystem
 {
+    /// <summary>
+    /// Component responsible for spawning entities based on a set of instructions.
+    /// Retrieves the entities from a specified spawn pool and spawns them in accordance with the given instructions.
+    /// It also implements IDisposable to ensure proper cleanup of resources when the spawner is destroyed or disabled.
+    /// </summary>
     public class Spawner : MonoBehaviour, ISpawner, IDisposable
     {
         private bool _disposed = false;
         private bool _isConfigured = false;
         private bool _isSpawnInProcess = false;
         private int _spawnedCounter = 0;
+
         private CancellationTokenSource _cts = new();
         private Queue<ISpawnerInstruction> _instructions = new();
+        private SpawnablePool _localPool = null;
 
-        [SerializeField]
+        [SerializeField,
+            Tooltip("List of spawn instructions to be executed by the spawner.")]
         private List<SpawnInstructionSO> givenInstructions = default;
 
         public Queue<ISpawnerInstruction> Instructions => _instructions;
@@ -55,6 +63,7 @@ namespace SpawnSystem
         private void Awake()
         {
             _isConfigured = false;
+            _localPool = new(this);
 
             if (!TrySetInstructions(givenInstructions.Cast<ISpawnerInstruction>()))
             {
@@ -70,7 +79,7 @@ namespace SpawnSystem
 
         private async void Update()
         {
-            await ProcessSpawning();
+            await ExecuteNextSpawn();
         }
 
         private void OnDisable()
@@ -86,7 +95,7 @@ namespace SpawnSystem
 
 
         #region Private Methods
-        private async UniTask ProcessSpawning()
+        private async UniTask ExecuteNextSpawn()
         {
             if (!_isConfigured)
                 return;
@@ -94,7 +103,7 @@ namespace SpawnSystem
             if (_isSpawnInProcess)
                 return;
 
-            await DelayedSpawn();
+            await SpawnWithDelay();
 
             if (!TryAdvanceToNextInstruction())
                 return;
@@ -103,7 +112,7 @@ namespace SpawnSystem
                 this.gameObject.SetActive(false);
         }
 
-        private async UniTask DelayedSpawn()
+        private async UniTask SpawnWithDelay()
         {
             _isSpawnInProcess = true;
 
@@ -134,11 +143,21 @@ namespace SpawnSystem
         private async UniTask Spawn(ISpawnerInstruction instruction)
         {
             if (_disposed || _cts.Token.IsCancellationRequested)
+            {
                 return;
+            }
 
-            var spawnable = instruction.SpawnableTypeToSpawn.SpawnPool.GetOrCreate(instruction.SpawnableTypeToSpawn);
+            if (!_localPool.TryGet(instruction.SpawnableTypeToSpawn, out var spawnable))
+            {
+                if (instruction.SpawnableTypeToSpawn.GlobalPool == null ||
+                    !instruction.SpawnableTypeToSpawn.GlobalPool.
+                    TryGetOrCreate(instruction.SpawnableTypeToSpawn, out spawnable))
+                {
+                    return;
+                }
+            }
 
-            spawnable.Spawn(this.transform.position);
+            spawnable.Spawn(this.transform.position, instruction.SpawnContext);
             _spawnedCounter++;
 
             await UniTask.Yield(PlayerLoopTiming.Update, _cts.Token);
@@ -190,7 +209,7 @@ namespace SpawnSystem
             if (_isConfigured)
             {
 #if UNITY_EDITOR
-                Debug.LogErrorFormat(
+                Debug.LogWarningFormat(
                     "Failed to set instructions for spawner because it is already configured: {0} | ID: {1}",
                     this.gameObject.name,
                     this.gameObject.GetEntityId());
@@ -260,12 +279,17 @@ namespace SpawnSystem
 
         public void StartSpawning()
         {
+            _cts = new();
             _spawnedCounter = 0;
             _spawningStarted?.Invoke();
         }
 
         public void StopSpawning()
         {
+            _cts?.Cancel();
+            _cts?.Dispose();
+            _cts = null;
+
             _spawnedCounter = 0;
             _isSpawnInProcess = false;
 

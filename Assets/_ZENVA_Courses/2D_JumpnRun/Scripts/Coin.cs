@@ -1,6 +1,7 @@
 ﻿using CollectibleSystem;
 using InteractableSystem;
 using SpawnSystem;
+using System;
 using UnityEngine;
 
 [RequireComponent(typeof(Collider2D))]
@@ -8,6 +9,8 @@ public class Coin : MonoBehaviour, ICollectible, ISpawnable, IInteractable
 {
     [SerializeField]
     private SpawnableDataSO coinData = null;
+
+    public event Func<ISpawnable, bool> DespawnRequested;
 
     public IDataProvider<ISpawnable> Data => coinData;
 

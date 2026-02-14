@@ -11,11 +11,12 @@ namespace BalloonPopper
     {
         // Public Static Events
         public static event Action<ISpawnable, BalloonDataSO> BalloonPopped;
+        public event Func<ISpawnable, bool> DespawnRequested;
 
         // Private Member Variables
         private int _counter = 0;
         private bool _isInitialized = false;
-        private ToggleState _toggleState = ToggleState.Inactive;
+        private ToggleState _toggleState = ToggleState.On;
 
         private BalloonDataSO _data = null;
         private Renderer _renderer = null;
@@ -45,7 +46,7 @@ namespace BalloonPopper
         {
             _counter = 0;
             _isInitialized = false;
-            _toggleState = ToggleState.Inactive;
+            _toggleState = ToggleState.On;
             this.gameObject.SetActive(false);
         }
         #endregion
@@ -57,8 +58,8 @@ namespace BalloonPopper
             // Check if the balloon is active and initialized
             if (this.gameObject.activeInHierarchy && _isInitialized)
             {
-                // Ignore clicks if the balloon is already popping
-                if (_toggleState != ToggleState.Active)
+                // Ignore clicks if the balloon's toggle state is not Off
+                if (_toggleState != ToggleState.Off)
                     return;
 
                 _counter--;
@@ -73,16 +74,16 @@ namespace BalloonPopper
 
         public void Despawn()
         {
-            if (_data.SpawnPool.TryReturn(this))
+            if (DespawnRequested?.Invoke(this) == true)
             {
-                _toggleState = ToggleState.Inactive;
+                _toggleState = ToggleState.On;
                 this.gameObject.SetActive(false);
             }
         }
 
         public void Spawn(Vector3 spawnPosition, ISpawnContext context = null)
         {
-            _toggleState = ToggleState.Active;
+            _toggleState = ToggleState.Off;
 
             this.gameObject.SetActive(true);
 
@@ -155,7 +156,7 @@ namespace BalloonPopper
         #region Private Methods
         private async UniTask PopBalloon()
         {
-            _toggleState = ToggleState.Cooldown;
+            _toggleState = ToggleState.Pending;
             // Compute the target scale
             Vector3 popScale = this.transform.localScale * 1.25f;
 
@@ -169,7 +170,7 @@ namespace BalloonPopper
             while (Vector3.SqrMagnitude(this.transform.localScale - popScale) > sqrEpsilon)
             {
                 this.transform.localScale = Vector3.MoveTowards(this.transform.localScale, popScale, scaleSpeed * Time.deltaTime);
-                await UniTask.Yield();
+                await UniTask.Yield(PlayerLoopTiming.Update);
             }
 
             // Snap exactly to the target to avoid tiny residual differences
@@ -178,8 +179,6 @@ namespace BalloonPopper
             BalloonPopped?.Invoke(this, _data);
 
             Despawn();
-
-            await UniTask.CompletedTask;
         }
 
         private bool TryResetCounter()

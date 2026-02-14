@@ -1,4 +1,5 @@
 ﻿using ObjectPools;
+using System;
 using UnityEngine;
 
 namespace SpawnSystem
@@ -11,9 +12,9 @@ namespace SpawnSystem
         GameObject Prefab { get; }
         
         /// <summary>
-        /// The object pool used to manage instances of the spawnable.
+        /// The global object pool used to manage instances of the spawnable.
         /// </summary>
-        IObjectPool<ISpawnable, ISpawnableData> SpawnPool { get; set; }
+        IObjectPool<ISpawnable, ISpawnableData> GlobalPool { get; set; }
     }
 
     public interface ISpawnable : IToggleable
@@ -27,6 +28,13 @@ namespace SpawnSystem
         /// The game object instance this spawnable represents.
         /// </summary>
         GameObject GameObject { get; }
+
+
+        /// <summary>
+        /// Function invoked when the spawnable is requested to be despawned.
+        /// The function should return true if the spawnable can be returned to its pool; otherwise, false.
+        /// </summary>
+        event Func<ISpawnable, bool> DespawnRequested;
 
 
         /// <summary>

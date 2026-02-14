@@ -2,9 +2,9 @@
 {
     public enum ToggleState : byte
     {
-        Active = 0,
-        Inactive = 1,
-        Cooldown = 2,
+        Off = 0,
+        On = 1,
+        Pending = 2,
     }
 
     ToggleState State { get; }

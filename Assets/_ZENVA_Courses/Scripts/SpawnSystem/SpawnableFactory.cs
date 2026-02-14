@@ -8,9 +8,9 @@ namespace SpawnSystem
     /// </summary>
     public class SpawnableFactory : IFactory<ISpawnable, ISpawnableData>
     {
-        private readonly SpawnablePool _myClient = null;
+        private readonly Spawner _myClient = null;
 
-        public SpawnableFactory(SpawnablePool objectPool)
+        public SpawnableFactory(Spawner objectPool)
         {
             if (objectPool != null)
             {
@@ -37,8 +37,6 @@ namespace SpawnSystem
                     data?.ID);
                 return false;
             }
-
-            data.SpawnPool = _myClient;
 
             // Instantiate the prefab
             var newSpawnableObject = UnityEngine.Object.Instantiate(
