@@ -63,13 +63,14 @@ namespace SpawnSystem
         private void Awake()
         {
             _isConfigured = false;
-            _localPool = new(this);
 
             if (!TrySetInstructions(givenInstructions.Cast<ISpawnerInstruction>()))
             {
                 this.gameObject.SetActive(false);
                 return;
             }
+            
+            _localPool = new(this);
         }
 
         private void Start()
@@ -287,8 +288,6 @@ namespace SpawnSystem
         public void StopSpawning()
         {
             _cts?.Cancel();
-            _cts?.Dispose();
-            _cts = null;
 
             _spawnedCounter = 0;
             _isSpawnInProcess = false;

@@ -53,9 +53,7 @@ namespace SpawnSystem
                 // Ensure the pool has enough capacity for the specified amount to spawn for each type. If not, add more capacity to the existing stack.
                 if (instruction.AmountToSpawn > _availableSpawnablesByType[instruction.SpawnableTypeToSpawn].Count)
                 {
-                    _availableSpawnablesByType.Add(
-                    instruction.SpawnableTypeToSpawn,
-                    new Stack<ISpawnable>(instruction.AmountToSpawn));
+                    _availableSpawnablesByType.EnsureCapacity(instruction.AmountToSpawn);
                 }
             }
 
