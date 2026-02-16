@@ -15,7 +15,7 @@ namespace SpawnSystem
     public class SpawnablePool : IObjectPool<ISpawnable, ISpawnableData>, IDisposable
     {
         /// Private Member Variables
-        private const int DefaultInitialCapacityPerSpawnableType = 20;
+        private const int DefaultInitialCapacityPerSpawnableType = 10;
 
         private readonly Dictionary<ISpawnableData, Stack<ISpawnable>> _availableSpawnablesByType = new();
         private readonly Spawner _daddy = null;
@@ -39,6 +39,8 @@ namespace SpawnSystem
             _factory = new(spawner);
             _availableSpawnablesByType = new Dictionary<ISpawnableData, Stack<ISpawnable>>();
 
+            var amountToSpawnPerType = new Dictionary<Guid, int>();
+
             // Initialize the pool for each spawnable type specified in the spawner's instructions with the maximum amount to spawn in a sequence.
             foreach (var instruction in spawner.Instructions)
             {
@@ -47,20 +49,23 @@ namespace SpawnSystem
                     instruction.SpawnableTypeToSpawn,
                     new Stack<ISpawnable>(instruction.AmountToSpawn)))
                 {
+                    amountToSpawnPerType.TryAdd(instruction.SpawnableTypeToSpawn.ID, instruction.AmountToSpawn);
+
                     continue;
                 }
 
                 // Ensure the pool has enough capacity for the specified amount to spawn for each type. If not, add more capacity to the existing stack.
-                if (instruction.AmountToSpawn > _availableSpawnablesByType[instruction.SpawnableTypeToSpawn].Count)
+                if (instruction.AmountToSpawn > amountToSpawnPerType[instruction.SpawnableTypeToSpawn.ID])
                 {
                     _availableSpawnablesByType.EnsureCapacity(instruction.AmountToSpawn);
+                    amountToSpawnPerType[instruction.SpawnableTypeToSpawn.ID] = instruction.AmountToSpawn;
                 }
             }
 
             // Initialize the pool for each spawnable type with the specified initial capacity.
             foreach (var spawnable in _availableSpawnablesByType)
             {
-                if (!TryInitializeTypePool(spawnable.Key, spawnable.Value.Count))
+                if (!TryInitializeTypePool(spawnable.Key, amountToSpawnPerType[spawnable.Key.ID]))
                 {
 #if UNITY_EDITOR
                     Debug.LogErrorFormat(
