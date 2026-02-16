@@ -7,12 +7,8 @@ using static IToggleable;
 
 namespace BalloonPopper
 {
-    public class Balloon : MonoBehaviour, ISpawnable, IClickable
+    public class Balloon : MonoBehaviour, ISpawnable, IClickable, IScoreChanger
     {
-        // Public Static Events
-        public static event Action<ISpawnable, BalloonDataSO> PointScored;
-        
-
         // Private Member Variables
         private int _counter = 0;
         private bool _isInitialized = false;
@@ -27,19 +23,20 @@ namespace BalloonPopper
         public string SpawnableType => _data.InstanceName;
         public ToggleState State => _toggleState;
 
+        public int ScoreChangeValue => _data.ScoreValue;
+
         public event Func<ISpawnable, bool> DespawnRequested;
 
         #region Unity Lifecycle Methods
         private void Awake()
         {
-            // The Renderer should be located on the Model child object
-            _renderer = this.GetComponentInChildren<Renderer>(true);
-
-            if (_renderer == null)
+            if (!this.transform.TryGetComponentInChildren(out _renderer))
             {
                 Debug.LogErrorFormat("Renderer component not found on Spawnable: {0} | ID: {1}",
                     this.gameObject.name,
                     this.gameObject.GetEntityId());
+
+                return;
             }
         }
 
@@ -150,7 +147,9 @@ namespace BalloonPopper
                 return false;
             }
 
-            _renderer.material = _data.Material;
+            if (_renderer != null)
+                _renderer.material = _data.Material;
+
             this.transform.localScale = Vector3.one * _data.InitialScale;
 
             return _isInitialized = true;
@@ -181,9 +180,8 @@ namespace BalloonPopper
             // Snap exactly to the target to avoid tiny residual differences
             this.transform.localScale = popScale;
 
-            PointScored?.Invoke(this, _data);
-
             Despawn();
+            IScoreChanger.ScoreChanged?.Invoke(this);
         }
 
         private bool TryResetCounter()

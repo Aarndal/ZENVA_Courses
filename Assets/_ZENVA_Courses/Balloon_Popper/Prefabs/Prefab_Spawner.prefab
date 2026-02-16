@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 8096049015483223616}
   - component: {fileID: 8048518898471035705}
   m_Layer: 2
-  m_Name: Prefab_BalloonSpawner
+  m_Name: Prefab_Spawner
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

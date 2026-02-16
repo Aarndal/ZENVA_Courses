@@ -6,7 +6,7 @@ using static IToggleable;
 
 namespace BalloonPopper
 {
-    public class Coin : MonoBehaviour, ISpawnable, IClickable
+    public class Coin : MonoBehaviour, ISpawnable, IClickable, IScoreChanger
     {
         private bool _isInitialized = false;
 
@@ -19,19 +19,19 @@ namespace BalloonPopper
         public string SpawnableType => _data.InstanceName;
         public ToggleState State => _toggleState;
 
-        public event Func<ISpawnable, bool> DespawnRequested;
+        public int ScoreChangeValue => _data.ScoreValue;
 
+        public event Func<ISpawnable, bool> DespawnRequested;
 
         private void Awake()
         {
-            // The Renderer should be located on the Model child object
-            _spriteRenderer = this.GetComponentInChildren<SpriteRenderer>(true);
-
-            if (_spriteRenderer == null)
+            if (!this.transform.TryGetComponentInChildren(out _spriteRenderer))
             {
-                Debug.LogErrorFormat("Renderer component not found on Spawnable: {0} | ID: {1}",
+                Debug.LogErrorFormat("Renderer component not found on Spawnable or Children: {0} | ID: {1}",
                     this.gameObject.name,
                     this.gameObject.GetEntityId());
+
+                return;
             }
         }
 
@@ -55,7 +55,9 @@ namespace BalloonPopper
                 _toggleState = ToggleState.Pending;
 
                 Debug.LogFormat("Clicked on {0} | ID: {1}", this.gameObject.name, this.gameObject.GetEntityId());
+
                 Despawn();
+                IScoreChanger.ScoreChanged?.Invoke(this);
             }
         }
 
@@ -123,7 +125,8 @@ namespace BalloonPopper
                 return false;
             }
 
-            _spriteRenderer.sprite = _data.Sprite;
+            if (_spriteRenderer != null)
+                _spriteRenderer.sprite = _data.Sprite;
 
             return _isInitialized = true;
         }
@@ -132,5 +135,12 @@ namespace BalloonPopper
         {
             return true;
         }
+    }
+
+    public interface IScoreChanger
+    {
+        static Action<IScoreChanger> ScoreChanged;
+
+        int ScoreChangeValue { get; }
     }
 }

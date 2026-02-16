@@ -391,7 +391,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 2554803838148388640, guid: f8c36e86ef8b2f745bea8361b1089d30, type: 3}
       propertyPath: m_Name
-      value: BalloonSpawner (1)
+      value: Spawner (1)
       objectReference: {fileID: 0}
     - target: {fileID: 6059549604894736199, guid: f8c36e86ef8b2f745bea8361b1089d30, type: 3}
       propertyPath: instructions
@@ -538,7 +538,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 2554803838148388640, guid: f8c36e86ef8b2f745bea8361b1089d30, type: 3}
       propertyPath: m_Name
-      value: BalloonSpawner (2)
+      value: Spawner (2)
       objectReference: {fileID: 0}
     - target: {fileID: 6059549604894736199, guid: f8c36e86ef8b2f745bea8361b1089d30, type: 3}
       propertyPath: instructions
@@ -640,7 +640,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 2554803838148388640, guid: f8c36e86ef8b2f745bea8361b1089d30, type: 3}
       propertyPath: m_Name
-      value: BalloonSpawner (3)
+      value: Spawner (3)
       objectReference: {fileID: 0}
     - target: {fileID: 6059549604894736199, guid: f8c36e86ef8b2f745bea8361b1089d30, type: 3}
       propertyPath: instructions
@@ -738,7 +738,7 @@ GameObject:
   m_Component:
   - component: {fileID: 890381498}
   m_Layer: 0
-  m_Name: BalloonSpawners
+  m_Name: Spawners
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1092,7 +1092,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 2554803838148388640, guid: f8c36e86ef8b2f745bea8361b1089d30, type: 3}
       propertyPath: m_Name
-      value: BalloonSpawner (4)
+      value: Spawner (4)
       objectReference: {fileID: 0}
     - target: {fileID: 6059549604894736199, guid: f8c36e86ef8b2f745bea8361b1089d30, type: 3}
       propertyPath: instructions
@@ -1190,7 +1190,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 2554803838148388640, guid: f8c36e86ef8b2f745bea8361b1089d30, type: 3}
       propertyPath: m_Name
-      value: BalloonSpawner
+      value: Spawner
       objectReference: {fileID: 0}
     - target: {fileID: 6059549604894736199, guid: f8c36e86ef8b2f745bea8361b1089d30, type: 3}
       propertyPath: instructions

@@ -1,10 +1,9 @@
-using SpawnSystem;
 using System;
 using UnityEngine;
 
 namespace BalloonPopper
 {
-    public sealed class BalloonPopperScoreManager : ScoreManager<BalloonDataSO>
+    public sealed class BalloonPopperScoreManager : ScoreManager
     {
         public override event Action<int> ScoreUpdated
         {
@@ -14,25 +13,25 @@ namespace BalloonPopper
 
         private void OnEnable()
         {
-            Balloon.PointScored += OnBalloonPopped;
+            IScoreChanger.ScoreChanged += OnScoreChanged;
         }
 
         private void OnDisable()
         {
-            Balloon.PointScored -= OnBalloonPopped;
+            IScoreChanger.ScoreChanged -= OnScoreChanged;
         }
 
-        void OnBalloonPopped(ISpawnable balloon, BalloonDataSO balloonData)
+        void OnScoreChanged(IScoreChanger scoreChanger)
         {
-            if (balloon == null || balloonData == null)
+            if (scoreChanger == null)
                 return;
 
-            IncreaseScore(balloonData);
+            IncreaseScore(scoreChanger.ScoreChangeValue);
         }
 
-        protected override void IncreaseScore(BalloonDataSO data)
+        protected override void IncreaseScore(int scoreChangeValue)
         {
-            _currentScore += data.ScoreValue;
+            _currentScore += scoreChangeValue;
             Debug.Log("Score: " + _currentScore);
 
             _scoreUpdated?.Invoke(_currentScore);

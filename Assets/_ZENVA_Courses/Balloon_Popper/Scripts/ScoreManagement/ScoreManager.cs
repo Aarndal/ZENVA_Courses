@@ -12,9 +12,6 @@ public abstract class ScoreManager : MonoBehaviour
     {
         _scoreUpdated?.Invoke(_currentScore);
     }
-}
 
-public abstract class ScoreManager<T> : ScoreManager
-{
-    protected abstract void IncreaseScore(T data);
+    protected abstract void IncreaseScore(int data);
 }
