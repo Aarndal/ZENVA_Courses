@@ -14,12 +14,12 @@ namespace BalloonPopper
 
         private void OnEnable()
         {
-            Balloon.BalloonPopped += OnBalloonPopped;
+            Balloon.PointScored += OnBalloonPopped;
         }
 
         private void OnDisable()
         {
-            Balloon.BalloonPopped -= OnBalloonPopped;
+            Balloon.PointScored -= OnBalloonPopped;
         }
 
         void OnBalloonPopped(ISpawnable balloon, BalloonDataSO balloonData)

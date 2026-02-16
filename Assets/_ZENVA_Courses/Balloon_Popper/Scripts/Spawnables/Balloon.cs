@@ -10,23 +10,24 @@ namespace BalloonPopper
     public class Balloon : MonoBehaviour, ISpawnable, IClickable
     {
         // Public Static Events
-        public static event Action<ISpawnable, BalloonDataSO> BalloonPopped;
-        public event Func<ISpawnable, bool> DespawnRequested;
+        public static event Action<ISpawnable, BalloonDataSO> PointScored;
+        
 
         // Private Member Variables
         private int _counter = 0;
         private bool _isInitialized = false;
-        private ToggleState _toggleState = ToggleState.On;
 
         private BalloonDataSO _data = null;
         private Renderer _renderer = null;
+        private ToggleState _toggleState = ToggleState.On;
 
         // Properties
         public ISpawnableData Data => _data;
         public GameObject GameObject => this.gameObject;
         public string SpawnableType => _data.InstanceName;
-
         public ToggleState State => _toggleState;
+
+        public event Func<ISpawnable, bool> DespawnRequested;
 
         #region Unity Lifecycle Methods
         private void Awake()
@@ -135,13 +136,17 @@ namespace BalloonPopper
 
         private bool TryInitializeBalloon(ISpawnableData data)
         {
-            _data = (BalloonDataSO)data;
+            _data = data as BalloonDataSO;
 
             if (_data == null)
             {
-                Debug.LogErrorFormat("Balloon initialization failed, incorrect data type: {0} | Type: {1}",
+                Debug.LogErrorFormat(
+                    "Spawnable initialization failed: {0} | ID: {1}" +
+                    "incorrect data type: {2} | ID: {3}",
+                    this.gameObject.name,
+                    this.gameObject.GetEntityId(),
                     data.InstanceName,
-                    data.ProvidedType);
+                    data.ID);
                 return false;
             }
 
@@ -176,7 +181,7 @@ namespace BalloonPopper
             // Snap exactly to the target to avoid tiny residual differences
             this.transform.localScale = popScale;
 
-            BalloonPopped?.Invoke(this, _data);
+            PointScored?.Invoke(this, _data);
 
             Despawn();
         }
