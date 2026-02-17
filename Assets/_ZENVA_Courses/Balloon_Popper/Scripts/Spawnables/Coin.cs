@@ -6,6 +6,7 @@ using static IToggleable;
 
 namespace BalloonPopper
 {
+    [RequireComponent(typeof(Collider))]
     public class Coin : MonoBehaviour, ISpawnable, IClickable, IScoreChanger
     {
         private bool _isInitialized = false;
@@ -48,16 +49,9 @@ namespace BalloonPopper
             // Check if the object is active and initialized
             if (this.gameObject.activeInHierarchy && _isInitialized)
             {
-                // Ignore clicks if the spawnable's toggle state is not Off
-                if (_toggleState != ToggleState.Off)
+                if (!TryToggle())
                     return;
 
-                _toggleState = ToggleState.Pending;
-
-                Debug.LogFormat("Clicked on {0} | ID: {1}", this.gameObject.name, this.gameObject.GetEntityId());
-
-                Despawn();
-                IScoreChanger.ScoreChanged?.Invoke(this);
             }
         }
 
@@ -74,9 +68,8 @@ namespace BalloonPopper
         {
             _toggleState = ToggleState.Off;
 
-            this.gameObject.SetActive(true);
-
             this.transform.position = spawnPosition;
+            this.gameObject.SetActive(true);
         }
 
         public bool TryInitialize(ISpawnableData data)
@@ -133,14 +126,17 @@ namespace BalloonPopper
 
         public bool TryToggle()
         {
+            if(_toggleState != ToggleState.Off)
+                return false;
+
+            _toggleState = ToggleState.Pending;
+
+            Debug.LogFormat("Clicked on {0} | ID: {1}", this.gameObject.name, this.gameObject.GetEntityId());
+
+            Despawn();
+            IScoreChanger.ScoreChanged?.Invoke(this);
+
             return true;
         }
-    }
-
-    public interface IScoreChanger
-    {
-        static Action<IScoreChanger> ScoreChanged;
-
-        int ScoreChangeValue { get; }
     }
 }

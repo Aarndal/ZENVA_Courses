@@ -1,95 +1,126 @@
-﻿using CollectibleSystem;
+﻿using BalloonPopper;
+using CollectibleSystem;
 using InteractableSystem;
 using SpawnSystem;
 using System;
 using UnityEngine;
 
+using static IToggleable;
+
 [RequireComponent(typeof(Collider2D))]
-public class Coin : MonoBehaviour, ICollectible, ISpawnable, IInteractable
+public class Coin : MonoBehaviour, ICollectible, ISpawnable, IInteractable, IScoreChanger
 {
-    [SerializeField]
-    private SpawnableDataSO coinData = null;
+    private CoinDataSO _data = null;
+    private SpriteRenderer _spriteRenderer = null;
+    private ToggleState _toggleState = ToggleState.On;
+
+    public bool CanBeInteractedWith => this.gameObject.activeInHierarchy;
+    public ISpawnableData Data => _data;
+    public GameObject GameObject => this.gameObject;
+    public ToggleState State => _toggleState;
+
+    public int ScoreChangeValue => _data.ScoreValue;
 
     public event Func<ISpawnable, bool> DespawnRequested;
 
-    public IDataProvider<ISpawnable> Data => coinData;
-
-    public GameObject GameObject => this.gameObject;
-
-    public string SpawnableType { get; private set; }
-
-    ISpawnableData ISpawnable.Data => throw new System.NotImplementedException();
-
-    IToggleable.ToggleState IToggleable.State => throw new System.NotImplementedException();
-
-    bool IInteractable.CanBeInteractedWith => throw new System.NotImplementedException();
-
-    public void Despawn()
+    private void Awake()
     {
-        //coinData.Pool.TryReturn(this);
+        if (!this.transform.TryGetComponentInChildren(out _spriteRenderer))
+        {
+            Debug.LogErrorFormat("Renderer component not found on Spawnable or Children: {0} | ID: {1}",
+                this.gameObject.name,
+                this.gameObject.GetEntityId());
+
+            return;
+        }
+    }
+
+    private void OnDestroy()
+    {
+        _toggleState = ToggleState.On;
         this.gameObject.SetActive(false);
     }
 
-    public void Spawn(Vector3 spawnPosition)
+    public void Despawn()
     {
+        if (DespawnRequested?.Invoke(this) == true)
+        {
+            _toggleState = ToggleState.On;
+            this.gameObject.SetActive(false);
+        }
+    }
+
+    public void Spawn(Vector3 spawnPosition, ISpawnContext context)
+    {
+        _toggleState = ToggleState.Off;
+
         this.transform.position = spawnPosition;
         this.gameObject.SetActive(true);
     }
 
-    public bool TryInitialize(IDataProvider<ISpawnable> data)
+    public bool TryInitialize(ISpawnableData data)
     {
         if (data == null)
         {
+            Debug.LogErrorFormat("Balloon initialization failed, missing data: {0} | Type: {1}",
+                data.InstanceName,
+                data.ProvidedType);
             return false;
         }
 
-        coinData = data as SpawnableDataSO;
-        if (coinData == null)
+        if (_spriteRenderer == null)
         {
+            Debug.LogErrorFormat("Balloon initialization failed, missing Renderer: {0} | ID: {1}",
+                this.gameObject.name,
+                this.gameObject.GetEntityId());
             return false;
         }
+
+        return TryInitializeCoin(data);
+    }
+
+    private bool TryInitializeCoin(ISpawnableData data)
+    {
+        _data = data as CoinDataSO;
+
+        if (_data == null)
+        {
+            Debug.LogErrorFormat(
+                "Spawnable initialization failed: {0} | ID: {1}" +
+                "incorrect data type: {2} | ID: {3}",
+                this.gameObject.name,
+                this.gameObject.GetEntityId(),
+                data.InstanceName,
+                data.ID);
+            return false;
+        }
+
+        if (_spriteRenderer != null)
+            _spriteRenderer.sprite = _data.Sprite;
 
         return true;
     }
 
-    public bool TryInteract<T>(IInteractor interactor, T data = default)
+
+    public bool TryCollect<T>(ICollector<T> collector)
+    {
+        Debug.Log("Coin collected!");
+        Despawn();
+        return true;
+    }
+
+    public bool TryToggle()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    public bool TryInteract(IInteractor interactor)
     {
         if ((interactor.InteractorLayer & (1 << LayerMask.NameToLayer("PlayerCharacter"))) == 0)
         {
             return false;
         }
 
-        return TryCollect();
-    }
-
-    public bool TryCollect()
-    {
-        Debug.Log("Coin collected!");
-        return true;
-    }
-
-    public bool TryCollect<T>(ICollector<T> collector)
-    {
-        throw new System.NotImplementedException();
-    }
-
-    void ISpawnable.Spawn(Vector3 spawnPosition, ISpawnContext context)
-    {
-        throw new System.NotImplementedException();
-    }
-
-    bool ISpawnable.TryInitialize(ISpawnableData data)
-    {
-        throw new System.NotImplementedException();
-    }
-
-    bool IToggleable.TryToggle()
-    {
-        throw new System.NotImplementedException();
-    }
-
-    bool IInteractable.TryInteract(IInteractor interactor)
-    {
-        throw new System.NotImplementedException();
+        return TryCollect(interactor);
     }
 }

@@ -56,17 +56,18 @@ namespace BalloonPopper
             // Check if the balloon is active and initialized
             if (this.gameObject.activeInHierarchy && _isInitialized)
             {
-                // Ignore clicks if the balloon's toggle state is not Off
-                if (_toggleState != ToggleState.Off)
+                if (!TryToggle())
                     return;
-
-                _counter--;
-
-                this.transform.localScale += Vector3.one * _data.ScaleFactor;
 
                 // Check if the balloon should start popping
                 if (_counter <= 0)
+                {
+                    _toggleState = ToggleState.On;
                     await PopBalloon();
+                    return;
+                }
+
+                _toggleState = ToggleState.Off;
             }
         }
 
@@ -205,6 +206,16 @@ namespace BalloonPopper
 
         public bool TryToggle()
         {
+            // Can only be toggled if currently in the Off state
+            if (_toggleState != ToggleState.Off)
+                return false;
+
+            _toggleState = ToggleState.Pending;
+
+            _counter--;
+
+            this.transform.localScale += Vector3.one * _data.ScaleFactor;
+                    
             return true;
         }
         #endregion
