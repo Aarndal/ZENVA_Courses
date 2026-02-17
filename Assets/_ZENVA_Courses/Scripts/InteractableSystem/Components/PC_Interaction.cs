@@ -9,6 +9,8 @@ public class PC_Interaction : MonoBehaviour, IInteractor
 
     public LayerMask InteractorLayer => (1 << this.gameObject.layer);
 
+    public GameObject GameObject => this.gameObject;
+
     private void Awake()
     {
         if (interactionCollider == null && !TryGetComponent(out interactionCollider))

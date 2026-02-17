@@ -2,8 +2,10 @@ using InteractableSystem;
 using UnityEngine;
 
 [RequireComponent(typeof(Collider2D))]
-public class InteractableChecker : MonoBehaviour, IChecker<IInteractable>, IInteractor
+public class InteractableChecker : MonoBehaviour, IChecker
 {
+    [SerializeField]
+    private PC_Interaction interactor = null;
     [SerializeField]
     private Collider2D checkerCollider = null;
     [SerializeField]
@@ -14,9 +16,15 @@ public class InteractableChecker : MonoBehaviour, IChecker<IInteractable>, IInte
 
     private void Awake()
     {
-        if (checkerCollider == null && !this.TryGetComponent(out checkerCollider))
+        if (checkerCollider == null && !this.transform.TryGetComponentInChildren(out checkerCollider))
         {
             Debug.LogError("Collider2D component is missing on " + this.gameObject.name);
+            this.enabled = false;
+        }
+
+        if (interactor == null && !this.TryGetComponent(out interactor) && !this.transform.parent.TryGetComponent(out interactor))
+        {
+            Debug.LogError("Interactor reference is missing on " + this.gameObject.name);
             this.enabled = false;
         }
     }
@@ -29,17 +37,18 @@ public class InteractableChecker : MonoBehaviour, IChecker<IInteractable>, IInte
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if ((interactableLayer & (1 << other.gameObject.layer)) == 0 || other.isTrigger)
+        if (!Check(other.gameObject))
             return;
-
-        if(!other.TryGetComponent<IInteractable>(out var interactableComponent))
-            return;
-
-        Check(interactableComponent);
     }
 
-    public bool Check(IInteractable interactable)
+    public bool Check(GameObject gameObject)
     {
-        return interactable.TryInteract(this);
+        if ((interactableLayer & (1 << gameObject.layer)) == 0)
+            return false;
+
+        if (!gameObject.TryGetComponent<IInteractable>(out var interactableComponent))
+            return false;
+
+        return interactableComponent.TryInteract(interactor);
     }
 }

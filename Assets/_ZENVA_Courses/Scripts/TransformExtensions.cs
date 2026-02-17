@@ -2,7 +2,15 @@ using UnityEngine;
 
 public static class TransformExtensions
 {
-    public static bool TryGetComponentInChildren<T>(this Transform transform, out T component) where T : Component
+    /// <summary>
+    /// Method that tries to get a component of type T on the transform or any of its children. 
+    /// Uses Unity's TryGetComponent method to check for the component on the current transform, and if not found, recursively checks each child transform.
+    /// </summary>
+    /// <typeparam name="T">The type of component to search for.</typeparam>
+    /// <param name="transform">The transform to search on.</param>
+    /// <param name="component">The found component, if any.</param>
+    /// <returns>true if the component is found; otherwise, false.</returns>
+    public static bool TryGetComponentInChildren<T>(this Transform transform, out T component)
     {
         if (transform.TryGetComponent(out component))
         {

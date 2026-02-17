@@ -1,66 +1,70 @@
 using UnityEngine;
 
-[RequireComponent(typeof(Rigidbody2D), typeof(Collider2D))]
-public class PCMovement : MonoBehaviour, IHorizontalMoveable
+
+namespace JumpnRun
 {
-    [SerializeField]
-    private JumpnRunInputReader inputReader = null;
-    [SerializeField]
-    private float moveSpeed = 5.0f;
-
-    private Rigidbody2D _rigidbody = null;
-
-    private void Awake()
+    [RequireComponent(typeof(Rigidbody2D), typeof(Collider2D))]
+    public class PCMovement : MonoBehaviour, IHorizontalMoveable
     {
-        if (!this.gameObject.TryGetComponent(out _rigidbody))
-            Debug.LogError("Rigidbody2D component is missing on " + gameObject.name);
-    }
+        [SerializeField]
+        private JumpnRunInputReader inputReader = null;
+        [SerializeField]
+        private float moveSpeed = 5.0f;
 
-    private void OnEnable()
-    {
-        inputReader.MovePerformed += OnMovePerformed;
-        inputReader.MoveCanceled += OnMoveCanceled;
-    }
+        private Rigidbody2D _rigidbody = null;
 
-    private void OnDisable()
-    {
-        inputReader.MovePerformed -= OnMovePerformed;
-        inputReader.MoveCanceled -= OnMoveCanceled;
-    }
-
-    private void OnMoveCanceled(Vector2 vector)
-    {
-        MoveHorizontal(Vector2.zero);
-    }
-
-    private void OnMovePerformed(Vector2 vector)
-    {
-        MoveHorizontal(vector.normalized);
-    }
-
-    public void Move(Vector3 direction)
-    {
-        
-    }
-
-    public void MoveHorizontal(Vector2 horizontalDirection)
-    {
-        if (Mathf.Approximately(horizontalDirection.x, 0.0f))
+        private void Awake()
         {
-            _rigidbody.linearVelocityX = 0.0f;
-            return;
+            if (!this.gameObject.TryGetComponent(out _rigidbody))
+                Debug.LogError("Rigidbody2D component is missing on " + gameObject.name);
         }
 
-        if (Mathf.Abs(_rigidbody.linearVelocityX) > moveSpeed &&
-            Mathf.Sign(horizontalDirection.x) == Mathf.Sign(_rigidbody.linearVelocityX))
+        private void OnEnable()
         {
-            return;
+            inputReader.MovePerformed += OnMovePerformed;
+            inputReader.MoveCanceled += OnMoveCanceled;
         }
 
-        if (Mathf.Sign(horizontalDirection.x) != Mathf.Sign(_rigidbody.linearVelocityX))
-            _rigidbody.linearVelocityX = 0.0f;
+        private void OnDisable()
+        {
+            inputReader.MovePerformed -= OnMovePerformed;
+            inputReader.MoveCanceled -= OnMoveCanceled;
+        }
 
-        _rigidbody.AddRelativeForce(horizontalDirection * moveSpeed, ForceMode2D.Impulse);
+        private void OnMoveCanceled(Vector2 vector)
+        {
+            MoveHorizontal(Vector2.zero);
+        }
+
+        private void OnMovePerformed(Vector2 vector)
+        {
+            MoveHorizontal(vector.normalized);
+        }
+
+        public void Move(Vector3 direction)
+        {
+
+        }
+
+        public void MoveHorizontal(Vector2 horizontalDirection)
+        {
+            if (Mathf.Approximately(horizontalDirection.x, 0.0f))
+            {
+                _rigidbody.linearVelocityX = 0.0f;
+                return;
+            }
+
+            if (Mathf.Abs(_rigidbody.linearVelocityX) > moveSpeed &&
+                Mathf.Sign(horizontalDirection.x) == Mathf.Sign(_rigidbody.linearVelocityX))
+            {
+                return;
+            }
+
+            if (Mathf.Sign(horizontalDirection.x) != Mathf.Sign(_rigidbody.linearVelocityX))
+                _rigidbody.linearVelocityX = 0.0f;
+
+            _rigidbody.AddRelativeForce(horizontalDirection * moveSpeed, ForceMode2D.Impulse);
+        }
+
     }
-
 }

@@ -1,81 +1,85 @@
 using System;
 using UnityEngine;
 
-public class PCJump : MonoBehaviour, IVerticalMoveable
+namespace JumpnRun
 {
-    private const float STANDARD_GRAVITY_SCALE = 1.0f;
-
-    [SerializeField]
-    private JumpnRunInputReader inputReader = null;
-    [SerializeField, Min(0.1f)]
-    private float jumpImpulse = 5.0f;
-    [SerializeField, Min(STANDARD_GRAVITY_SCALE)]
-    private float fallGravityScale = 2.0f;
-
-    private Rigidbody2D _rigidbody = null;
-    private GroundChecker _groundChecker = null;
-    private bool _canJump = false;
-
-    private void Awake()
+    [RequireComponent(typeof(Rigidbody2D))]
+    public class PCJump : MonoBehaviour, IVerticalMoveable
     {
-        if (!this.gameObject.TryGetComponent(out _rigidbody))
-            Debug.LogError("Rigidbody2D component is missing on " + gameObject.name);
+        private const float STANDARD_GRAVITY_SCALE = 1.0f;
 
-        if (!this.gameObject.TryGetComponent(out _groundChecker))
+        [SerializeField]
+        private JumpnRunInputReader inputReader = null;
+        [SerializeField, Min(0.1f)]
+        private float jumpImpulse = 5.0f;
+        [SerializeField, Min(STANDARD_GRAVITY_SCALE)]
+        private float fallGravityScale = 2.0f;
+
+        private Rigidbody2D _rigidbody = null;
+        private GroundChecker _groundChecker = null;
+        private bool _canJump = false;
+
+        private void Awake()
         {
-            _groundChecker = this.gameObject.GetComponentInChildren<GroundChecker>();
+            if (!this.gameObject.TryGetComponent(out _rigidbody))
+                Debug.LogError("Rigidbody2D component is missing on " + gameObject.name);
 
-            if (_groundChecker == null)
-                Debug.LogError("GroundChecker component is missing on " + gameObject.name);
-        }
-    }
+            if (!this.gameObject.TryGetComponent(out _groundChecker))
+            {
+                _groundChecker = this.gameObject.GetComponentInChildren<GroundChecker>();
 
-    private void OnEnable()
-    {
-        _groundChecker.GroundedStateChanged += OnGroundedStateChanged;
-        inputReader.JumpPressed += OnJumpPressed;
-    }
-
-    private void OnGroundedStateChanged(bool isGrounded)
-    {
-        _canJump = isGrounded;
-    }
-
-    private void FixedUpdate()
-    {
-        if (_rigidbody.linearVelocityY < 0.0f && _rigidbody.gravityScale < fallGravityScale)
-        {
-            _rigidbody.gravityScale = fallGravityScale;
+                if (_groundChecker == null)
+                    Debug.LogError("GroundChecker component is missing on " + gameObject.name);
+            }
         }
 
-        if (_rigidbody.linearVelocityY >= 0.0f && _rigidbody.gravityScale > STANDARD_GRAVITY_SCALE)
+        private void OnEnable()
         {
-            _rigidbody.gravityScale = STANDARD_GRAVITY_SCALE;
+            _groundChecker.GroundedStateChanged += OnGroundedStateChanged;
+            inputReader.JumpPressed += OnJumpPressed;
         }
+
+        private void OnGroundedStateChanged(bool isGrounded)
+        {
+            _canJump = isGrounded;
+        }
+
+        private void FixedUpdate()
+        {
+            if (_rigidbody.linearVelocityY < 0.0f && _rigidbody.gravityScale < fallGravityScale)
+            {
+                _rigidbody.gravityScale = fallGravityScale;
+            }
+
+            if (_rigidbody.linearVelocityY >= 0.0f && _rigidbody.gravityScale > STANDARD_GRAVITY_SCALE)
+            {
+                _rigidbody.gravityScale = STANDARD_GRAVITY_SCALE;
+            }
+        }
+
+        private void OnDisable()
+        {
+            inputReader.JumpPressed -= OnJumpPressed;
+            _groundChecker.GroundedStateChanged -= OnGroundedStateChanged;
+        }
+
+        private void OnJumpPressed(bool isPressed)
+        {
+            if (!isPressed) return;
+            if (!_canJump) return;
+
+            MoveVertical(Vector2.up);
+        }
+
+        public void Move(Vector3 direction)
+        {
+            return;
+        }
+
+        public void MoveVertical(Vector2 verticalDirection)
+        {
+            _rigidbody.AddForce(verticalDirection * jumpImpulse, ForceMode2D.Impulse);
+        }
+
     }
-
-    private void OnDisable()
-    {
-        inputReader.JumpPressed -= OnJumpPressed;
-        _groundChecker.GroundedStateChanged -= OnGroundedStateChanged;
-    }
-
-    private void OnJumpPressed(bool isPressed)
-    {
-        if (!isPressed) return;
-        if (!_canJump) return;
-
-        MoveVertical(Vector2.up);
-    }
-
-    public void Move(Vector3 direction)
-    {
-        return;
-    }
-
-    public void MoveVertical(Vector2 verticalDirection)
-    {
-        _rigidbody.AddForce(verticalDirection * jumpImpulse, ForceMode2D.Impulse);
-    }
-
 }
