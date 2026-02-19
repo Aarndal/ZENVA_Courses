@@ -1,5 +1,6 @@
 using ObjectPools;
 using System;
+using Unity.Collections;
 using UnityEditor;
 using UnityEngine;
 
@@ -9,7 +10,7 @@ namespace SpawnSystem
     public abstract class SpawnableDataSO : ScriptableObject, ISpawnableData
     {
         [SerializeField, HideInInspector]
-        private string id = null;
+        private string id = default;
 
         [SerializeField]
         private GameObject prefab = null;
@@ -19,10 +20,12 @@ namespace SpawnSystem
             get
             {
                 if (string.IsNullOrEmpty(id))
-                {
                     id = Guid.NewGuid().ToString();
-                }
-                return Guid.Parse(id);
+                if (Guid.TryParse(id, out var guid))
+                    return guid;
+                guid = Guid.NewGuid();
+                id = guid.ToString();
+                return guid;
             }
         }
         public string InstanceName => this.name;

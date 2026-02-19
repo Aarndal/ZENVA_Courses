@@ -1,4 +1,5 @@
 using Cysharp.Threading.Tasks;
+using EventSystem;
 using SpawnSystem;
 using System;
 using UnityEngine;
@@ -7,11 +8,12 @@ using static IToggleable;
 
 namespace BalloonPopper
 {
-    public class Balloon : MonoBehaviour, ISpawnable, IClickable, IScoreChanger
+    public class Balloon : MonoBehaviour, ISpawnable, IClickable, IScoreChanger, IPublisher
     {
         // Private Member Variables
         private int _counter = 0;
         private bool _isInitialized = false;
+        private IEventChannel<ScoreChangedEventArgs> _channel = null;
 
         private BalloonDataSO _data = null;
         private Renderer _renderer = null;
@@ -24,6 +26,8 @@ namespace BalloonPopper
         public ToggleState State => _toggleState;
 
         public int ScoreChangeValue => _data.ScoreValue;
+
+        public Guid ID => Guid.TryParse(this.gameObject.GetEntityId().ToString(), out var guid) ? guid : Guid.Empty;
 
         public event Func<ISpawnable, bool> DespawnRequested;
 
@@ -182,7 +186,17 @@ namespace BalloonPopper
             this.transform.localScale = popScale;
 
             Despawn();
-            IScoreChanger.ScoreChanged?.Invoke(this);
+            //IScoreChanger.ScoreChanged?.Invoke(this);
+
+            if(_channel == null)
+            {
+                if(!EventTransmitter.TryGetChannel(this, out _channel))
+                {
+                    return;
+                }
+            }
+
+            _channel.TryPublish(new ScoreChangedEventArgs(this), publisher: this);
         }
 
         private bool TryResetCounter()

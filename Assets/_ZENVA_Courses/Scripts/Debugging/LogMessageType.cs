@@ -1,4 +1,4 @@
-﻿namespace DebugLogger
+﻿namespace Debugging
 {
     /// <summary>
     /// Defines the type of log message and whether strict formatting is applied.

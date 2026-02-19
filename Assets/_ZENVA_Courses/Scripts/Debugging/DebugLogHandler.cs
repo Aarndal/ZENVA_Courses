@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace DebugLogger
+namespace Debugging
 {
     /// <summary>
     /// Custom ILogHandler that wraps Unity's default log handler.

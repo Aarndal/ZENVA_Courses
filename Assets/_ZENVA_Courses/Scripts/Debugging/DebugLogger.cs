@@ -2,7 +2,7 @@
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace DebugLogger
+namespace Debugging
 {
     /// <summary>
     /// Static Debug Logger utility for Unity 6.x, built on Unity's ILogHandler system.
@@ -84,7 +84,7 @@ namespace DebugLogger
         /// </param>
         /// <param name="args">Up to six data values replacing <c>{data}</c> in order.</param>
         [Conditional("ENABLE_LOGS")]
-        public static void Debug(
+        public static void Log(
             LogMessageType type,
             object caller,
             string logMessage,

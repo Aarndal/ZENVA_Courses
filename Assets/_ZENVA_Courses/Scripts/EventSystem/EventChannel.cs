@@ -1,7 +1,8 @@
-using DebugLogger;
+using Debugging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 
 namespace EventSystem
 {
@@ -24,7 +25,7 @@ namespace EventSystem
         {
             if(SubscriberCount > 0)
             {
-                DebugLogger.DebugLogger.Debug(
+                DebugLogger.Log(
                     LogMessageType.Warning, 
                     this, 
                     "Attempting to dispose EventChannel while there are still handlers subscribed: {0} subscribers", 
@@ -47,9 +48,15 @@ namespace EventSystem
                 return false;
             foreach (var (Subscriber, Handler, _) in _subscribedHandlers)
             {
-                // Here you would typically invoke the subscriber's event handler with the provided args.
-                // This is a placeholder for demonstration purposes.
-                Console.WriteLine($"Event published to subscriber {Subscriber.ID} with handler {Handler.Method.Name}, with args: {args}");
+                Debug.Log($"Invoking handler {Handler.Method.Name} for subscriber {Subscriber.ID} with event args: {args}");
+                DebugLogger.Log(
+                    LogMessageType.Message,
+                    this,
+                    "Invoking handler {0} for subscriber {1} with event args: {2}",
+                    true,
+                    Handler.Method.Name,
+                    Subscriber.ID,
+                    args);
             }
             return true;
         }
@@ -58,7 +65,7 @@ namespace EventSystem
         {
             if (subscriber == null || handler == null)
             {
-                DebugLogger.DebugLogger.Debug(
+                DebugLogger.Log(
                     LogMessageType.Error, 
                     this, 
                     "Attempting to subscribe with null subscriber or handler. Subscription failed.", 
@@ -68,7 +75,7 @@ namespace EventSystem
 
             if (!_subscribedHandlers.Add((subscriber, handler, filter)))
             {
-                DebugLogger.DebugLogger.Debug(
+                Debugging.DebugLogger.Log(
                     LogMessageType.Warning, 
                     this, 
                     "Subscriber is already subscribed with the same handler: {0} (Handler: {1})" +
@@ -81,9 +88,7 @@ namespace EventSystem
 
             //EventRaised += handler;
 
-            // Here you would typically store the handler and filter for later invocation when an event is published.
-            // This is a placeholder for demonstration purposes.
-            Console.WriteLine($"Subscriber {subscriber.ID} subscribed with handler {handler.Method.Name}.");
+            Debug.Log($"Subscriber {subscriber.ID} subscribed with handler {handler.Method.Name}.");
             return true;
         }
 

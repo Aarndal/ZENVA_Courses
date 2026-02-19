@@ -7,9 +7,24 @@ namespace BalloonPopper
 {
     public sealed class BalloonPopperScoreManager : ScoreManager, ISubscriber
     {
+        [SerializeField, HideInInspector]
+        private string id = default;
+
         public HashSet<IEventChannel> SubscribedChannels { get; private set; } = new();
 
-        public Guid ID => Guid.Parse(this.gameObject.GetEntityId().ToString());
+        public Guid ID
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(id))
+                    id = Guid.NewGuid().ToString();
+                if (Guid.TryParse(id, out var guid))
+                    return guid;
+                guid = Guid.NewGuid();
+                id = guid.ToString();
+                return guid;
+            }
+        }
 
         public override event Action<int> ScoreUpdated
         {
@@ -30,13 +45,13 @@ namespace BalloonPopper
                 SubscribedChannels.Add(scoreChangeChannel);
             }
 
-            IScoreChanger.ScoreChanged += OnScoreChanged;
+            //IScoreChanger.ScoreChanged += OnScoreChanged;
         }
 
 
         private void OnDisable()
         {
-            IScoreChanger.ScoreChanged -= OnScoreChanged;
+            //IScoreChanger.ScoreChanged -= OnScoreChanged;
 
             foreach (var channel in SubscribedChannels)
             {

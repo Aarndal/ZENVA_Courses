@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace DebugLogger
+namespace Debugging
 {
     /// <summary>
     /// Handles message construction, placeholder replacement, and strict format rules.
