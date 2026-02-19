@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using Unity.VisualScripting;
 
 namespace EventSystem
 {
@@ -15,11 +17,12 @@ namespace EventSystem
     /// <summary>
     /// An EventChannelFactory is responsible to create IEventChannel instances when requested by the EventTransmitter.
     /// </summary>
-    public class EventChannelFactory : IFactory<IEventChannel, IEventArgs>
+    public class EventChannelFactory : IFactory<IEventChannel<IEventArgs>, NoData>
     {
-        public bool TryCreate(IEventArgs args, out IEventChannel channel)
+        public bool TryCreate(NoData _, out IEventChannel<IEventArgs> channel)
         {
-            throw new NotImplementedException();
+            channel = new EventChannel<IEventArgs>();
+            return channel != null;
         }
     }
 
@@ -32,19 +35,6 @@ namespace EventSystem
         EventFlag Flag { get; }
     }
 
-    public struct DefaultEventArgs : IEventArgs
-    {
-        public readonly EventFlag Flag => EventFlag.None;
-
-        public readonly string InstanceName => "Anonymous Publisher";
-
-        public readonly Guid ID => Guid.Empty;
-
-        public bool Equals(IDataProvider other)
-        {
-            throw new NotImplementedException();
-        }
-    }
 
     /// <summary>
     /// IEventParticipants are the base type for both ISubscribers and IPublishers.
@@ -59,7 +49,7 @@ namespace EventSystem
     }
 
     /// <summary>
-    /// ISubscribers are IEventParticipants that can subscribe their EventHandlers to IEventChannels.
+    /// ISubscribers are IEventParticipants that can subscribe their event handlers to IEventChannels.
     /// They can also request IEventChannel references through the EventTransmitter.
     /// The EventTransmitter will provide a new IEventChannel if the requested IEventChannel doesn't exist.
     /// </summary>
@@ -69,7 +59,7 @@ namespace EventSystem
     }
 
     /// <summary>
-    /// IPublishers are IEventParticipants that can publish their EventArgs in IEventChannels, which will raise the corresponding events and trigger the subscribed EventHandlers.
+    /// IPublishers are IEventParticipants that can publish their EventArgs in IEventChannels, which will raise the corresponding events and trigger the subscribed event handlers.
     /// They can also request IEventChannel references through the EventTransmitter.
     /// If the requested IEventChannel doesn't exist, the EventTransmitter will return null.
     /// </summary>
@@ -87,22 +77,95 @@ namespace EventSystem
     /// They are created and managed by the EventTransmitter.
     /// If an IEventChannel has no ISubscribers left, it will request the EventTransmitter to execute its destruction, freeing up resources.
     /// IPublishers can publish their EventArgs, a reference to themselves, and an EventFlag value to an IEventChannel, raising the corresponding event.
-    /// ISubscribers can subscribe their EventHandlers to an IEventChannel, which will be triggered when an event is raised in that channel.
+    /// ISubscribers can subscribe their event handlers to an IEventChannel, which will be triggered when an event is raised in that channel.
     /// </summary>
     public interface IEventChannel : IDisposable
     {
-        HashSet<ISubscriber> Subscribers { get; }
+        event Action<IEventChannel> DisposalRequested;
+        int SubscriberCount { get; }
     }
 
-    public interface IEventChannel<TPublisher, TEventArgs> : IEventChannel 
-        where TPublisher: IPublisher 
+    public interface IEventChannel<TEventArgs> : IEventChannel
         where TEventArgs : IEventArgs
     {
+        /// <summary>
+        /// Tries to publish the provided EventArgs in this typed IEventChannel.
+        /// When published, the corresponding event is raised and the subscribed event handlers are triggered.
+        /// </summary>
+        /// <param name="args">The event arguments to publish.</param>
+        /// <param name="publisher">The publisher of the event.</param>
+        /// <returns>true if the event was successfully published; otherwise, false.</returns>
+        bool TryPublish(
+            TEventArgs args,
+            IPublisher publisher = null);
+
+        bool TrySubscribe(
+            ISubscriber subscriber,
+            Action<TEventArgs> handler,
+            Func<TEventArgs, bool> filter = null);
+
+        bool TryUnsubscribe(
+            ISubscriber subscriber,
+            Action<TEventArgs> handler);
     }
 
-    public interface IEventChannel<TEventArgs> : IEventChannel<DefaultPublisher, TEventArgs> 
+    public class EventChannel<TEventArgs> : IEventChannel<TEventArgs>
         where TEventArgs : IEventArgs
     {
+        private readonly HashSet<(ISubscriber Subscriber, Action<TEventArgs> Handler, Func<TEventArgs, bool> Filter)> _subscribedHandlers = new();
+
+        public int SubscriberCount => _subscribedHandlers.Count;
+
+        public event Action<IEventChannel> DisposalRequested;
+
+        public void Dispose()
+        {
+            _subscribedHandlers?.Clear();
+        }
+        public bool TryPublish(TEventArgs args, IPublisher publisher = null)
+        {
+            if (SubscriberCount == 0)
+                return false;
+            foreach (var subscriber in _subscribedHandlers.Select(sh => sh.Subscriber))
+            {
+                // Here you would typically invoke the subscriber's event handler with the provided args.
+                // This is a placeholder for demonstration purposes.
+                Console.WriteLine($"Event published to subscriber {subscriber.ID} with args: {args}");
+            }
+            return true;
+        }
+        public bool TrySubscribe(ISubscriber subscriber, Action<TEventArgs> handler, Func<TEventArgs, bool> filter = null)
+        {
+            if (subscriber == null || handler == null)
+                return false;
+
+            if (!_subscribedHandlers.Add((subscriber, handler, filter)))
+                return false;
+
+            // Here you would typically store the handler and filter for later invocation when an event is published.
+            // This is a placeholder for demonstration purposes.
+            Console.WriteLine($"Subscriber {subscriber.ID} subscribed with handler and filter.");
+            return true;
+        }
+        public bool TryUnsubscribe(ISubscriber subscriber, Action<TEventArgs> handler)
+        {
+            if (subscriber == null || handler == null)
+                return false;
+            var handlerToRemove = _subscribedHandlers.FirstOrDefault(sh => sh.Subscriber.ID == subscriber.ID && sh.Handler == handler);
+
+            if (handlerToRemove.Equals(default))
+                return false;
+
+            _subscribedHandlers.Remove(handlerToRemove);
+            Console.WriteLine($"Subscriber {subscriber.ID} unsubscribed from handler.");
+
+            if(_subscribedHandlers.Count == 0)
+            {
+                DisposalRequested?.Invoke(this);
+            }
+
+            return true;
+        }
     }
 
     /// <summary>
