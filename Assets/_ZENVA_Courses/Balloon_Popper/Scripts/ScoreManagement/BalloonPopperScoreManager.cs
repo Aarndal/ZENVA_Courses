@@ -1,10 +1,16 @@
+using EventSystem;
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace BalloonPopper
 {
-    public sealed class BalloonPopperScoreManager : ScoreManager
+    public sealed class BalloonPopperScoreManager : ScoreManager, ISubscriber
     {
+        public HashSet<IEventChannel> SubscribedChannels { get; private set; } = new();
+
+        public Guid ID => Guid.Parse(this.gameObject.GetEntityId().ToString());
+
         public override event Action<int> ScoreUpdated
         {
             add { _scoreUpdated += value; }
@@ -13,15 +19,42 @@ namespace BalloonPopper
 
         private void OnEnable()
         {
+            if (!EventTransmitter.TryGetChannel(this, out IEventChannel<ScoreChangedEventArgs> scoreChangeChannel))
+            {
+                Debug.LogError("ScoreValueChangedEventArgs channel not found. Score updates will not be received.");
+                return;
+            }
+
+            if (scoreChangeChannel.TrySubscribe(this, OnScoreChanged))
+            {
+                SubscribedChannels.Add(scoreChangeChannel);
+            }
+
             IScoreChanger.ScoreChanged += OnScoreChanged;
         }
+
 
         private void OnDisable()
         {
             IScoreChanger.ScoreChanged -= OnScoreChanged;
+
+            foreach (var channel in SubscribedChannels)
+            {
+                if (channel is IEventChannel<IEventArgs> eventChannel)
+                    eventChannel.TryUnsubscribe(this);
+            }
+            SubscribedChannels.Clear();
         }
 
-        void OnScoreChanged(IScoreChanger scoreChanger)
+        private void OnScoreChanged(ScoreChangedEventArgs args)
+        {
+            if (args.ScoreChanger == null)
+                return;
+
+            IncreaseScore(args.ScoreChanger.ScoreChangeValue);
+        }
+
+        private void OnScoreChanged(IScoreChanger scoreChanger)
         {
             if (scoreChanger == null)
                 return;

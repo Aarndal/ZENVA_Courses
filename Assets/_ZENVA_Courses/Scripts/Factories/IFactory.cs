@@ -1,4 +1,6 @@
-﻿/// <summary>
+﻿using EventSystem;
+
+/// <summary>
 /// Base interface for factories.
 /// </summary>
 public interface IFactory { }
@@ -12,10 +14,9 @@ public interface IFactory<TObj, TData> : IFactory
     bool TryCreate(TData data, out TObj obj);
 }
 
-/// <summary>
-/// Factory that creates objects without requiring data.
-/// </summary>
-public interface IFactory<T> : IFactory<T, NoData>
+
+public interface IGenericFactory<T> : IFactory
 {
-    bool TryCreate(out T obj) => TryCreate(default, out obj);
+    public bool TryCreate<TData>(out T obj)
+            where TData : IDataProvider;
 }
