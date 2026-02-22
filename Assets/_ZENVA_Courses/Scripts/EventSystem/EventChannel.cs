@@ -6,14 +6,42 @@ using UnityEngine;
 
 namespace EventSystem
 {
+    [CreateAssetMenu(fileName = "NewEventChannel", menuName = "Event System/Event Channel")]
+    public class EventChannelSO : ScriptableObject, IEventChannel
+    {
+        private readonly HashSet<ISubscriber> _subscribers = new();
+
+        public int SubscriberCount => _subscribers.Count;
+
+        public event Action<IEventChannel> DisposalRequested;
+
+        public void Dispose()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Subscribe<TEventArgs>(ISubscriber subscriber, Action<TEventArgs> handler, Func<TEventArgs, bool> filter = null) 
+            where TEventArgs : IEventArgs
+        {
+            if (!EventTransmitter.TryGetChannel<TEventArgs>(subscriber, out var channel))
+                return;
+
+            if (!channel.TrySubscribe(subscriber, handler, filter))
+                return;
+            
+            if (!_subscribers.Add(subscriber))
+                return;
+        }
+    }
+
     public class EventChannel<TEventArgs> : IEventChannel<TEventArgs>
         where TEventArgs : IEventArgs
     {
         // Private Members
-        private readonly HashSet<(ISubscriber Subscriber, Action<TEventArgs> Handler, Func<TEventArgs, bool> Filter)> _subscribedHandlers = new();
+        private readonly HashSet<SubscriberInfo<TEventArgs>> _subscriberInfo = new();
 
         // Properties
-        public int SubscriberCount => _subscribedHandlers.Count;
+        public int SubscriberCount => _subscriberInfo.Count;
 
         // Events
         //public event Action<TEventArgs> EventRaised;
@@ -34,7 +62,7 @@ namespace EventSystem
                 return;
             }
 
-            _subscribedHandlers?.Clear();
+            _subscriberInfo?.Clear();
 
             if(DisposalRequested != null)
             {
@@ -46,17 +74,20 @@ namespace EventSystem
         {
             if (SubscriberCount == 0)
                 return false;
-            foreach (var (Subscriber, Handler, _) in _subscribedHandlers)
+
+            foreach (var info in _subscriberInfo)
             {
-                Debug.Log($"Invoking handler {Handler.Method.Name} for subscriber {Subscriber.ID} with event args: {args}");
                 DebugLogger.Log(
                     LogMessageType.Message,
                     this,
                     "Invoking handler {0} for subscriber {1} with event args: {2}",
                     true,
-                    Handler.Method.Name,
-                    Subscriber.ID,
+                    info.Handler.Method.Name,
+                    info.Subscriber.ID,
                     args);
+
+                if(info.Filter?.Invoke(args) == false)
+                    return false;
             }
             return true;
         }
@@ -73,7 +104,7 @@ namespace EventSystem
                 return false;
             }
 
-            if (!_subscribedHandlers.Add((subscriber, handler, filter)))
+            if (!_subscriberInfo.Add(new SubscriberInfo<TEventArgs>(subscriber, handler, filter)))
             {
                 Debugging.DebugLogger.Log(
                     LogMessageType.Warning, 
@@ -98,15 +129,15 @@ namespace EventSystem
             if (subscriber == null)
                 return false;
 
-            var handlerToRemove = _subscribedHandlers.FirstOrDefault(sh => sh.Subscriber.Equals(subscriber));
+            var handlerToRemove = _subscriberInfo.FirstOrDefault(sh => sh.Subscriber.Equals(subscriber));
 
             if (handlerToRemove.Equals(default))
                 return false;
 
-            _subscribedHandlers.Remove(handlerToRemove);
+            _subscriberInfo.Remove(handlerToRemove);
             Console.WriteLine($"Subscriber {subscriber.ID} unsubscribed from handler.");
 
-            if (_subscribedHandlers.Count == 0)
+            if (_subscriberInfo.Count == 0)
             {
                 DisposalRequested?.Invoke(this);
             }

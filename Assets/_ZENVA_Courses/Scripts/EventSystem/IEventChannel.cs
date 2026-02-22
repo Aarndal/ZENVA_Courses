@@ -15,7 +15,7 @@ namespace EventSystem
         int SubscriberCount { get; }
     }
 
-    public interface IEventChannel<TEventArgs> : IEventChannel
+    public partial interface IEventChannel<TEventArgs> : IEventChannel
         where TEventArgs : IEventArgs
     {
         /// <summary>

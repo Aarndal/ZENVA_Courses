@@ -7,5 +7,6 @@ namespace EventSystem
     public interface IEventArgs : IDataProvider
     {
         EventFlag Flag { get; }
+        IPublisher Publisher { get; }
     }
 }

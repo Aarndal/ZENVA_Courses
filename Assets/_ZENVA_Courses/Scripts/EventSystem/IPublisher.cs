@@ -1,5 +1,3 @@
-using System;
-
 namespace EventSystem
 {
     /// <summary>
@@ -9,10 +7,5 @@ namespace EventSystem
     /// </summary>
     public interface IPublisher : IEventParticipant
     {
-    }
-
-    public struct DefaultPublisher : IPublisher
-    {
-        public readonly Guid ID => Guid.Empty;
     }
 }

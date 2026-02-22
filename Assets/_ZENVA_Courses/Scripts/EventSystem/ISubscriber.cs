@@ -11,4 +11,5 @@ namespace EventSystem
     {
         HashSet<IEventChannel> SubscribedChannels { get; }
     }
+
 }
