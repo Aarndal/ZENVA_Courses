@@ -7,10 +7,10 @@ namespace BalloonPopper
 {
     public sealed class BalloonPopperScoreManager : ScoreManager, ISubscriber
     {
+        private readonly HashSet<IEventChannel> _subscribedChannels = new();
+        
         [SerializeField, HideInInspector]
         private string id = default;
-
-        public HashSet<IEventChannel> SubscribedChannels { get; private set; } = new();
 
         public Guid ID
         {
@@ -26,11 +26,14 @@ namespace BalloonPopper
             }
         }
 
+        public Dictionary<IEventChannel, IEventQueue<IEventArgs>> EventQueuePerChannel => new();
+
         public override event Action<int> ScoreUpdated
         {
             add { _scoreUpdated += value; }
             remove { _scoreUpdated -= value; }
         }
+
 
         private void OnEnable()
         {
@@ -42,23 +45,22 @@ namespace BalloonPopper
 
             if (scoreChangeChannel.TrySubscribe(this, OnScoreChanged))
             {
-                SubscribedChannels.Add(scoreChangeChannel);
+                _subscribedChannels.Add(scoreChangeChannel);
+                EventQueuePerChannel.TryAdd(scoreChangeChannel, null);
             }
 
-            //IScoreChanger.ScoreChanged += OnScoreChanged;
         }
 
 
         private void OnDisable()
         {
-            //IScoreChanger.ScoreChanged -= OnScoreChanged;
 
-            foreach (var channel in SubscribedChannels)
+            foreach (var channel in _subscribedChannels)
             {
                 if (channel is IEventChannel<IEventArgs> eventChannel)
                     eventChannel.TryUnsubscribe(this);
             }
-            SubscribedChannels.Clear();
+            _subscribedChannels.Clear();
         }
 
         private void OnScoreChanged(ScoreChangedEventArgs args)
@@ -69,20 +71,19 @@ namespace BalloonPopper
             IncreaseScore(args.ScoreChanger.ScoreChangeValue);
         }
 
-        private void OnScoreChanged(IScoreChanger scoreChanger)
-        {
-            if (scoreChanger == null)
-                return;
-
-            IncreaseScore(scoreChanger.ScoreChangeValue);
-        }
-
         protected override void IncreaseScore(int scoreChangeValue)
         {
             _currentScore += scoreChangeValue;
             Debug.Log("Score: " + _currentScore);
 
             _scoreUpdated?.Invoke(_currentScore);
+        }
+
+        public bool Equals(IEventParticipant other)
+        {
+            if (other == null) return false;
+
+            return ID.Equals(other.ID);
         }
     }
 }

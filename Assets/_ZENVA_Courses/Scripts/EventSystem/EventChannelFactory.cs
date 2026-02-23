@@ -18,7 +18,7 @@ namespace EventSystem
             }
             catch (Exception ex)
             {
-                Debugging.DebugLogger.Log(
+                DebugLogger.Log(
                     LogMessageType.Error, 
                     this, 
                     "Failed to create event channel for IEventArgs type: {0} | GUID: {1}" +

@@ -5,20 +5,18 @@ namespace EventSystem
     public readonly struct SubscriberInfo<TEventArgs> : IEquatable<SubscriberInfo<TEventArgs>>
         where TEventArgs : IEventArgs
     {
-        public ISubscriber Subscriber { get; }
         public Action<TEventArgs> Handler { get; }
-        public Func<TEventArgs, bool> Filter { get; }
+        public Predicate<TEventArgs> Predicate { get; }
 
-        public SubscriberInfo(ISubscriber subscriber, Action<TEventArgs> handler, Func<TEventArgs, bool> filter = null)
+        public SubscriberInfo(Action<TEventArgs> handler, Predicate<TEventArgs> predicate = null)
         {
-            Subscriber = subscriber;
             Handler = handler;
-            Filter = filter;
+            Predicate = predicate;
         }
 
         public bool Equals(SubscriberInfo<TEventArgs> other)
         {
-            return Subscriber.Equals(other.Subscriber) && Handler.Equals(other.Handler) && Filter.Equals(other.Filter);
+            return Handler.Equals(other.Handler) && Predicate.Equals(other.Predicate);
         }
 
         public override bool Equals(object obj)
@@ -28,7 +26,7 @@ namespace EventSystem
 
         public override int GetHashCode()
         {
-            return Subscriber.GetHashCode();
+            return HashCode.Combine(Handler, Predicate);
         }
     }
 }

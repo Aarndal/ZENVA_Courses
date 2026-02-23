@@ -8,9 +8,6 @@ namespace EventSystem
     /// </summary>
     public interface IEventParticipant : IEquatable<IEventParticipant>
     {
-        Guid ID
-        {
-            get;
-        }
+        Guid ID { get; }
     }
 }

@@ -6,6 +6,10 @@ using UnityEngine;
 
 namespace EventSystem
 {
+    /// <summary>
+    /// This ScriptableObject serves as a container for references to multiple event channels. 
+    /// It allows Designers to subscribe to events without needing direct references to the individual channels.
+    /// </summary>
     [CreateAssetMenu(fileName = "NewEventChannel", menuName = "Event System/Event Channel")]
     public class EventChannelSO : ScriptableObject, IEventChannel
     {
@@ -33,7 +37,6 @@ namespace EventSystem
             }
         }
 
-
         public void Dispose()
         {
             // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
@@ -41,7 +44,7 @@ namespace EventSystem
             GC.SuppressFinalize(this);
         }
 
-        public void Subscribe<TEventArgs>(ISubscriber subscriber, Action<TEventArgs> handler, Func<TEventArgs, bool> filter = null)
+        public void Subscribe<TEventArgs>(ISubscriber subscriber, Action<TEventArgs> handler, Predicate<TEventArgs> predicate = null)
             where TEventArgs : IEventArgs
         {
             if (subscriber == null || handler == null)
@@ -64,7 +67,7 @@ namespace EventSystem
                 }
             }
 
-            if (!channel.TrySubscribe(subscriber, handler, filter))
+            if (!channel.TrySubscribe(subscriber, handler, predicate))
             {
                 return;
             }

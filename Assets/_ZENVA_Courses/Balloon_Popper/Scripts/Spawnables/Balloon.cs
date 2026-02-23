@@ -29,6 +29,8 @@ namespace BalloonPopper
 
         public Guid ID => Guid.TryParse(this.gameObject.GetEntityId().ToString(), out var guid) ? guid : Guid.Empty;
 
+        public string Name => this.gameObject.name;
+
         public event Func<ISpawnable, bool> DespawnRequested;
 
         #region Unity Lifecycle Methods
@@ -51,6 +53,66 @@ namespace BalloonPopper
             _toggleState = ToggleState.On;
             this.gameObject.SetActive(false);
         }
+        #endregion
+
+
+        #region Private Methods
+        private async UniTask PopBalloon()
+        {
+            _toggleState = ToggleState.Pending;
+            // Compute the target scale
+            Vector3 popScale = this.transform.localScale * 1.25f;
+
+            // Speed in scale-units per second (tweak as needed)
+            const float scaleSpeed = 0.75f;
+
+            // Squared epsilon for comparison to avoid using exact equality
+            const float sqrEpsilon = 0.0001f;
+
+            // Animate towards the target scale using MoveTowards to guarantee progress
+            while (Vector3.SqrMagnitude(this.transform.localScale - popScale) > sqrEpsilon)
+            {
+                this.transform.localScale = Vector3.MoveTowards(this.transform.localScale, popScale, scaleSpeed * Time.deltaTime);
+                await UniTask.Yield(PlayerLoopTiming.Update);
+            }
+
+            // Snap exactly to the target to avoid tiny residual differences
+            this.transform.localScale = popScale;
+
+            Despawn();
+            //IScoreChanger.ScoreChanged?.Invoke(this);
+
+            if (_channel == null)
+            {
+                if (!EventTransmitter.TryGetChannel(this, out _channel))
+                {
+                    return;
+                }
+            }
+
+            _channel.TryPublish(new ScoreChangedEventArgs(this, EventFlag.None, this));
+        }
+
+        private bool TryResetCounter()
+        {
+            if (_data.ClicksToPop <= 0)
+            {
+                Debug.LogErrorFormat("Data has invalid ClicksToPop value in Balloon script: {0} | ID: {1}",
+                    this.gameObject.name,
+                    this.gameObject.GetEntityId());
+
+                return false;
+            }
+
+            if (_counter != _data.ClicksToPop)
+            {
+                _counter = _data.ClicksToPop;
+            }
+
+            return true;
+        }
+
+
         #endregion
 
 
@@ -159,64 +221,6 @@ namespace BalloonPopper
 
             return _isInitialized = true;
         }
-        #endregion
-
-
-        #region Private Methods
-        private async UniTask PopBalloon()
-        {
-            _toggleState = ToggleState.Pending;
-            // Compute the target scale
-            Vector3 popScale = this.transform.localScale * 1.25f;
-
-            // Speed in scale-units per second (tweak as needed)
-            const float scaleSpeed = 0.75f;
-
-            // Squared epsilon for comparison to avoid using exact equality
-            const float sqrEpsilon = 0.0001f;
-
-            // Animate towards the target scale using MoveTowards to guarantee progress
-            while (Vector3.SqrMagnitude(this.transform.localScale - popScale) > sqrEpsilon)
-            {
-                this.transform.localScale = Vector3.MoveTowards(this.transform.localScale, popScale, scaleSpeed * Time.deltaTime);
-                await UniTask.Yield(PlayerLoopTiming.Update);
-            }
-
-            // Snap exactly to the target to avoid tiny residual differences
-            this.transform.localScale = popScale;
-
-            Despawn();
-            //IScoreChanger.ScoreChanged?.Invoke(this);
-
-            if(_channel == null)
-            {
-                if(!EventTransmitter.TryGetChannel(this, out _channel))
-                {
-                    return;
-                }
-            }
-
-            _channel.TryPublish(new ScoreChangedEventArgs(this), publisher: this);
-        }
-
-        private bool TryResetCounter()
-        {
-            if (_data.ClicksToPop <= 0)
-            {
-                Debug.LogErrorFormat("Data has invalid ClicksToPop value in Balloon script: {0} | ID: {1}",
-                    this.gameObject.name,
-                    this.gameObject.GetEntityId());
-
-                return false;
-            }
-
-            if (_counter != _data.ClicksToPop)
-            {
-                _counter = _data.ClicksToPop;
-            }
-
-            return true;
-        }
 
         public bool TryToggle()
         {
@@ -229,8 +233,15 @@ namespace BalloonPopper
             _counter--;
 
             this.transform.localScale += Vector3.one * _data.ScaleFactor;
-                    
+
             return true;
+        }
+
+        public bool Equals(IEventParticipant other)
+        {
+            if (other == null) return false;
+
+            return this.ID == other.ID;
         }
         #endregion
     }

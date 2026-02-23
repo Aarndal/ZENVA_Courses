@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace EventSystem
@@ -9,7 +10,6 @@ namespace EventSystem
     /// </summary>
     public interface ISubscriber : IEventParticipant
     {
-        HashSet<IEventChannel> SubscribedChannels { get; }
+        Dictionary<IEventChannel, IEventQueue<IEventArgs>> EventQueuePerChannel { get; }
     }
-
 }

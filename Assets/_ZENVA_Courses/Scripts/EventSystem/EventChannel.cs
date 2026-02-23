@@ -3,14 +3,20 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Analytics;
 
 namespace EventSystem
 {
+    /// <summary>
+    /// A communication channel for a specific type of event arguments (<see cref="IEventArgs"/>).
+    /// It allows <see cref="ISubscriber"/> to register or deregister their interest in events of type TEventArgs and <see cref="IPublisher"/> to raise events of that type.
+    /// </summary>
+    /// <typeparam name="TEventArgs">The type of event arguments (<see cref="IEventArgs"/>) that this channel handles.</typeparam>
     public class EventChannel<TEventArgs> : IEventChannel<TEventArgs>
         where TEventArgs : IEventArgs
     {
         // Private Members
-        private readonly HashSet<SubscriberInfo<TEventArgs>> _subscriberInfo = new();
+        private readonly Dictionary<ISubscriber, SubscriberInfo<TEventArgs>> _subscriberInfo = new();
 
         // Properties
         public int SubscriberCount => _subscriberInfo.Count;
@@ -42,29 +48,47 @@ namespace EventSystem
             }
         }
 
-        public bool TryPublish(TEventArgs args, IPublisher publisher = null)
+        /// <summary>
+        /// Tries to publish an event with the given arguments. 
+        /// It checks all subscribed handlers and their filters before invoking them.
+        /// </summary>
+        /// <param name="args">The <see cref="IEventArgs"/> to publish.</param>
+        /// <param name="publisher">The <see cref="IPublisher"/> of the event.</param>
+        /// <returns>true if the event was successfully published; otherwise, false.</returns>
+        public bool TryPublish(TEventArgs args)
         {
             if (SubscriberCount == 0)
-                return false;
-
-            foreach (var info in _subscriberInfo)
             {
                 DebugLogger.Log(
-                    LogMessageType.Message,
+                    LogMessageType.WarningFormatted,
                     this,
-                    "Invoking handler {0} for subscriber {1} with event args: {2}",
+                    "Publish attempt of an event with no subscribers: {0} | PublisherID: {1}" +
+                    "\nEvent will not be raised: {2} | EventID: {3}",
                     true,
-                    info.Handler.Method.Name,
-                    info.Subscriber.ID,
-                    args);
+                    args?.Publisher?.Name,
+                    args?.Publisher?.ID,
+                    args?.ToString(),
+                    args?.ID);
+                return false;
+            }
 
-                if (info.Filter?.Invoke(args) == false)
-                    return false;
+            foreach (var subscriber in _subscriberInfo)
+            {
+                if (subscriber.Value.Predicate != null && !subscriber.Value.Predicate.Invoke(args))
+                    continue;
+
+                //if (subscriber.Key.EventQueuePerChannel[this] != null)
+                //{
+                //    subscriber.Key.EventQueuePerChannel[this].EnqueueEvent(args);
+                //    continue;
+                //}
+
+                subscriber.Value.Handler?.Invoke(args);
             }
             return true;
         }
 
-        public bool TrySubscribe(ISubscriber subscriber, Action<TEventArgs> handler, Func<TEventArgs, bool> filter = null)
+        public bool TrySubscribe(ISubscriber subscriber, Action<TEventArgs> handler, Predicate<TEventArgs> predicate = null)
         {
             if (subscriber == null || handler == null)
             {
@@ -76,9 +100,9 @@ namespace EventSystem
                 return false;
             }
 
-            if (!_subscriberInfo.Add(new SubscriberInfo<TEventArgs>(subscriber, handler, filter)))
+            if (!_subscriberInfo.TryAdd(subscriber, new SubscriberInfo<TEventArgs>(handler, predicate)))
             {
-                Debugging.DebugLogger.Log(
+                DebugLogger.Log(
                     LogMessageType.Warning,
                     this,
                     "Subscriber is already subscribed with the same handler: {0} (Handler: {1})" +
@@ -89,9 +113,8 @@ namespace EventSystem
                 return false;
             }
 
-            //EventRaised += handler;
-
             Debug.Log($"Subscriber {subscriber.ID} subscribed with handler {handler.Method.Name}.");
+
             return true;
         }
 
@@ -101,13 +124,17 @@ namespace EventSystem
             if (subscriber == null)
                 return false;
 
-            var handlerToRemove = _subscriberInfo.FirstOrDefault(sh => sh.Subscriber.Equals(subscriber));
-
-            if (handlerToRemove.Equals(default))
+            if (!_subscriberInfo.Remove(subscriber))
+            {
+                DebugLogger.Log(     
+                    LogMessageType.Warning,     
+                    this,     
+                    "Attempting to unsubscribe a subscriber that is not currently subscribed: {0}" +
+                    "\nUnsubscription ignored.",
+                    true,
+                    subscriber.ID);
                 return false;
-
-            _subscriberInfo.Remove(handlerToRemove);
-            Console.WriteLine($"Subscriber {subscriber.ID} unsubscribed from handler.");
+            }
 
             if (_subscriberInfo.Count == 0)
             {
