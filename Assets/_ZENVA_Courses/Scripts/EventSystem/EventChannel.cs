@@ -6,34 +6,6 @@ using UnityEngine;
 
 namespace EventSystem
 {
-    [CreateAssetMenu(fileName = "NewEventChannel", menuName = "Event System/Event Channel")]
-    public class EventChannelSO : ScriptableObject, IEventChannel
-    {
-        private readonly HashSet<ISubscriber> _subscribers = new();
-
-        public int SubscriberCount => _subscribers.Count;
-
-        public event Action<IEventChannel> DisposalRequested;
-
-        public void Dispose()
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Subscribe<TEventArgs>(ISubscriber subscriber, Action<TEventArgs> handler, Func<TEventArgs, bool> filter = null) 
-            where TEventArgs : IEventArgs
-        {
-            if (!EventTransmitter.TryGetChannel<TEventArgs>(subscriber, out var channel))
-                return;
-
-            if (!channel.TrySubscribe(subscriber, handler, filter))
-                return;
-            
-            if (!_subscribers.Add(subscriber))
-                return;
-        }
-    }
-
     public class EventChannel<TEventArgs> : IEventChannel<TEventArgs>
         where TEventArgs : IEventArgs
     {
@@ -51,20 +23,20 @@ namespace EventSystem
         #region Public Methods
         public void Dispose()
         {
-            if(SubscriberCount > 0)
+            if (SubscriberCount > 0)
             {
                 DebugLogger.Log(
-                    LogMessageType.Warning, 
-                    this, 
-                    "Attempting to dispose EventChannel while there are still handlers subscribed: {0} subscribers", 
-                    true, 
+                    LogMessageType.Warning,
+                    this,
+                    "Attempting to dispose EventChannel while there are still handlers subscribed: {0} subscribers",
+                    true,
                     SubscriberCount);
                 return;
             }
 
             _subscriberInfo?.Clear();
 
-            if(DisposalRequested != null)
+            if (DisposalRequested != null)
             {
                 DisposalRequested = null;
             }
@@ -86,7 +58,7 @@ namespace EventSystem
                     info.Subscriber.ID,
                     args);
 
-                if(info.Filter?.Invoke(args) == false)
+                if (info.Filter?.Invoke(args) == false)
                     return false;
             }
             return true;
@@ -97,9 +69,9 @@ namespace EventSystem
             if (subscriber == null || handler == null)
             {
                 DebugLogger.Log(
-                    LogMessageType.Error, 
-                    this, 
-                    "Attempting to subscribe with null subscriber or handler. Subscription failed.", 
+                    LogMessageType.Error,
+                    this,
+                    "Attempting to subscribe with null subscriber or handler. Subscription failed.",
                     true);
                 return false;
             }
@@ -107,11 +79,11 @@ namespace EventSystem
             if (!_subscriberInfo.Add(new SubscriberInfo<TEventArgs>(subscriber, handler, filter)))
             {
                 Debugging.DebugLogger.Log(
-                    LogMessageType.Warning, 
-                    this, 
+                    LogMessageType.Warning,
+                    this,
                     "Subscriber is already subscribed with the same handler: {0} (Handler: {1})" +
-                    "\nSubscription ignored.", 
-                    true, 
+                    "\nSubscription ignored.",
+                    true,
                     subscriber.ID,
                     handler.Method.Name);
                 return false;
