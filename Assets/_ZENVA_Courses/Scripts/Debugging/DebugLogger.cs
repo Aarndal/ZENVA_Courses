@@ -116,8 +116,8 @@ namespace Debugging
             // ── Route to the correct private handler ──
             switch (type)
             {
-                case LogMessageType.Message:
-                case LogMessageType.MessageFormatted:
+                case LogMessageType.Info:
+                case LogMessageType.InfoFormatted:
                     LogMessage(type, unityContext, objectName, instanceId,
                                isUnityObject, logMessage, isLoggingEnabled, args);
                     break;
@@ -156,7 +156,7 @@ namespace Debugging
             if (!isLoggingEnabled || !EnableMessages)
                 return;
 
-            if (type == LogMessageType.MessageFormatted)
+            if (type == LogMessageType.InfoFormatted)
             {
                 var (format, fmtArgs) = LogFormatter.BuildFormatted(
                     objectName, instanceId, isUnityObject, logMessage, args);

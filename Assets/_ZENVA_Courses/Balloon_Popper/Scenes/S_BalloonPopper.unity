@@ -542,8 +542,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b3b6a21d377e5e34caacc598456f77d3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EventSystem.SubscriberComponent
-  EventChannel: {fileID: 11400000, guid: 292a2a0220209fb45bbfed751fcdc67c, type: 2}
-  UnityEvent:
+  EventChannelSubscriber: {fileID: 0}
+  ClassHandler:
+    m_PersistentCalls:
+      m_Calls: []
+  StructHandler:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 542079083}

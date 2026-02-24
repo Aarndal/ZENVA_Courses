@@ -5,8 +5,8 @@
     /// </summary>
     public enum LogMessageType : byte
     {
-        Message,
-        MessageFormatted,
+        Info,
+        InfoFormatted,
         Warning,
         WarningFormatted,
         Error,

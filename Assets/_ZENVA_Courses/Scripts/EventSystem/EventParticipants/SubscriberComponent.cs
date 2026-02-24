@@ -4,58 +4,28 @@ using UnityEngine.Events;
 
 namespace EventSystem
 {
-    public class SubscriberComponent : MonoBehaviour, ISubscriber
+    public class SubscriberComponent : MonoBehaviour
     {
-        public EventChannelSO MyEventChannel;
-        public UnityEvent<MyEventArgs> UnityEvent;
+        public EventChannelSubscriberSO EventChannelSubscriber = default;
+        public UnityEvent<MyEventArgs> ClassHandler = default;
+        public UnityEvent<MyEventArgsStruct> StructHandler = default;
 
-        public Guid ID => Guid.Parse(this.GetEntityId().ToString());
-
-        public bool Equals(IEventParticipant other)
+        private void OnEnable()
         {
-            if (other is ISubscriber subscriber)
-            {
-                return ID == subscriber.ID;
-            }
-            return false;
+            if (EventChannelSubscriber != null)
+                EventChannelSubscriber.TryAddListener(OnEventRaised);
         }
-
-        private void Awake()
+        
+        private void OnEventRaised(IEventArgs args)
         {
-            for (int i = 0; i < UnityEvent.GetPersistentEventCount(); i++)
+            if (args is MyEventArgs myArgs)
             {
-                var target = UnityEvent.GetPersistentTarget(i);
-                if (target == null)
-                    continue;
-                if (target is ISubscriber subscriber)
-                {
-                    if (!subscriber.Equals(this))
-                    {
-                        Debug.LogWarning($"SubscriberComponent on {gameObject.name} has a UnityEvent listener that does not reference itself. This may lead to unexpected behavior.");
-                    }
-                }
-                else
-                {
-                    Debug.LogWarning($"SubscriberComponent on {gameObject.name} has a UnityEvent listener that does not implement ISubscriber. This may lead to unexpected behavior.");
-                }
+                ClassHandler?.Invoke(myArgs);
             }
-
-        }
-    }
-
-    public abstract class MyEventArgs : EventArgs, IEventArgs
-    {
-        public bool AreValid => throw new NotImplementedException();
-
-        public EventFlag Flag => throw new NotImplementedException();
-
-        public IPublisher Publisher => throw new NotImplementedException();
-
-        public Guid ID => throw new NotImplementedException();
-
-        public bool Equals(IDataProvider other)
-        {
-            throw new NotImplementedException();
+            else if (args is MyEventArgsStruct myArgsStruct)
+            {
+                StructHandler?.Invoke(myArgsStruct);
+            }
         }
     }
 }

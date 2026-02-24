@@ -6,7 +6,9 @@ namespace EventSystem
         where TEventArgs : IEventArgs
     {
         event Action<TEventArgs> EventEnqueued;
-        int PendingEventsCount { get; }
-        void EnqueueEvent(TEventArgs args);
+
+        int Count { get; }
+        bool TryDequeue(out TEventArgs args);
+        bool TryEnqueue(TEventArgs args);
     }
 }

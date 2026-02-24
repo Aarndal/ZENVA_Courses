@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.Analytics;
 
 namespace EventSystem
 {
@@ -16,7 +15,7 @@ namespace EventSystem
         where TEventArgs : IEventArgs
     {
         // Private Members
-        private readonly Dictionary<ISubscriber, SubscriberInfo<TEventArgs>> _subscriberInfo = new();
+        private readonly Dictionary<ISubscriber, HashSet<SubscribedHandlerInfo<TEventArgs>>> _subscriberInfo = new();
 
         // Properties
         public int SubscriberCount => _subscriberInfo.Count;
@@ -57,6 +56,16 @@ namespace EventSystem
         /// <returns>true if the event was successfully published; otherwise, false.</returns>
         public bool TryPublish(TEventArgs args)
         {
+            if (args == null)
+            {
+                DebugLogger.Log(
+                    LogMessageType.Error,
+                    this,
+                    "Attempting to publish an event with null arguments. Publish failed.",
+                    true);
+                return false;
+            }
+
             if (SubscriberCount == 0)
             {
                 DebugLogger.Log(
@@ -72,18 +81,8 @@ namespace EventSystem
                 return false;
             }
 
-            if(args == null)
+            if (!args.AreValid)
             {
-                DebugLogger.Log(
-                    LogMessageType.Error,
-                    this,
-                    "Attempting to publish an event with null arguments. Publish failed.",
-                    true);
-                return false;
-            }
-
-            if(!args.AreValid)
-            {                 
                 DebugLogger.Log(
                     LogMessageType.Error,
                     this,
@@ -95,12 +94,15 @@ namespace EventSystem
             }
 
             //Raise Event
-            foreach (var subscriber in _subscriberInfo.Values)
+            foreach (var handlerInfo in _subscriberInfo.Values)
             {
-                if (subscriber.Predicate != null && !subscriber.Predicate.Invoke(args))
-                    continue;
-                
-                subscriber.Handler?.Invoke(args);
+                foreach (var info in handlerInfo)
+                {
+                    if (info.Predicate != null && !info.Predicate.Invoke(args))
+                        continue;
+
+                    info.Handler?.Invoke(args);
+                }
             }
 
             return true;
@@ -118,47 +120,109 @@ namespace EventSystem
                 return false;
             }
 
-            if (!_subscriberInfo.TryAdd(subscriber, new SubscriberInfo<TEventArgs>(handler, predicate)))
+            if (!_subscriberInfo.ContainsKey(subscriber))
+            {
+                if (!_subscriberInfo.TryAdd(subscriber, new HashSet<SubscribedHandlerInfo<TEventArgs>>()))
+                {
+                    DebugLogger.Log(
+                        LogMessageType.Error,
+                        this,
+                        "Failed to add subscriber to the subscriber info dictionary. Subscription failed. SubscriberID: {0}",
+                        true,
+                        subscriber.ID);
+                    return false;
+                }
+            }
+
+            if (!_subscriberInfo[subscriber].Add(new SubscribedHandlerInfo<TEventArgs>(handler, predicate)))
             {
                 DebugLogger.Log(
                     LogMessageType.Warning,
                     this,
-                    "Subscriber is already subscribed with the same handler: {0} (Handler: {1})" +
-                    "\nSubscription ignored.",
+                    "Subscriber is already subscribed with the same handler and predicate. Subscription ignored. SubscriberID: {0} | Handler: {1} | Predicate: {2}",
                     true,
                     subscriber.ID,
-                    handler.Method.Name);
+                    handler.Method.Name,
+                    predicate != null ? predicate.Method.Name : "null");
                 return false;
             }
 
-            Debug.Log($"Subscriber {subscriber.ID} subscribed with handler {handler.Method.Name}.");
+            DebugLogger.Log(
+                LogMessageType.Info,
+                this,
+                "Subscriber {0} subscribed with handler {1}.",
+                true,
+                subscriber.ID,
+                handler.Method.Name);
 
             return true;
         }
 
+        public bool TryUnsubscribe(ISubscriber subscriber, Action<TEventArgs> handler)
+        {
+            if (!CheckFor(subscriber))
+                return false;
+
+            if (handler == null)
+            {
+                DebugLogger.Log(
+                    LogMessageType.Error,
+                    subscriber,
+                    "Attempting to unsubscribe with null handler." +
+                    "\nUnsubscription failed.",
+                    true);
+                return false;
+            }
+
+            var unsubscribedHandlers = _subscriberInfo[subscriber].RemoveWhere(info => info.Handler == handler);
+
+            return unsubscribedHandlers > 0;
+        }
 
         public bool TryUnsubscribe(ISubscriber subscriber)
         {
-            if (subscriber == null)
+            if (!CheckFor(subscriber))
                 return false;
 
-            if (!_subscriberInfo.Remove(subscriber))
+            _subscriberInfo[subscriber].Clear();
+            _subscriberInfo.Remove(subscriber);
+
+            // If there are no more subscribers, request disposal of this channel
+            if (_subscriberInfo.Count == 0)
             {
-                DebugLogger.Log(     
-                    LogMessageType.Warning,     
-                    this,     
+                DisposalRequested?.Invoke(this);
+            }
+
+            return true;
+        }
+        #endregion
+
+
+        #region Private Methods
+        private bool CheckFor(ISubscriber subscriber)
+        {
+            if (subscriber == null)
+            {
+                DebugLogger.Log(
+                    LogMessageType.Error,
+                    this,
+                    "Attempting to unsubscribe null." +
+                    "\nUnsubscription failed.",
+                    true);
+                return false;
+            }
+
+            if (!_subscriberInfo.ContainsKey(subscriber))
+            {
+                DebugLogger.Log(
+                    LogMessageType.Warning,
+                    this,
                     "Attempting to unsubscribe a subscriber that is not currently subscribed: {0}" +
                     "\nUnsubscription ignored.",
                     true,
                     subscriber.ID);
                 return false;
             }
-
-            if (_subscriberInfo.Count == 0)
-            {
-                DisposalRequested?.Invoke(this);
-            }
-
             return true;
         }
         #endregion
