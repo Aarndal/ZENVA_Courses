@@ -21,7 +21,10 @@ namespace EventSystem
                 return false;
             }
             args = _queue.Dequeue();
-            return args != null;
+
+            if(args == null) return false;
+
+            return args.AreValid;
         }
         public bool TryEnqueue(TEventArgs args)
         {

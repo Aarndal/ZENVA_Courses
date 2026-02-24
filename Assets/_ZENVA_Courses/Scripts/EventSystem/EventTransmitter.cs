@@ -46,8 +46,6 @@ namespace EventSystem
                 return channel != null;
             }
 
-            _channels.Remove(typeof(TEventArgs));
-
             if (requester is not ISubscriber)
             {
                 return false;

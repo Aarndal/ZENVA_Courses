@@ -29,7 +29,7 @@ namespace EventSystem
 
         public override int GetHashCode()
         {
-            return (Handler?.GetHashCode() ?? 0) ^ (Predicate?.GetHashCode() ?? 0);
+            return HashCode.Combine(Handler, Predicate);
         }
     }
 }
