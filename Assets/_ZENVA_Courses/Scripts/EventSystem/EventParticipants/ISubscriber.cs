@@ -10,6 +10,5 @@ namespace EventSystem
     /// </summary>
     public interface ISubscriber : IEventParticipant
     {
-        Dictionary<IEventChannel, IEventQueue<IEventArgs>> EventQueuePerChannel { get; }
     }
 }

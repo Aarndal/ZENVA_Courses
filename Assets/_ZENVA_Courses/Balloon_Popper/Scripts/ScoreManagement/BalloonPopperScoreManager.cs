@@ -8,7 +8,7 @@ namespace BalloonPopper
     public sealed class BalloonPopperScoreManager : ScoreManager, ISubscriber
     {
         private readonly HashSet<IEventChannel> _subscribedChannels = new();
-        
+
         [SerializeField, HideInInspector]
         private string id = default;
 
@@ -26,7 +26,7 @@ namespace BalloonPopper
             }
         }
 
-        public Dictionary<IEventChannel, IEventQueue<IEventArgs>> EventQueuePerChannel => new();
+        public Dictionary<IEventChannel, (bool hasEventQueue, IEventQueue<IEventArgs> eventQueue)> EventQueuePerChannel => new();
 
         public override event Action<int> ScoreUpdated
         {
@@ -46,7 +46,7 @@ namespace BalloonPopper
             if (scoreChangeChannel.TrySubscribe(this, OnScoreChanged))
             {
                 _subscribedChannels.Add(scoreChangeChannel);
-                EventQueuePerChannel.TryAdd(scoreChangeChannel, null);
+                EventQueuePerChannel.TryAdd(scoreChangeChannel, (false, null));
             }
 
         }
@@ -61,6 +61,15 @@ namespace BalloonPopper
                     eventChannel.TryUnsubscribe(this);
             }
             _subscribedChannels.Clear();
+        }
+
+
+        public void ReceiveEvent(IEventArgs eventArgs)
+        {
+            if (eventArgs is ScoreChangedEventArgs scoreChangedArgs)
+            {
+                OnScoreChanged(scoreChangedArgs);
+            }
         }
 
         private void OnScoreChanged(ScoreChangedEventArgs args)

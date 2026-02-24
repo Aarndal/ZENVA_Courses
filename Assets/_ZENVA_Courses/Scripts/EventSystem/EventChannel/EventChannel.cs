@@ -72,19 +72,37 @@ namespace EventSystem
                 return false;
             }
 
-            foreach (var subscriber in _subscriberInfo)
+            if(args == null)
             {
-                if (subscriber.Value.Predicate != null && !subscriber.Value.Predicate.Invoke(args))
-                    continue;
-
-                //if (subscriber.Key.EventQueuePerChannel[this] != null)
-                //{
-                //    subscriber.Key.EventQueuePerChannel[this].EnqueueEvent(args);
-                //    continue;
-                //}
-
-                subscriber.Value.Handler?.Invoke(args);
+                DebugLogger.Log(
+                    LogMessageType.Error,
+                    this,
+                    "Attempting to publish an event with null arguments. Publish failed.",
+                    true);
+                return false;
             }
+
+            if(!args.AreValid)
+            {                 
+                DebugLogger.Log(
+                    LogMessageType.Error,
+                    this,
+                    "Attempting to publish an event with invalid arguments. Publish failed. EventArgs: {0} | EventID: {1}",
+                    true,
+                    args.ToString(),
+                    args.ID);
+                return false;
+            }
+
+            //Raise Event
+            foreach (var subscriber in _subscriberInfo.Values)
+            {
+                if (subscriber.Predicate != null && !subscriber.Predicate.Invoke(args))
+                    continue;
+                
+                subscriber.Handler?.Invoke(args);
+            }
+
             return true;
         }
 

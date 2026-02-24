@@ -6,6 +6,7 @@ namespace EventSystem
     /// </summary>
     public interface IEventArgs : IDataProvider
     {
+        bool AreValid { get; }
         EventFlag Flag { get; }
         IPublisher Publisher { get; }
     }
