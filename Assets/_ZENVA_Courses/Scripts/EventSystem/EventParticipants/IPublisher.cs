@@ -8,7 +8,6 @@ namespace EventSystem
     /// </summary>
     public interface IPublisher : IEventParticipant
     {
-        bool IsAnonymous => string.IsNullOrEmpty(Name) && ID.Equals(Guid.Empty);
-        string Name { get; }
+        bool IsAnonymous => string.IsNullOrEmpty(UniqueKey) && EventGuid.Equals(EventParticipantIDManager.GetParticipantGuid(this.GetType(), ""));
     }
 }

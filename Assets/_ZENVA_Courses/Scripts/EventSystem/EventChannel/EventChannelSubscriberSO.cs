@@ -17,7 +17,7 @@ namespace EventSystem
         [HideInInspector, SerializeField]
         private string id = default;
 
-        public Guid ID
+        public Guid EventGuid
         {
             get
             {
@@ -31,7 +31,7 @@ namespace EventSystem
 
         private void Awake()
         {
-            _subscriber = new(ID);
+            _subscriber = new(EventGuid);
         }
 
         private void OnDestroy()
@@ -43,7 +43,7 @@ namespace EventSystem
         {
             if (other is ISubscriber subscriber)
             {
-                return ID.Equals(subscriber.ID);
+                return EventGuid.Equals(subscriber.EventGuid);
             }
             return false;
         }

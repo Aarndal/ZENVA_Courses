@@ -12,7 +12,7 @@ namespace BalloonPopper
         [SerializeField, HideInInspector]
         private string id = default;
 
-        public Guid ID
+        public Guid EventGuid
         {
             get
             {
@@ -92,7 +92,7 @@ namespace BalloonPopper
         {
             if (other == null) return false;
 
-            return ID.Equals(other.ID);
+            return EventGuid.Equals(other.EventGuid);
         }
     }
 }

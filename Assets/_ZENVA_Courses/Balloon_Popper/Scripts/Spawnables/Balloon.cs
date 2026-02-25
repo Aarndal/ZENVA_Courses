@@ -27,9 +27,9 @@ namespace BalloonPopper
 
         public int ScoreChangeValue => _data.ScoreValue;
 
-        public Guid ID => Guid.TryParse(this.gameObject.GetEntityId().ToString(), out var guid) ? guid : Guid.Empty;
+        public Guid EventGuid => Guid.TryParse(this.gameObject.GetEntityId().ToString(), out var guid) ? guid : Guid.Empty;
 
-        public string Name => this.gameObject.name;
+        public string UniqueKey => this.gameObject.name;
 
         public event Func<ISpawnable, bool> DespawnRequested;
 
@@ -241,7 +241,7 @@ namespace BalloonPopper
         {
             if (other == null) return false;
 
-            return this.ID == other.ID;
+            return this.EventGuid == other.EventGuid;
         }
         #endregion
     }

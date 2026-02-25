@@ -8,6 +8,13 @@ namespace EventSystem
     /// </summary>
     public interface IEventParticipant : IEquatable<IEventParticipant>
     {
-        Guid ID { get; }
+        Guid EventGuid => EventParticipantIDManager.GetParticipantGuid(this.GetType(), UniqueKey);
+
+        int EventID => EventParticipantIDManager.GetParticipantId(this.GetType(), UniqueKey);
+
+        /// <summary>
+        /// Return a unique and stable key for this participant (e.g. "Player1", "Enemy/42", path, GUID, etc).
+        /// </summary>
+        string UniqueKey { get; }
     }
 }

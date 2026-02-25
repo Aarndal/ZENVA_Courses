@@ -8,11 +8,11 @@ namespace EventSystem
     {
         private readonly HashSet<IEventChannel> _subscribedChannels = new();
 
-        public Guid ID { get; }
+        public Guid EventGuid { get; }
 
         public Subscriber(Guid id)
         {
-            ID = id;
+            EventGuid = id;
         }
 
         public bool TryAddHandlerToSubscription<TEventArgs>(Action<TEventArgs> handler, Predicate<TEventArgs> filter = null)
@@ -61,7 +61,7 @@ namespace EventSystem
         {
             if (other is ISubscriber subscriber)
             {
-                return ID == subscriber.ID;
+                return EventGuid == subscriber.EventGuid;
             }
             return false;
         }
@@ -71,7 +71,7 @@ namespace EventSystem
         }
         public override int GetHashCode()
         {
-            return ID.GetHashCode();
+            return EventGuid.GetHashCode();
         }
     }
 }

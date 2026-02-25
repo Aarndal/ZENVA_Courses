@@ -74,8 +74,8 @@ namespace EventSystem
                     "Publish attempt of an event with no subscribers: {0} | PublisherID: {1}" +
                     "\nEvent will not be raised: {2} | EventID: {3}",
                     true,
-                    args?.Publisher?.Name,
-                    args?.Publisher?.ID,
+                    args?.Publisher?.UniqueKey,
+                    args?.Publisher?.EventGuid,
                     args?.ToString(),
                     args?.ID);
                 return false;
@@ -129,7 +129,7 @@ namespace EventSystem
                         this,
                         "Failed to add subscriber to the subscriber info dictionary. Subscription failed. SubscriberID: {0}",
                         true,
-                        subscriber.ID);
+                        subscriber.EventGuid);
                     return false;
                 }
             }
@@ -141,7 +141,7 @@ namespace EventSystem
                     this,
                     "Subscriber is already subscribed with the same handler and predicate. Subscription ignored. SubscriberID: {0} | Handler: {1} | Predicate: {2}",
                     true,
-                    subscriber.ID,
+                    subscriber.EventGuid,
                     handler.Method.Name,
                     predicate != null ? predicate.Method.Name : "null");
                 return false;
@@ -152,7 +152,7 @@ namespace EventSystem
                 this,
                 "Subscriber {0} subscribed with handler {1}.",
                 true,
-                subscriber.ID,
+                subscriber.EventGuid,
                 handler.Method.Name);
 
             return true;
@@ -220,7 +220,7 @@ namespace EventSystem
                     "Attempting to unsubscribe a subscriber that is not currently subscribed: {0}" +
                     "\nUnsubscription ignored.",
                     true,
-                    subscriber.ID);
+                    subscriber.EventGuid);
                 return false;
             }
             return true;
