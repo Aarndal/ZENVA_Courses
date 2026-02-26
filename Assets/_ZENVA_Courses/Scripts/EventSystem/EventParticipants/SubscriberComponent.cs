@@ -1,5 +1,4 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.Events;
 
 namespace EventSystem
@@ -15,7 +14,13 @@ namespace EventSystem
             if (EventChannelSubscriber != null)
                 EventChannelSubscriber.TryAddListener(OnEventRaised);
         }
-        
+
+        private void OnDisable()
+        {
+            if (EventChannelSubscriber != null)
+                EventChannelSubscriber.TryRemoveListener(OnEventRaised);
+        }
+
         private void OnEventRaised(IEventArgs args)
         {
             if (args is MyEventArgs myArgs)

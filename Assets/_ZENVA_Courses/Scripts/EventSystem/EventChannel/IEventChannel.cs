@@ -44,5 +44,9 @@ namespace EventSystem
         /// <returns>true if the unsubscription was successful; otherwise, false.</returns>
         bool TryUnsubscribe(
             ISubscriber subscriber);
+
+        bool TryUnsubscribe(
+            ISubscriber subscriber, 
+            Action<TEventArgs> handler);
     }
 }

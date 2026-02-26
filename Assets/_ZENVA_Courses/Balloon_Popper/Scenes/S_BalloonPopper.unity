@@ -528,7 +528,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bec742ee6e862024db83d5aafbcdc7c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BalloonPopper.BalloonPopperScoreManager
-  id: 
+  uniqueKey: UI_ScoreManager
 --- !u!1001 &550669706
 PrefabInstance:
   m_ObjectHideFlags: 0

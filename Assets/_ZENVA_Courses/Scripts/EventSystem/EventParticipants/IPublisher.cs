@@ -1,5 +1,3 @@
-using System;
-
 namespace EventSystem
 {
     /// <summary>
@@ -8,6 +6,6 @@ namespace EventSystem
     /// </summary>
     public interface IPublisher : IEventParticipant
     {
-        bool IsAnonymous => string.IsNullOrEmpty(UniqueKey) && EventGuid.Equals(EventParticipantIDManager.GetParticipantGuid(this.GetType(), ""));
+        bool IsAnonymous { get; }
     }
 }

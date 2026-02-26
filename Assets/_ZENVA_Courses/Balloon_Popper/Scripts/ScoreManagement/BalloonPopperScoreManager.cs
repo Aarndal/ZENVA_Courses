@@ -1,33 +1,60 @@
+using Debugging;
 using EventSystem;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace BalloonPopper
 {
     public sealed class BalloonPopperScoreManager : ScoreManager, ISubscriber
     {
+        // Private Member Variables
         private readonly HashSet<IEventChannel> _subscribedChannels = new();
 
-        [SerializeField, HideInInspector]
-        private string id = default;
+        private Guid _eventGuid;
+        private uint _eventID;
 
+        // Serialized Fields
+        [SerializeField]
+        private string uniqueKey = default;
+
+        // Properties
         public Guid EventGuid
         {
             get
             {
-                if (string.IsNullOrEmpty(id))
-                    id = Guid.NewGuid().ToString();
-                if (Guid.TryParse(id, out var guid))
-                    return guid;
-                guid = Guid.NewGuid();
-                id = guid.ToString();
-                return guid;
+                if (_eventGuid == Guid.Empty)
+                {
+                    _eventGuid = EventSystemIDManager.GetParticipantGuid(this);
+                }
+                return _eventGuid;
+            }
+        }
+        public uint EventID
+        {
+            get
+            {
+                if (_eventID == 0)
+                {
+                    _eventID = EventSystemIDManager.GetParticipantID(this);
+                }
+                return _eventID;
+            }
+        }
+        public string UniqueKey
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(uniqueKey))
+                {
+                    uniqueKey = this.gameObject.name;
+                }
+                return uniqueKey;
             }
         }
 
-        public Dictionary<IEventChannel, (bool hasEventQueue, IEventQueue<IEventArgs> eventQueue)> EventQueuePerChannel => new();
-
+        // Events
         public override event Action<int> ScoreUpdated
         {
             add { _scoreUpdated += value; }
@@ -35,49 +62,75 @@ namespace BalloonPopper
         }
 
 
+        #region Unity Lifecycle Methods
+        private void Awake()
+        {
+            if (string.IsNullOrEmpty(uniqueKey))
+                uniqueKey = this.gameObject.name;
+
+            _eventGuid = EventSystemIDManager.GetParticipantGuid(this);
+            _eventID = EventSystemIDManager.GetParticipantID(this);
+        }
+
         private void OnEnable()
         {
+            if (_subscribedChannels == null)
+                return;
+
+            if (_subscribedChannels.Count > 0)
+            {
+                var channel = _subscribedChannels.FirstOrDefault(channel => channel is IEventChannel<ScoreChangedEventArgs>);
+
+                if (channel != default)
+                {
+                    var typedChannel = channel as IEventChannel<ScoreChangedEventArgs>;
+                    typedChannel.TrySubscribe(this, OnScoreChanged, CheckScoreChangedArgs);
+                    return;
+                }
+            }
+
             if (!EventTransmitter.TryGetChannel(this, out IEventChannel<ScoreChangedEventArgs> scoreChangeChannel))
             {
-                Debug.LogError("ScoreValueChangedEventArgs channel not found. Score updates will not be received.");
+                DebugLogger.Log(
+                    LogMessageType.Error,
+                    this,
+                    "Failed to subscribe to event channel for event arguments: {0}" +
+                    "\nNo such channel found.",
+                    true,
+                    typeof(ScoreChangedEventArgs).Name);
                 return;
             }
 
-            if (scoreChangeChannel.TrySubscribe(this, OnScoreChanged))
+            if (scoreChangeChannel.TrySubscribe(this, OnScoreChanged, CheckScoreChangedArgs))
             {
                 _subscribedChannels.Add(scoreChangeChannel);
-                EventQueuePerChannel.TryAdd(scoreChangeChannel, (false, null));
             }
-
         }
-
 
         private void OnDisable()
         {
-
             foreach (var channel in _subscribedChannels)
             {
                 if (channel is IEventChannel<IEventArgs> eventChannel)
                     eventChannel.TryUnsubscribe(this);
             }
+        }
+
+        private void OnDestroy()
+        {
             _subscribedChannels.Clear();
         }
+        #endregion
 
-
-        public void ReceiveEvent(IEventArgs eventArgs)
-        {
-            if (eventArgs is ScoreChangedEventArgs scoreChangedArgs)
-            {
-                OnScoreChanged(scoreChangedArgs);
-            }
-        }
 
         private void OnScoreChanged(ScoreChangedEventArgs args)
         {
-            if (args.ScoreChanger == null)
-                return;
-
             IncreaseScore(args.ScoreChanger.ScoreChangeValue);
+        }
+
+        private bool CheckScoreChangedArgs(ScoreChangedEventArgs args)
+        {
+            return args.ScoreChanger != null && args.AreValid;
         }
 
         protected override void IncreaseScore(int scoreChangeValue)
@@ -88,11 +141,34 @@ namespace BalloonPopper
             _scoreUpdated?.Invoke(_currentScore);
         }
 
+
+        //! For SubscriberComponent, if used
+        public void ReceiveEvent(IEventArgs eventArgs)
+        {
+            if (eventArgs is ScoreChangedEventArgs scoreChangedArgs)
+            {
+                OnScoreChanged(scoreChangedArgs);
+            }
+        }
+
+
+        #region IEquatable Implementation
         public bool Equals(IEventParticipant other)
         {
-            if (other == null) return false;
+            if (other == null || other is not BalloonPopperScoreManager) return false;
 
-            return EventGuid.Equals(other.EventGuid);
+            return EventGuid.Equals(other.EventGuid) && EventID.Equals(other.EventID);
         }
+
+        public override bool Equals(object other)
+        {
+            return other is BalloonPopperScoreManager otherScoreManager && Equals(otherScoreManager);
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(EventGuid, EventID);
+        }
+        #endregion
     }
 }

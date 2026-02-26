@@ -6,15 +6,43 @@ namespace EventSystem
 {
     public class Subscriber : ISubscriber
     {
+        // Private Members
         private readonly HashSet<IEventChannel> _subscribedChannels = new();
 
+        // Properties
         public Guid EventGuid { get; }
+        public uint EventID { get; }
+        public string UniqueKey { get; }
 
-        public Subscriber(Guid id)
+        // Constructor
+        public Subscriber(string uniqueKey)
         {
-            EventGuid = id;
+            UniqueKey = uniqueKey;
+
+            EventSystemIDManager.GetParticipantID(this);
+            EventSystemIDManager.GetParticipantGuid(this);
         }
 
+
+        #region Private Methods
+        private bool TryGetChannel<T>(out IEventChannel<T> channel)
+            where T : IEventArgs
+        {
+            channel = _subscribedChannels.FirstOrDefault(
+                c => c is IEventChannel<T>) as IEventChannel<T>;
+
+            if (channel == null || channel == default)
+            {
+                EventTransmitter.TryGetChannel<T>(this, out var newChannel);
+                channel = newChannel;
+            }
+
+            return channel != null;
+        }
+        #endregion
+
+
+        #region Public Methods
         public bool TryAddHandlerToSubscription<TEventArgs>(Action<TEventArgs> handler, Predicate<TEventArgs> filter = null)
             where TEventArgs : IEventArgs
         {
@@ -30,38 +58,45 @@ namespace EventSystem
             return false;
         }
 
+        public bool TryRemoveHandlerFromSubscription<TEventArgs>(Action<TEventArgs> handler)
+            where TEventArgs : IEventArgs
+        {
+            bool result = false;
+
+            foreach (var channel in _subscribedChannels)
+            {
+                if (channel is not IEventChannel<TEventArgs> typedChannel)
+                    continue;
+
+                if (!typedChannel.TryUnsubscribe(this, handler))
+                    continue;
+
+                result = true;
+            }
+
+            return result;
+        }
+
         public void UnsubscribeAll()
         {
             foreach (var channel in _subscribedChannels)
             {
-                if(channel is IEventChannel<IEventArgs> genericChannel)
+                if (channel is IEventChannel<IEventArgs> genericChannel)
                 {
                     genericChannel.TryUnsubscribe(this);
                 }
             }
             _subscribedChannels.Clear();
         }
+        #endregion
 
-        private bool TryGetChannel<T>(out IEventChannel<T> channel)
-            where T : IEventArgs
-        {
-            channel = _subscribedChannels.FirstOrDefault(
-                c => c is IEventChannel<T>) as IEventChannel<T>;
 
-            if (channel == null || channel == default)
-            {
-                EventTransmitter.TryGetChannel<T>(this, out var newChannel);
-                channel = newChannel;
-            }
-
-            return channel != null;
-        }
-
+        #region IEquatable Implementation
         public bool Equals(IEventParticipant other)
         {
             if (other is ISubscriber subscriber)
             {
-                return EventGuid == subscriber.EventGuid;
+                return EventGuid == subscriber.EventGuid && EventID == subscriber.EventID;
             }
             return false;
         }
@@ -71,7 +106,8 @@ namespace EventSystem
         }
         public override int GetHashCode()
         {
-            return EventGuid.GetHashCode();
+            return HashCode.Combine(EventGuid, EventID);
         }
+        #endregion
     }
 }

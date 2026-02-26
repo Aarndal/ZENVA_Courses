@@ -1,8 +1,6 @@
 using Debugging;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using UnityEngine;
 
 namespace EventSystem
 {
@@ -21,32 +19,40 @@ namespace EventSystem
         public int SubscriberCount => _subscriberInfo.Count;
 
         // Events
-        //public event Action<TEventArgs> EventRaised;
         public event Action<IEventChannel> DisposalRequested;
 
 
-        #region Public Methods
-        public void Dispose()
+        #region Private Methods
+        private bool CheckFor(ISubscriber subscriber)
         {
-            if (SubscriberCount > 0)
+            if (subscriber == null)
+            {
+                DebugLogger.Log(
+                    LogMessageType.Error,
+                    this,
+                    "Attempting to unsubscribe null." +
+                    "\nUnsubscription failed.",
+                    true);
+                return false;
+            }
+
+            if (!_subscriberInfo.ContainsKey(subscriber))
             {
                 DebugLogger.Log(
                     LogMessageType.Warning,
                     this,
-                    "Attempting to dispose EventChannel while there are still handlers subscribed: {0} subscribers",
+                    "Attempting to unsubscribe a subscriber that is not currently subscribed: {0}" +
+                    "\nUnsubscription ignored.",
                     true,
-                    SubscriberCount);
-                return;
+                    subscriber.EventGuid);
+                return false;
             }
-
-            _subscriberInfo?.Clear();
-
-            if (DisposalRequested != null)
-            {
-                DisposalRequested = null;
-            }
+            return true;
         }
+        #endregion
 
+
+        #region IEventChannel Implementation
         /// <summary>
         /// Tries to publish an event with the given arguments. 
         /// It checks all subscribed handlers and their filters before invoking them.
@@ -198,32 +204,26 @@ namespace EventSystem
         #endregion
 
 
-        #region Private Methods
-        private bool CheckFor(ISubscriber subscriber)
+        #region IDisposable Implementation
+        public void Dispose()
         {
-            if (subscriber == null)
-            {
-                DebugLogger.Log(
-                    LogMessageType.Error,
-                    this,
-                    "Attempting to unsubscribe null." +
-                    "\nUnsubscription failed.",
-                    true);
-                return false;
-            }
-
-            if (!_subscriberInfo.ContainsKey(subscriber))
+            if (SubscriberCount > 0)
             {
                 DebugLogger.Log(
                     LogMessageType.Warning,
                     this,
-                    "Attempting to unsubscribe a subscriber that is not currently subscribed: {0}" +
-                    "\nUnsubscription ignored.",
+                    "Attempting to dispose EventChannel while there are still handlers subscribed: {0} subscribers",
                     true,
-                    subscriber.EventGuid);
-                return false;
+                    SubscriberCount);
+                return;
             }
-            return true;
+
+            _subscriberInfo?.Clear();
+
+            if (DisposalRequested != null)
+            {
+                DisposalRequested = null;
+            }
         }
         #endregion
     }

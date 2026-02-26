@@ -1,6 +1,4 @@
-using Debugging;
 using System;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace EventSystem
@@ -10,28 +8,16 @@ namespace EventSystem
     /// It allows Designers to subscribe to events without needing direct references to the individual channels.
     /// </summary>
     [CreateAssetMenu(fileName = "NewEventChannel", menuName = "Event System/Event Channel")]
-    public class EventChannelSubscriberSO : ScriptableObject, ISubscriber
+    public class EventChannelSubscriberSO : ScriptableObject
     {
         private Subscriber _subscriber = default;
 
-        [HideInInspector, SerializeField]
-        private string id = default;
-
-        public Guid EventGuid
-        {
-            get
-            {
-                if (string.IsNullOrEmpty(id))
-                {
-                    id = Guid.NewGuid().ToString();
-                }
-                return Guid.Parse(id);
-            }
-        }
+        [SerializeField]
+        private string uniqueKey = default;
 
         private void Awake()
         {
-            _subscriber = new(EventGuid);
+            _subscriber = new(uniqueKey);
         }
 
         private void OnDestroy()
@@ -39,18 +25,14 @@ namespace EventSystem
             _subscriber.UnsubscribeAll();
         }
 
-        public bool Equals(IEventParticipant other)
-        {
-            if (other is ISubscriber subscriber)
-            {
-                return EventGuid.Equals(subscriber.EventGuid);
-            }
-            return false;
-        }
-
         public bool TryAddListener(Action<IEventArgs> handler, Predicate<IEventArgs> filter = null)
         {
             return _subscriber.TryAddHandlerToSubscription(handler, filter);
+        }
+
+        public bool TryRemoveListener(Action<IEventArgs> handler)
+        {
+            return _subscriber.TryRemoveHandlerFromSubscription(handler);
         }
     }
 }

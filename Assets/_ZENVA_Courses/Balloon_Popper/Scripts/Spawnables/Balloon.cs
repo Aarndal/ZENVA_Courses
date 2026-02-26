@@ -24,14 +24,16 @@ namespace BalloonPopper
         public GameObject GameObject => this.gameObject;
         public string SpawnableType => _data.InstanceName;
         public ToggleState State => _toggleState;
-
         public int ScoreChangeValue => _data.ScoreValue;
 
-        public Guid EventGuid => Guid.TryParse(this.gameObject.GetEntityId().ToString(), out var guid) ? guid : Guid.Empty;
-
+        public Guid EventGuid => EventSystemIDManager.GetParticipantGuid(this);
+        public uint EventID => EventSystemIDManager.GetParticipantID(this);
+        public bool IsAnonymous => false;
         public string UniqueKey => this.gameObject.name;
 
+
         public event Func<ISpawnable, bool> DespawnRequested;
+
 
         #region Unity Lifecycle Methods
         private void Awake()
