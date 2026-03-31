@@ -30,14 +30,24 @@ namespace EventSystem
             return false;
         }
 
+        public bool TryRemoveHandlerFromSubscription<TEventArgs>(Action<TEventArgs> handler)
+            where TEventArgs : IEventArgs
+        {
+            if (handler == null) return false;
+
+            var channel = _subscribedChannels.FirstOrDefault(
+                c => c is IEventChannel<TEventArgs>) as IEventChannel<TEventArgs>;
+
+            if (channel == null) return false;
+
+            return channel.TryUnsubscribe(this, handler);
+        }
+
         public void UnsubscribeAll()
         {
             foreach (var channel in _subscribedChannels)
             {
-                if(channel is IEventChannel<IEventArgs> genericChannel)
-                {
-                    genericChannel.TryUnsubscribe(this);
-                }
+                channel.TryUnsubscribe(this);
             }
             _subscribedChannels.Clear();
         }

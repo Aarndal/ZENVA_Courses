@@ -6,6 +6,13 @@ namespace EventSystem
     {
         event Action<IEventChannel> DisposalRequested;
         int SubscriberCount { get; }
+
+        /// <summary>
+        /// Removes all handlers registered by the specified <see cref="ISubscriber"/> from this channel.
+        /// </summary>
+        /// <param name="subscriber">The subscriber to unsubscribe.</param>
+        /// <returns><c>true</c> if the subscriber was found and removed; otherwise, <c>false</c>.</returns>
+        bool TryUnsubscribe(ISubscriber subscriber);
     }
 
     /// <summary>
@@ -38,11 +45,13 @@ namespace EventSystem
             Predicate<TEventArgs> predicate = null);
 
         /// <summary>
-        /// Tries to unsubscribe the provided <see cref="ISubscriber"/> from this typed IEventChannel.
+        /// Tries to unsubscribe the provided <see cref="ISubscriber"/> and a specific handler from this typed IEventChannel.
         /// </summary>
         /// <param name="subscriber">The subscriber requesting to unsubscribe from this channel.</param>
+        /// <param name="handler">The specific event handler to remove.</param>
         /// <returns>true if the unsubscription was successful; otherwise, false.</returns>
         bool TryUnsubscribe(
-            ISubscriber subscriber);
+            ISubscriber subscriber,
+            Action<TEventArgs> handler);
     }
 }

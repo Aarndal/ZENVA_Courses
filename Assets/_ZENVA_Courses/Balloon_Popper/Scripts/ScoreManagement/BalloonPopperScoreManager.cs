@@ -26,8 +26,6 @@ namespace BalloonPopper
             }
         }
 
-        public Dictionary<IEventChannel, (bool hasEventQueue, IEventQueue<IEventArgs> eventQueue)> EventQueuePerChannel => new();
-
         public override event Action<int> ScoreUpdated
         {
             add { _scoreUpdated += value; }
@@ -46,7 +44,6 @@ namespace BalloonPopper
             if (scoreChangeChannel.TrySubscribe(this, OnScoreChanged))
             {
                 _subscribedChannels.Add(scoreChangeChannel);
-                EventQueuePerChannel.TryAdd(scoreChangeChannel, (false, null));
             }
 
         }
@@ -54,11 +51,9 @@ namespace BalloonPopper
 
         private void OnDisable()
         {
-
             foreach (var channel in _subscribedChannels)
             {
-                if (channel is IEventChannel<IEventArgs> eventChannel)
-                    eventChannel.TryUnsubscribe(this);
+                channel.TryUnsubscribe(this);
             }
             _subscribedChannels.Clear();
         }

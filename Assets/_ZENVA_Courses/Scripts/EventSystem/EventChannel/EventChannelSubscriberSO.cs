@@ -52,5 +52,15 @@ namespace EventSystem
         {
             return _subscriber.TryAddHandlerToSubscription(handler, filter);
         }
+
+        public bool TryRemoveListener(Action<IEventArgs> handler)
+        {
+            return _subscriber.TryRemoveHandlerFromSubscription(handler);
+        }
+
+        public void UnsubscribeAll()
+        {
+            _subscriber.UnsubscribeAll();
+        }
     }
 }

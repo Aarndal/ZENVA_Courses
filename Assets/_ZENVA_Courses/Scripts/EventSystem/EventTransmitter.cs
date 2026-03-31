@@ -43,10 +43,13 @@ namespace EventSystem
             if (_channels.TryGetValue(typeof(TEventArgs), out var existingChannel))
             {
                 channel = existingChannel as IEventChannel<TEventArgs>;
-                return channel != null;
-            }
 
-            _channels.Remove(typeof(TEventArgs));
+                if (channel != null)
+                    return true;
+
+                // Stale entry whose type cast failed — remove it and fall through to create a new channel.
+                _channels.Remove(typeof(TEventArgs));
+            }
 
             if (requester is not ISubscriber)
             {

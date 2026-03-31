@@ -41,10 +41,7 @@ namespace EventSystem
 
             _subscriberInfo?.Clear();
 
-            if (DisposalRequested != null)
-            {
-                DisposalRequested = null;
-            }
+            DisposalRequested = null;
         }
 
         /// <summary>
@@ -176,7 +173,21 @@ namespace EventSystem
 
             var unsubscribedHandlers = _subscriberInfo[subscriber].RemoveWhere(info => info.Handler == handler);
 
-            return unsubscribedHandlers > 0;
+            if (unsubscribedHandlers == 0)
+                return false;
+
+            // Clean up an empty handler set and request disposal when no subscribers remain.
+            if (_subscriberInfo[subscriber].Count == 0)
+            {
+                _subscriberInfo.Remove(subscriber);
+
+                if (_subscriberInfo.Count == 0)
+                {
+                    DisposalRequested?.Invoke(this);
+                }
+            }
+
+            return true;
         }
 
         public bool TryUnsubscribe(ISubscriber subscriber)
