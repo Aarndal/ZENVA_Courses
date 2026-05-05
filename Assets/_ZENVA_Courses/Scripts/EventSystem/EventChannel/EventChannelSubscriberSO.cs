@@ -17,12 +17,18 @@ namespace EventSystem
 
         private void OnEnable()
         {
+            // Guard against re-initialisation if a subscriber already exists.
+            // A shared SO asset can be referenced by multiple GameObjects; each OnEnable call
+            // must not overwrite and orphan an already-active subscriber.
+            if (_subscriber != null) return;
+
             _subscriber = new(uniqueKey);
         }
 
         private void OnDestroy()
         {
             _subscriber?.UnsubscribeAll();
+            _subscriber = null;
         }
 
         public bool TryAddListener<TEventArgs>(Action<TEventArgs> handler, Predicate<TEventArgs> filter = null)

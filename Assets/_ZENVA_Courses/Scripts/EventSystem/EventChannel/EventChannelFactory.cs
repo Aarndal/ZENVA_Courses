@@ -1,6 +1,3 @@
-using Debugging;
-using System;
-
 namespace EventSystem
 {
     /// <summary>
@@ -8,29 +5,11 @@ namespace EventSystem
     /// </summary>
     public class EventChannelFactory
     {
-        public bool TryCreate<TEventArgs>(out IEventChannel<TEventArgs> channel) 
+        public bool TryCreate<TEventArgs>(out IEventChannel<TEventArgs> channel)
             where TEventArgs : IEventArgs
         {
-            channel = null;
-            try
-            {
-                channel = new EventChannel<TEventArgs>();
-            }
-            catch (Exception ex)
-            {
-                DebugLogger.Log(
-                    LogMessageType.Error, 
-                    this, 
-                    "Failed to create event channel for IEventArgs type: {0} | GUID: {1}" +
-                    "\nException Message: {2}", 
-                    true, 
-                    typeof(TEventArgs).Name,
-                    typeof(TEventArgs).GUID,
-                    ex.Message);
-
-                return false;
-            }
-            return channel != null;
+            channel = new EventChannel<TEventArgs>();
+            return true;
         }
     }
 }

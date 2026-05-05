@@ -7,7 +7,7 @@ namespace EventSystem
     {
         public EventFlag Flag { get; }
         public IScoreChanger ScoreChanger { get; }
-        public readonly Guid ID => this.GetType().GUID;
+        public Guid ID { get; }
         public IPublisher Publisher { get; }
 
         public bool AreValid => Validate();
@@ -35,6 +35,7 @@ namespace EventSystem
 
         public ScoreChangedEventArgs(IScoreChanger scoreChanger, EventFlag flag = EventFlag.None, IPublisher publisher = null)
         {
+            ID = Guid.NewGuid();
             ScoreChanger = scoreChanger;
             Flag = flag;
 

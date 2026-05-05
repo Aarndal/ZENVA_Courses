@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace EventSystem
 {
@@ -29,7 +29,7 @@ namespace EventSystem
                 return AreValid == otherStruct.AreValid &&
                        Flag == otherStruct.Flag &&
                        ID == otherStruct.ID &&
-                       Publisher.Equals(otherStruct.Publisher);
+                       (Publisher == null ? otherStruct.Publisher == null : Publisher.Equals(otherStruct.Publisher));
             }
             return false;
         }
