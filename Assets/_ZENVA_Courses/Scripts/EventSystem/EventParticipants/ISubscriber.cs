@@ -1,3 +1,5 @@
+using System;
+
 namespace EventSystem
 {
     /// <summary>
@@ -7,5 +9,10 @@ namespace EventSystem
     /// </summary>
     public interface ISubscriber : IEventParticipant
     {
+        /// <summary>
+        /// Raised when the subscriber wants to unsubscribe from all channels.
+        /// IEventChannels subscribe to this event and handle their own cleanup via TryUnsubscribe.
+        /// </summary>
+        event Action<ISubscriber> UnsubscribeRequested;
     }
 }

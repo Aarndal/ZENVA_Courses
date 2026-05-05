@@ -14,6 +14,9 @@ namespace EventSystem
         public uint EventID { get; private set; }
         public string UniqueKey { get; }
 
+        // Events
+        public event Action<ISubscriber> UnsubscribeRequested;
+
         // Constructor
         public Subscriber(string uniqueKey)
         {
@@ -63,7 +66,7 @@ namespace EventSystem
         {
             bool result = false;
 
-            foreach (var channel in _subscribedChannels)
+            foreach (var channel in _subscribedChannels.ToList())
             {
                 if (channel is not IEventChannel<TEventArgs> typedChannel)
                     continue;
@@ -71,6 +74,8 @@ namespace EventSystem
                 if (!typedChannel.TryUnsubscribe(this, handler))
                     continue;
 
+                // Clean up the stale channel reference
+                _subscribedChannels.Remove(channel);
                 result = true;
             }
 
@@ -79,13 +84,7 @@ namespace EventSystem
 
         public void UnsubscribeAll()
         {
-            foreach (var channel in _subscribedChannels)
-            {
-                if (channel is IEventChannel<IEventArgs> genericChannel)
-                {
-                    genericChannel.TryUnsubscribe(this);
-                }
-            }
+            UnsubscribeRequested?.Invoke(this);
             _subscribedChannels.Clear();
         }
         #endregion

@@ -49,6 +49,11 @@ namespace EventSystem
             }
             return true;
         }
+
+        private void OnUnsubscribeRequested(ISubscriber subscriber)
+        {
+            TryUnsubscribe(subscriber);
+        }
         #endregion
 
 
@@ -58,7 +63,6 @@ namespace EventSystem
         /// It checks all subscribed handlers and their filters before invoking them.
         /// </summary>
         /// <param name="args">The <see cref="IEventArgs"/> to publish.</param>
-        /// <param name="publisher">The <see cref="IPublisher"/> of the event.</param>
         /// <returns>true if the event was successfully published; otherwise, false.</returns>
         public bool TryPublish(TEventArgs args)
         {
@@ -138,6 +142,9 @@ namespace EventSystem
                         subscriber.EventGuid);
                     return false;
                 }
+
+                // Subscribe to the UnsubscribeRequested event when a new subscriber is first added
+                subscriber.UnsubscribeRequested += OnUnsubscribeRequested;
             }
 
             if (!_subscriberInfo[subscriber].Add(new SubscribedHandlerInfo<TEventArgs>(handler, predicate)))
@@ -189,6 +196,9 @@ namespace EventSystem
         {
             if (!CheckFor(subscriber))
                 return false;
+
+            // Unsubscribe from the UnsubscribeRequested event before removing the subscriber
+            subscriber.UnsubscribeRequested -= OnUnsubscribeRequested;
 
             _subscriberInfo[subscriber].Clear();
             _subscriberInfo.Remove(subscriber);
