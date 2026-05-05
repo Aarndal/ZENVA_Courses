@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -35,8 +35,15 @@ namespace EventSystem
                 return Guid.Empty; //! Invalid participant, no unique key
             }
 
+            var participantType = participant switch
+            {
+                IPublisher => typeof(IPublisher),
+                ISubscriber => typeof(ISubscriber),
+                _ => participant.GetType(),//! Fallback to actual type, ensuring we can still generate an ID for custom participant types.
+            };
+
             // Combine type and unique key for higher uniqueness
-            string combinedKey = participant.GetType().FullName + "|" + participant.UniqueKey;
+            string combinedKey = participantType.FullName + "|" + participant.UniqueKey;
 
             using var algorithmProvider = MD5.Create();
             byte[] hash = algorithmProvider.ComputeHash(Encoding.UTF8.GetBytes(combinedKey));
