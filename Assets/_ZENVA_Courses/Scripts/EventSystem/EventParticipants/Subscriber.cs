@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -10,8 +10,8 @@ namespace EventSystem
         private readonly HashSet<IEventChannel> _subscribedChannels = new();
 
         // Properties
-        public Guid EventGuid { get; }
-        public uint EventID { get; }
+        public Guid EventGuid { get; private set; }
+        public uint EventID { get; private set; }
         public string UniqueKey { get; }
 
         // Constructor
@@ -19,8 +19,8 @@ namespace EventSystem
         {
             UniqueKey = uniqueKey;
 
-            EventSystemIDManager.GetParticipantID(this);
-            EventSystemIDManager.GetParticipantGuid(this);
+            EventID = EventSystemIDManager.GetParticipantID(this);
+            EventGuid = EventSystemIDManager.GetParticipantGuid(this);
         }
 
 
