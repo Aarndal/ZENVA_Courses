@@ -20,7 +20,21 @@ namespace EventSystem
             if (channel == null || channel.SubscriberCount > 0) return;
 
             channel.DisposalRequested -= OnChannelDisposalRequested;
-            _channels.Remove(channel.GetType());
+
+
+            Type keyToRemove = null;
+            foreach (var kvp in _channels)
+            {
+                if (kvp.Value == channel)
+                {
+                    keyToRemove = kvp.Key;
+                    break;
+                }
+            }
+
+            if (keyToRemove != null)
+                _channels.Remove(keyToRemove);
+
             channel.Dispose();
         }
 

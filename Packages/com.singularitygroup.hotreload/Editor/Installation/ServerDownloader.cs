@@ -77,7 +77,7 @@ namespace SingularityGroup.HotReload.Editor {
             await ThreadUtility.SwitchToThreadPool(cancellationToken);
 
             Directory.CreateDirectory(targetDir);
-            if(TryUseUserDefinedBinaryPath(cliController, targetPath)) {
+            if(TryUseUserDefinedBinaryPath(cliController, targetPath, true)) {
                 Progress = 1f;
                 return true;
             }
@@ -125,7 +125,7 @@ namespace SingularityGroup.HotReload.Editor {
                     { StatKey.Errors, new List<string>(errors) },
                 };
                 // sending telemetry requires server to be running so we only attempt after server is downloaded
-                RequestHelper.RequestEditorEventWithRetry(new Stat(StatSource.Client, StatLevel.Error, StatFeature.Editor, StatEventType.Download), data).Forget();
+                EditorCodePatcher.SendEditorTelemetryIfEnabled(new Stat(StatSource.Client, StatLevel.Error, StatFeature.Editor, StatEventType.Download), data);
                 Log.Info(Translations.Errors.ErrorDownloadSucceeded);
             }
             
@@ -145,7 +145,7 @@ namespace SingularityGroup.HotReload.Editor {
             return true;
         }
 
-        static bool TryUseUserDefinedBinaryPath(ICliController cliController, string targetPath) {
+        static bool TryUseUserDefinedBinaryPath(ICliController cliController, string targetPath, bool logNotFoundWarning = false) {
             if (!File.Exists(PackageConst.ConfigFilePath)) {
                 return false;
             } 
@@ -162,7 +162,9 @@ namespace SingularityGroup.HotReload.Editor {
             }
             
             if (!File.Exists(customBinaryPath)) {
-                Log.Warning(Translations.Errors.ErrorServerBinaryNotFound, cliController.PlatformName, customBinaryPath);
+                if (logNotFoundWarning) {
+                    Log.Warning(Translations.Errors.ErrorServerBinaryNotFound, cliController.PlatformName, customBinaryPath);
+                }
                 return false;
             } 
             
