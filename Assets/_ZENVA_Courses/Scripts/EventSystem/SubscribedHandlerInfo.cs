@@ -21,13 +21,7 @@ namespace EventSystem
 
         public override bool Equals(object obj)
         {
-            if(!base.Equals(obj))
-                return false;
-
-            if (obj is not SubscribedHandlerInfo<TEventArgs> other)
-                return false;
-
-            return Equals(other);
+            return obj is SubscribedHandlerInfo<TEventArgs> other && Equals(other);
         }
 
         public override int GetHashCode()
