@@ -23,7 +23,7 @@ namespace EventSystem
                     "\nPublisher: {1}",
                     true,
                     (ScoreChanger == null ?
-                    ScoreChanger.GetType().ToString() + " is null." :
+                    "ScoreChanger is null." :
                     ScoreChanger.ScoreChangeValue.GetType().ToString() + " is 0."),
                     (Publisher != null ? Publisher.ToString() : "Anonymous")
                     );
