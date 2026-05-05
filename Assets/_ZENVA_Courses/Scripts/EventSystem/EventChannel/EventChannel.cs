@@ -14,6 +14,7 @@ namespace EventSystem
     {
         // Private Members
         private readonly Dictionary<ISubscriber, HashSet<SubscribedHandlerInfo<TEventArgs>>> _subscriberInfo = new();
+        private readonly List<SubscribedHandlerInfo<TEventArgs>> _publishSnapshot = new();
 
         // Properties
         public int SubscriberCount => _subscriberInfo.Count;
@@ -103,16 +104,18 @@ namespace EventSystem
                 return false;
             }
 
-            //Raise Event
-            foreach (var handlerInfo in _subscriberInfo.Values)
-            {
-                foreach (var info in handlerInfo)
-                {
-                    if (info.Predicate != null && !info.Predicate.Invoke(args))
-                        continue;
+            // Snapshot handlers before invoking to guard against mid-publish subscription changes
+            _publishSnapshot.Clear();
+            foreach (var handlerSet in _subscriberInfo.Values)
+                foreach (var info in handlerSet)
+                    _publishSnapshot.Add(info);
 
-                    info.Handler?.Invoke(args);
-                }
+            foreach (var info in _publishSnapshot)
+            {
+                if (info.Predicate != null && !info.Predicate.Invoke(args))
+                    continue;
+
+                info.Handler?.Invoke(args);
             }
 
             return true;
@@ -189,7 +192,20 @@ namespace EventSystem
 
             var unsubscribedHandlers = _subscriberInfo[subscriber].RemoveWhere(info => info.Handler == handler);
 
-            return unsubscribedHandlers > 0;
+            if (unsubscribedHandlers == 0)
+                return false;
+
+            // Clean up subscriber entry if no handlers remain
+            if (_subscriberInfo[subscriber].Count == 0)
+            {
+                subscriber.UnsubscribeRequested -= OnUnsubscribeRequested;
+                _subscriberInfo.Remove(subscriber);
+
+                if (_subscriberInfo.Count == 0)
+                    DisposalRequested?.Invoke(this);
+            }
+
+            return true;
         }
 
         public bool TryUnsubscribe(ISubscriber subscriber)
@@ -229,6 +245,7 @@ namespace EventSystem
             }
 
             _subscriberInfo?.Clear();
+            _publishSnapshot?.Clear();
 
             if (DisposalRequested != null)
             {

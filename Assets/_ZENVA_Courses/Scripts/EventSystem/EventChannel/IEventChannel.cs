@@ -13,7 +13,7 @@ namespace EventSystem
     /// They are created and managed by the <see cref="EventTransmitter"/>.
     /// An IEventChannel can request the <see cref="EventTransmitter"/> to execute its destruction, freeing up resources.
     /// </summary>
-    public partial interface IEventChannel<TEventArgs> : IEventChannel
+    public interface IEventChannel<TEventArgs> : IEventChannel
         where TEventArgs : IEventArgs
     {
         /// <summary>
@@ -46,7 +46,7 @@ namespace EventSystem
             ISubscriber subscriber);
 
         bool TryUnsubscribe(
-            ISubscriber subscriber, 
+            ISubscriber subscriber,
             Action<TEventArgs> handler);
     }
 }
