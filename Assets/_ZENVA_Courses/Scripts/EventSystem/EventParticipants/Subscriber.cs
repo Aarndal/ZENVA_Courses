@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace EventSystem
 {
@@ -31,14 +30,19 @@ namespace EventSystem
         private bool TryGetChannel<T>(out IEventChannel<T> channel)
             where T : IEventArgs
         {
-            channel = _subscribedChannels.FirstOrDefault(
-                c => c is IEventChannel<T>) as IEventChannel<T>;
+            channel = null;
 
-            if (channel == null || channel == default)
+            foreach (var c in _subscribedChannels)
             {
-                EventTransmitter.TryGetChannel<T>(this, out var newChannel);
-                channel = newChannel;
+                if (c is IEventChannel<T> typedChannel)
+                {
+                    channel = typedChannel;
+                    return true;
+                }
             }
+
+            EventTransmitter.TryGetChannel<T>(this, out var newChannel);
+            channel = newChannel;
 
             return channel != null;
         }
@@ -66,7 +70,7 @@ namespace EventSystem
         {
             bool result = false;
 
-            foreach (var channel in _subscribedChannels.ToList())
+            foreach (var channel in _subscribedChannels)
             {
                 if (channel is not IEventChannel<TEventArgs> typedChannel)
                     continue;
@@ -74,8 +78,6 @@ namespace EventSystem
                 if (!typedChannel.TryUnsubscribe(this, handler))
                     continue;
 
-                // Clean up the stale channel reference
-                _subscribedChannels.Remove(channel);
                 result = true;
             }
 
