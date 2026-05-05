@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace EventSystem
 {
@@ -13,27 +15,31 @@ namespace EventSystem
         // Private Members
         private static readonly EventChannelFactory _channelFactory = new();
         private static readonly Dictionary<Type, IEventChannel> _channels = new();
+        private static readonly Dictionary<IEventChannel, Type> _channelTypes = new();
+
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        private static void Init()
+        {
+            SceneManager.sceneUnloaded += OnSceneUnloaded;
+        }
 
         // Callback Functions
+        private static void OnSceneUnloaded(Scene scene)
+        {
+            Reset();
+        }
+
         private static void OnChannelDisposalRequested(IEventChannel channel)
         {
             if (channel == null || channel.SubscriberCount > 0) return;
 
             channel.DisposalRequested -= OnChannelDisposalRequested;
 
-
-            Type keyToRemove = null;
-            foreach (var kvp in _channels)
+            if (_channelTypes.TryGetValue(channel, out var key))
             {
-                if (kvp.Value == channel)
-                {
-                    keyToRemove = kvp.Key;
-                    break;
-                }
+                _channels.Remove(key);
+                _channelTypes.Remove(channel);
             }
-
-            if (keyToRemove != null)
-                _channels.Remove(keyToRemove);
 
             channel.Dispose();
         }
@@ -75,8 +81,25 @@ namespace EventSystem
                 return false;
             }
 
+            _channelTypes[channel] = typeof(TEventArgs);
             channel.DisposalRequested += OnChannelDisposalRequested;
-            return channel != null;
+            return true;
+        }
+
+        /// <summary>
+        /// Disposes all active channels and clears internal state.
+        /// Called automatically on scene unload to prevent stale references across scenes.
+        /// </summary>
+        public static void Reset()
+        {
+            foreach (var channel in _channels.Values)
+            {
+                channel.DisposalRequested -= OnChannelDisposalRequested;
+                channel.Dispose();
+            }
+
+            _channels.Clear();
+            _channelTypes.Clear();
         }
         #endregion
     }
