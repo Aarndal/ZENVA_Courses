@@ -1,36 +1,40 @@
-﻿using UnityEngine;
+using UnityEngine;
 using UnityEngine.Events;
 
 namespace EventSystem
 {
     public class SubscriberComponent : MonoBehaviour
     {
-        public EventChannelSubscriberSO EventChannelSubscriber = default;
-        public UnityEvent<MyEventArgs> ClassHandler = default;
-        public UnityEvent<MyEventArgsStruct> StructHandler = default;
+        [SerializeField] private EventChannelSubscriberSO _eventChannelSubscriber = default;
+        [SerializeField] private UnityEvent<MyEventArgs> _classHandler = default;
+        [SerializeField] private UnityEvent<MyEventArgsStruct> _structHandler = default;
 
         private void OnEnable()
         {
-            if (EventChannelSubscriber != null)
-                EventChannelSubscriber.TryAddListener(OnEventRaised);
+            if (_eventChannelSubscriber != null)
+            {
+                _eventChannelSubscriber.TryAddListener<MyEventArgs>(OnClassEventRaised);
+                _eventChannelSubscriber.TryAddListener<MyEventArgsStruct>(OnStructEventRaised);
+            }
         }
 
         private void OnDisable()
         {
-            if (EventChannelSubscriber != null)
-                EventChannelSubscriber.TryRemoveListener(OnEventRaised);
+            if (_eventChannelSubscriber != null)
+            {
+                _eventChannelSubscriber.TryRemoveListener<MyEventArgs>(OnClassEventRaised);
+                _eventChannelSubscriber.TryRemoveListener<MyEventArgsStruct>(OnStructEventRaised);
+            }
         }
 
-        private void OnEventRaised(IEventArgs args)
+        private void OnClassEventRaised(MyEventArgs args)
         {
-            if (args is MyEventArgs myArgs)
-            {
-                ClassHandler?.Invoke(myArgs);
-            }
-            else if (args is MyEventArgsStruct myArgsStruct)
-            {
-                StructHandler?.Invoke(myArgsStruct);
-            }
+            _classHandler?.Invoke(args);
+        }
+
+        private void OnStructEventRaised(MyEventArgsStruct args)
+        {
+            _structHandler?.Invoke(args);
         }
     }
 }

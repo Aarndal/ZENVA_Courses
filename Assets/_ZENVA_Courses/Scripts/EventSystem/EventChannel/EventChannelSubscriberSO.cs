@@ -15,23 +15,27 @@ namespace EventSystem
         [SerializeField]
         private string uniqueKey = default;
 
-        private void Awake()
+        private void OnEnable()
         {
             _subscriber = new(uniqueKey);
         }
 
         private void OnDestroy()
         {
-            _subscriber.UnsubscribeAll();
+            _subscriber?.UnsubscribeAll();
         }
 
-        public bool TryAddListener(Action<IEventArgs> handler, Predicate<IEventArgs> filter = null)
+        public bool TryAddListener<TEventArgs>(Action<TEventArgs> handler, Predicate<TEventArgs> filter = null)
+            where TEventArgs : IEventArgs
         {
+            if (_subscriber == null) return false;
             return _subscriber.TryAddHandlerToSubscription(handler, filter);
         }
 
-        public bool TryRemoveListener(Action<IEventArgs> handler)
+        public bool TryRemoveListener<TEventArgs>(Action<TEventArgs> handler)
+            where TEventArgs : IEventArgs
         {
+            if (_subscriber == null) return false;
             return _subscriber.TryRemoveHandlerFromSubscription(handler);
         }
     }
