@@ -5,9 +5,12 @@ namespace EventSystem
 {
     public class SubscriberComponent : MonoBehaviour
     {
-        [SerializeField] private EventChannelSubscriberSO _eventChannelSubscriber = default;
-        [SerializeField] private UnityEvent<MyEventArgs> _classHandler = default;
-        [SerializeField] private UnityEvent<MyEventArgsStruct> _structHandler = default;
+        [SerializeField] 
+        private EventChannelSubscriberSO _eventChannelSubscriber = default;
+        [SerializeField] 
+        private UnityEvent<MyEventArgs> _classHandler = default;
+        [SerializeField] 
+        private UnityEvent<MyEventArgsStruct> _structHandler = default;
 
         private void OnEnable()
         {
