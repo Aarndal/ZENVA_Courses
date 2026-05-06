@@ -13,7 +13,8 @@ namespace BalloonPopper
         // Private Member Variables
         private int _counter = 0;
         private bool _isInitialized = false;
-        private IEventChannel<ScoreChangedEventArgs> _channel = null;
+        private uint _eventID = 0;
+        private IEventChannel<ScoreChangedEventArgs> _scoreChangedChannel = null;
 
         private BalloonDataSO _data = null;
         private Renderer _renderer = null;
@@ -22,11 +23,11 @@ namespace BalloonPopper
         // Properties
         public ISpawnableData Data => _data;
         public GameObject GameObject => this.gameObject;
-        public string SpawnableType => _data.InstanceName;
+        public string SpawnableType => _data != null ? _data.InstanceName : string.Empty;
         public ToggleState State => _toggleState;
-        public int ScoreChangeValue => _data.ScoreValue;
+        public int ScoreChangeValue => _data != null ? _data.ScoreValue : 0;
 
-        public uint EventID => EventSystemIDManager.GetParticipantID(this);
+        public uint EventID => _eventID;
         public bool IsAnonymous => false;
         public string UniqueKey => this.gameObject.name;
 
@@ -37,65 +38,66 @@ namespace BalloonPopper
         #region Unity Lifecycle Methods
         private void Awake()
         {
+            _eventID = EventSystemIDManager.GetParticipantID(this);
+
             if (!this.transform.TryGetComponentInChildren(out _renderer))
             {
                 Debug.LogErrorFormat("Renderer component not found on Spawnable: {0} | ID: {1}",
                     this.gameObject.name,
                     this.gameObject.GetEntityId());
-
-                return;
             }
-        }
-
-        private void OnDestroy()
-        {
-            _counter = 0;
-            _isInitialized = false;
-            _toggleState = ToggleState.On;
-            this.gameObject.SetActive(false);
         }
         #endregion
 
 
         #region Private Methods
-        private async UniTask PopBalloon()
+        private async UniTask AnimatePopAsync()
         {
             _toggleState = ToggleState.Pending;
-            // Compute the target scale
+
             Vector3 popScale = this.transform.localScale * 1.25f;
-
-            // Speed in scale-units per second (tweak as needed)
             const float scaleSpeed = 0.75f;
-
-            // Squared epsilon for comparison to avoid using exact equality
             const float sqrEpsilon = 0.0001f;
 
-            // Animate towards the target scale using MoveTowards to guarantee progress
             while (Vector3.SqrMagnitude(this.transform.localScale - popScale) > sqrEpsilon)
             {
                 this.transform.localScale = Vector3.MoveTowards(this.transform.localScale, popScale, scaleSpeed * Time.deltaTime);
                 await UniTask.Yield(PlayerLoopTiming.Update);
             }
 
-            // Snap exactly to the target to avoid tiny residual differences
             this.transform.localScale = popScale;
+        }
 
-            Despawn();
-            //IScoreChanger.ScoreChanged?.Invoke(this);
-
-            if (_channel == null)
+        private bool TryPublishScoreChanged()
+        {
+            if (_scoreChangedChannel == null)
             {
-                if (!EventTransmitter.TryGetChannel(this, out _channel))
+                if (!EventTransmitter.TryGetChannel(this, out _scoreChangedChannel))
                 {
-                    return;
+                    return false;
                 }
             }
 
-            _channel.TryPublish(new ScoreChangedEventArgs(this, EventFlag.None, this));
+            return _scoreChangedChannel.TryPublish(new ScoreChangedEventArgs(this, EventFlag.None, this));
+        }
+
+        private async UniTask PopBalloonAsync()
+        {
+            await AnimatePopAsync();
+            Despawn();
+            TryPublishScoreChanged();
         }
 
         private bool TryResetCounter()
         {
+            if (_data == null)
+            {
+                Debug.LogErrorFormat("Balloon cannot reset counter because data is missing: {0} | ID: {1}",
+                    this.gameObject.name,
+                    this.gameObject.GetEntityId());
+                return false;
+            }
+
             if (_data.ClicksToPop <= 0)
             {
                 Debug.LogErrorFormat("Data has invalid ClicksToPop value in Balloon script: {0} | ID: {1}",
@@ -105,11 +107,7 @@ namespace BalloonPopper
                 return false;
             }
 
-            if (_counter != _data.ClicksToPop)
-            {
-                _counter = _data.ClicksToPop;
-            }
-
+            _counter = _data.ClicksToPop;
             return true;
         }
 
@@ -121,21 +119,21 @@ namespace BalloonPopper
         public async void Click()
         {
             // Check if the balloon is active and initialized
-            if (this.gameObject.activeInHierarchy && _isInitialized)
+            if (!this.gameObject.activeInHierarchy || !_isInitialized)
+                return;
+
+            if (!TryToggle())
+                return;
+
+            // Check if the balloon should start popping
+            if (_counter <= 0)
             {
-                if (!TryToggle())
-                    return;
-
-                // Check if the balloon should start popping
-                if (_counter <= 0)
-                {
-                    _toggleState = ToggleState.On;
-                    await PopBalloon();
-                    return;
-                }
-
-                _toggleState = ToggleState.Off;
+                _toggleState = ToggleState.On;
+                await PopBalloonAsync();
+                return;
             }
+
+            _toggleState = ToggleState.Off;
         }
 
         public void Despawn()
@@ -182,9 +180,7 @@ namespace BalloonPopper
 
             if (dataProvider == null)
             {
-                Debug.LogErrorFormat("Balloon initialization failed, missing data: {0} | Type: {1}",
-                    dataProvider.InstanceName,
-                    dataProvider.ProvidedType);
+                Debug.LogError("Balloon initialization failed, missing data provider.");
                 return false;
             }
 
@@ -206,8 +202,7 @@ namespace BalloonPopper
             if (_data == null)
             {
                 Debug.LogErrorFormat(
-                    "Spawnable initialization failed: {0} | ID: {1}" +
-                    "incorrect data type: {2} | ID: {3}",
+                    "Spawnable initialization failed: {0} | ID: {1}\nIncorrect data type: {2} | ID: {3}",
                     this.gameObject.name,
                     this.gameObject.GetEntityId(),
                     data.InstanceName,
