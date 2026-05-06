@@ -46,11 +46,6 @@ namespace BalloonPopper
             _subscriber?.UnsubscribeAll();
         }
 
-        private void OnDestroy()
-        {
-            _subscriber?.UnsubscribeAll();
-        }
-
         private void OnScoreChanged(ScoreChangedEventArgs args)
         {
             IncreaseScore(args.ScoreChanger.ScoreChangeValue);
