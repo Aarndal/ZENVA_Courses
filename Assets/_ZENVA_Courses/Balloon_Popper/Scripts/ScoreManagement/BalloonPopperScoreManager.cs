@@ -12,12 +12,14 @@ namespace BalloonPopper
         // Private Member Variables
         private readonly HashSet<IEventChannel> _subscribedChannels = new();
 
-        private Guid _eventGuid;
-        private uint _eventID;
+        private Guid _eventGuid = Guid.Empty;
+        private uint _eventID = 0;
 
         // Serialized Fields
         [SerializeField]
         private string uniqueKey = default;
+
+        public event Action<ISubscriber> UnsubscribeRequested;
 
         // Properties
         public Guid EventGuid
