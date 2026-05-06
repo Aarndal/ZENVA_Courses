@@ -1,163 +1,70 @@
 using Debugging;
 using EventSystem;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 namespace BalloonPopper
 {
-    public sealed class BalloonPopperScoreManager : ScoreManager, ISubscriber
+    public sealed class BalloonPopperScoreManager : ScoreManager
     {
-        // Private Member Variables
-        private readonly HashSet<IEventChannel> _subscribedChannels = new();
-
-        private uint _eventID = 0;
-
-        // Serialized Fields
         [SerializeField]
         private string uniqueKey = default;
 
-        public event Action<ISubscriber> UnsubscribeRequested;
+        private Subscriber _subscriber;
 
-        // Properties
-        public uint EventID
-        {
-            get
-            {
-                if (_eventID == 0)
-                {
-                    _eventID = EventSystemIDManager.GetParticipantID(this);
-                }
-                return _eventID;
-            }
-        }
-        public string UniqueKey
-        {
-            get
-            {
-                if (string.IsNullOrEmpty(uniqueKey))
-                {
-                    uniqueKey = this.gameObject.name;
-                }
-                return uniqueKey;
-            }
-        }
-
-        // Events
         public override event Action<int> ScoreUpdated
         {
             add { _scoreUpdated += value; }
             remove { _scoreUpdated -= value; }
         }
 
-
-        #region Unity Lifecycle Methods
         private void Awake()
         {
             if (string.IsNullOrEmpty(uniqueKey))
-                uniqueKey = this.gameObject.name;
+                uniqueKey = gameObject.name;
 
-            _eventID = EventSystemIDManager.GetParticipantID(this);
+            _subscriber = new Subscriber(uniqueKey);
         }
 
         private void OnEnable()
         {
-            if (_subscribedChannels == null)
-                return;
-
-            if (_subscribedChannels.Count > 0)
-            {
-                var channel = _subscribedChannels.FirstOrDefault(channel => channel is IEventChannel<ScoreChangedEventArgs>);
-
-                if (channel != default)
-                {
-                    var typedChannel = channel as IEventChannel<ScoreChangedEventArgs>;
-                    typedChannel.TrySubscribe(this, OnScoreChanged, CheckScoreChangedArgs);
-                    return;
-                }
-            }
-
-            if (!EventTransmitter.TryGetChannel(this, out IEventChannel<ScoreChangedEventArgs> scoreChangeChannel))
+            if (_subscriber == null)
             {
                 DebugLogger.Log(
                     LogMessageType.Error,
                     this,
-                    "Failed to subscribe to event channel for event arguments: {0}" +
-                    "\nNo such channel found.",
-                    true,
-                    typeof(ScoreChangedEventArgs).Name);
+                    "Subscriber is not initialized. Subscription failed.",
+                    true);
                 return;
             }
 
-            if (scoreChangeChannel.TrySubscribe(this, OnScoreChanged, CheckScoreChangedArgs))
-            {
-                _subscribedChannels.Add(scoreChangeChannel);
-            }
+            _subscriber.TryAddHandlerToSubscription<ScoreChangedEventArgs>(OnScoreChanged, IsValidScoreChange);
         }
 
         private void OnDisable()
         {
-            foreach (var channel in _subscribedChannels)
-            {
-                if (channel is IEventChannel<IEventArgs> eventChannel)
-                    eventChannel.TryUnsubscribe(this);
-            }
+            _subscriber?.UnsubscribeAll();
         }
 
         private void OnDestroy()
         {
-            _subscribedChannels.Clear();
+            _subscriber?.UnsubscribeAll();
         }
-        #endregion
-
 
         private void OnScoreChanged(ScoreChangedEventArgs args)
         {
             IncreaseScore(args.ScoreChanger.ScoreChangeValue);
         }
 
-        private bool CheckScoreChangedArgs(ScoreChangedEventArgs args)
+        private bool IsValidScoreChange(ScoreChangedEventArgs args)
         {
-            return args.ScoreChanger != null && args.AreValid;
+            return args.AreValid;
         }
 
         protected override void IncreaseScore(int scoreChangeValue)
         {
             _currentScore += scoreChangeValue;
-            Debug.Log("Score: " + _currentScore);
-
             _scoreUpdated?.Invoke(_currentScore);
         }
-
-
-        //! For SubscriberComponent, if used
-        public void ReceiveEvent(IEventArgs eventArgs)
-        {
-            if (eventArgs is ScoreChangedEventArgs scoreChangedArgs)
-            {
-                OnScoreChanged(scoreChangedArgs);
-            }
-        }
-
-
-        #region IEquatable Implementation
-        public bool Equals(IEventParticipant other)
-        {
-            if (other == null || other is not BalloonPopperScoreManager) return false;
-
-            return EventID.Equals(other.EventID);
-        }
-
-        public override bool Equals(object other)
-        {
-            return other is BalloonPopperScoreManager otherScoreManager && Equals(otherScoreManager);
-        }
-
-        public override int GetHashCode()
-        {
-            return HashCode.Combine(EventID);
-        }
-        #endregion
     }
 }
