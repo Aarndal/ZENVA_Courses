@@ -1,5 +1,4 @@
 using Debugging;
-using System;
 
 namespace EventSystem
 {
@@ -7,7 +6,6 @@ namespace EventSystem
     {
         public EventFlag Flag { get; }
         public IScoreChanger ScoreChanger { get; }
-        public Guid ID { get; }
         public IPublisher Publisher { get; }
 
         public bool AreValid => Validate();
@@ -35,7 +33,6 @@ namespace EventSystem
 
         public ScoreChangedEventArgs(IScoreChanger scoreChanger, EventFlag flag = EventFlag.None, IPublisher publisher = null)
         {
-            ID = Guid.NewGuid();
             ScoreChanger = scoreChanger;
             Flag = flag;
 
@@ -43,12 +40,6 @@ namespace EventSystem
                 Publisher = publisher;
             else
                 Publisher = null;
-        }
-
-        public readonly bool Equals(IDataProvider other)
-        {
-            if (other == null) return false;
-            return ID == other.ID;
         }
     }
 }

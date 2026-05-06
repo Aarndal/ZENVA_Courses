@@ -26,7 +26,6 @@ namespace BalloonPopper
         public ToggleState State => _toggleState;
         public int ScoreChangeValue => _data.ScoreValue;
 
-        public Guid EventGuid => EventSystemIDManager.GetParticipantGuid(this);
         public uint EventID => EventSystemIDManager.GetParticipantID(this);
         public bool IsAnonymous => false;
         public string UniqueKey => this.gameObject.name;
@@ -243,7 +242,7 @@ namespace BalloonPopper
         {
             if (other == null) return false;
 
-            return this.EventGuid == other.EventGuid;
+            return this.EventID == other.EventID;
         }
         #endregion
     }

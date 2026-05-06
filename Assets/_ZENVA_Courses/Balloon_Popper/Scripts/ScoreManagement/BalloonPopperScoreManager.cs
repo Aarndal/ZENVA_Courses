@@ -12,7 +12,6 @@ namespace BalloonPopper
         // Private Member Variables
         private readonly HashSet<IEventChannel> _subscribedChannels = new();
 
-        private Guid _eventGuid = Guid.Empty;
         private uint _eventID = 0;
 
         // Serialized Fields
@@ -22,17 +21,6 @@ namespace BalloonPopper
         public event Action<ISubscriber> UnsubscribeRequested;
 
         // Properties
-        public Guid EventGuid
-        {
-            get
-            {
-                if (_eventGuid == Guid.Empty)
-                {
-                    _eventGuid = EventSystemIDManager.GetParticipantGuid(this);
-                }
-                return _eventGuid;
-            }
-        }
         public uint EventID
         {
             get
@@ -70,7 +58,6 @@ namespace BalloonPopper
             if (string.IsNullOrEmpty(uniqueKey))
                 uniqueKey = this.gameObject.name;
 
-            _eventGuid = EventSystemIDManager.GetParticipantGuid(this);
             _eventID = EventSystemIDManager.GetParticipantID(this);
         }
 
@@ -159,7 +146,7 @@ namespace BalloonPopper
         {
             if (other == null || other is not BalloonPopperScoreManager) return false;
 
-            return EventGuid.Equals(other.EventGuid) && EventID.Equals(other.EventID);
+            return EventID.Equals(other.EventID);
         }
 
         public override bool Equals(object other)
@@ -169,7 +156,7 @@ namespace BalloonPopper
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(EventGuid, EventID);
+            return HashCode.Combine(EventID);
         }
         #endregion
     }
