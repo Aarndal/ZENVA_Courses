@@ -12,18 +12,13 @@ namespace EventSystem
     public class EventChannel<TEventArgs> : IEventChannel<TEventArgs>
         where TEventArgs : IEventArgs
     {
-        // Private Members
         private readonly Dictionary<ISubscriber, HashSet<SubscribedHandlerInfo<TEventArgs>>> _subscriberInfo = new();
         private readonly List<SubscribedHandlerInfo<TEventArgs>> _publishSnapshot = new();
 
-        // Properties
         public int SubscriberCount => _subscriberInfo.Count;
 
-        // Events
         public event Action<IEventChannel> DisposalRequested;
 
-
-        #region Private Methods
         private bool CheckFor(ISubscriber subscriber)
         {
             if (subscriber == null)
@@ -45,7 +40,7 @@ namespace EventSystem
                     "Attempting to unsubscribe a subscriber that is not currently subscribed: {0}" +
                     "\nUnsubscription ignored.",
                     true,
-                    subscriber.EventGuid);
+                    subscriber.EventID);
                 return false;
             }
             return true;
@@ -55,16 +50,7 @@ namespace EventSystem
         {
             TryUnsubscribe(subscriber);
         }
-        #endregion
 
-
-        #region IEventChannel Implementation
-        /// <summary>
-        /// Tries to publish an event with the given arguments. 
-        /// It checks all subscribed handlers and their filters before invoking them.
-        /// </summary>
-        /// <param name="args">The <see cref="IEventArgs"/> to publish.</param>
-        /// <returns>true if the event was successfully published; otherwise, false.</returns>
         public bool TryPublish(TEventArgs args)
         {
             if (args == null)
@@ -83,12 +69,12 @@ namespace EventSystem
                     LogMessageType.WarningFormatted,
                     this,
                     "Publish attempt of an event with no subscribers: {0} | PublisherID: {1}" +
-                    "\nEvent will not be raised: {2} | EventID: {3}",
+                    "\nEvent will not be raised: {2} | EventType: {3}",
                     true,
                     args?.Publisher?.UniqueKey,
-                    args?.Publisher?.EventGuid,
+                    args?.Publisher?.EventID,
                     args?.ToString(),
-                    args?.ID);
+                    typeof(TEventArgs).Name);
                 return false;
             }
 
@@ -97,14 +83,13 @@ namespace EventSystem
                 DebugLogger.Log(
                     LogMessageType.Error,
                     this,
-                    "Attempting to publish an event with invalid arguments. Publish failed. EventArgs: {0} | EventID: {1}",
+                    "Attempting to publish an event with invalid arguments. Publish failed. EventArgs: {0} | EventType: {1}",
                     true,
                     args.ToString(),
-                    args.ID);
+                    typeof(TEventArgs).Name);
                 return false;
             }
 
-            // Snapshot handlers before invoking to guard against mid-publish subscription changes
             _publishSnapshot.Clear();
             foreach (var handlerSet in _subscriberInfo.Values)
                 foreach (var info in handlerSet)
@@ -142,11 +127,10 @@ namespace EventSystem
                         this,
                         "Failed to add subscriber to the subscriber info dictionary. Subscription failed. SubscriberID: {0}",
                         true,
-                        subscriber.EventGuid);
+                        subscriber.EventID);
                     return false;
                 }
 
-                // Subscribe to the UnsubscribeRequested event when a new subscriber is first added
                 subscriber.UnsubscribeRequested += OnUnsubscribeRequested;
             }
 
@@ -157,7 +141,7 @@ namespace EventSystem
                     this,
                     "Subscriber is already subscribed with the same handler and predicate. Subscription ignored. SubscriberID: {0} | Handler: {1} | Predicate: {2}",
                     true,
-                    subscriber.EventGuid,
+                    subscriber.EventID,
                     handler.Method.Name,
                     predicate != null ? predicate.Method.Name : "null");
                 return false;
@@ -168,7 +152,7 @@ namespace EventSystem
                 this,
                 "Subscriber {0} subscribed with handler {1}.",
                 true,
-                subscriber.EventGuid,
+                subscriber.EventID,
                 handler.Method.Name);
 
             return true;
@@ -195,7 +179,6 @@ namespace EventSystem
             if (unsubscribedHandlers == 0)
                 return false;
 
-            // Clean up subscriber entry if no handlers remain
             if (_subscriberInfo[subscriber].Count == 0)
             {
                 subscriber.UnsubscribeRequested -= OnUnsubscribeRequested;
@@ -213,13 +196,11 @@ namespace EventSystem
             if (!CheckFor(subscriber))
                 return false;
 
-            // Unsubscribe from the UnsubscribeRequested event before removing the subscriber
             subscriber.UnsubscribeRequested -= OnUnsubscribeRequested;
 
             _subscriberInfo[subscriber].Clear();
             _subscriberInfo.Remove(subscriber);
 
-            // If there are no more subscribers, request disposal of this channel
             if (_subscriberInfo.Count == 0)
             {
                 DisposalRequested?.Invoke(this);
@@ -227,10 +208,7 @@ namespace EventSystem
 
             return true;
         }
-        #endregion
 
-
-        #region IDisposable Implementation
         public void Dispose()
         {
             if (SubscriberCount > 0)
@@ -252,6 +230,5 @@ namespace EventSystem
                 DisposalRequested = null;
             }
         }
-        #endregion
     }
 }

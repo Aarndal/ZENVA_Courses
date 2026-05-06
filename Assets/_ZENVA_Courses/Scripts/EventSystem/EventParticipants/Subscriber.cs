@@ -5,28 +5,19 @@ namespace EventSystem
 {
     public class Subscriber : ISubscriber
     {
-        // Private Members
         private readonly HashSet<IEventChannel> _subscribedChannels = new();
 
-        // Properties
-        public Guid EventGuid { get; private set; }
         public uint EventID { get; private set; }
         public string UniqueKey { get; }
 
-        // Events
         public event Action<ISubscriber> UnsubscribeRequested;
 
-        // Constructor
         public Subscriber(string uniqueKey)
         {
             UniqueKey = uniqueKey;
-
             EventID = EventSystemIDManager.GetParticipantID(this);
-            EventGuid = EventSystemIDManager.GetParticipantGuid(this);
         }
 
-
-        #region Private Methods
         private bool TryGetChannel<T>(out IEventChannel<T> channel)
             where T : IEventArgs
         {
@@ -46,10 +37,7 @@ namespace EventSystem
 
             return channel != null;
         }
-        #endregion
 
-
-        #region Public Methods
         public bool TryAddHandlerToSubscription<TEventArgs>(Action<TEventArgs> handler, Predicate<TEventArgs> filter = null)
             where TEventArgs : IEventArgs
         {
@@ -89,26 +77,20 @@ namespace EventSystem
             UnsubscribeRequested?.Invoke(this);
             _subscribedChannels.Clear();
         }
-        #endregion
 
-
-        #region IEquatable Implementation
         public bool Equals(IEventParticipant other)
         {
-            if (other is ISubscriber subscriber)
-            {
-                return EventGuid == subscriber.EventGuid && EventID == subscriber.EventID;
-            }
-            return false;
+            return other != null && EventID == other.EventID;
         }
+
         public override bool Equals(object obj)
         {
             return obj is Subscriber other && Equals(other);
         }
+
         public override int GetHashCode()
         {
-            return HashCode.Combine(EventGuid, EventID);
+            return HashCode.Combine(EventID);
         }
-        #endregion
     }
 }

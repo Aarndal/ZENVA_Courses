@@ -1,15 +1,11 @@
-using System;
-
 namespace EventSystem
 {
     /// <summary>
     /// IEventParticipants are the base type for both ISubscribers and IPublishers.
     /// They can request IEventChannel references through the EventTransmitter.
     /// </summary>
-    public interface IEventParticipant : IEquatable<IEventParticipant>
+    public interface IEventParticipant : System.IEquatable<IEventParticipant>
     {
-        Guid EventGuid { get; }
-
         uint EventID { get; }
 
         /// <summary>
