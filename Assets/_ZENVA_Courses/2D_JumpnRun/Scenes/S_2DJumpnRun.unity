@@ -1455,8 +1455,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1765505382}
-  - component: {fileID: 1765505384}
   - component: {fileID: 1765505383}
+  - component: {fileID: 1765505384}
   m_Layer: 3
   m_Name: PC_BottomChecker
   m_TagString: Untagged
@@ -1491,48 +1491,32 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c3a3942e22b23d543ab9c0e5d9e7c01e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GroundChecker
-  checkerCollider: {fileID: 1765505384}
   groundLayer:
     serializedVersion: 2
     m_Bits: 2049
-  castDistance: 0.01
---- !u!70 &1765505384
-CapsuleCollider2D:
+  castShape: 3
+  originOffset: {x: 0, y: -0.02}
+  castDirection: -1
+  castAngle: 0
+  castDistance: 0.05
+  castRadius: 0.25
+  castSize: {x: 0.3, y: 0.05}
+  castTilt: 0
+  capsuleDirection: 1
+--- !u!114 &1765505384
+MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1765505381}
   m_Enabled: 1
-  serializedVersion: 3
-  m_Density: 1
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_ForceSendLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_ForceReceiveLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_ContactCaptureLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_CallbackLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_IsTrigger: 1
-  m_UsedByEffector: 0
-  m_CompositeOperation: 0
-  m_CompositeOrder: 0
-  m_Offset: {x: 0, y: 0}
-  m_Size: {x: 0.25, y: 0.025}
-  m_Direction: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ddc5d1392f588444c9a6e9ec4ebaf9d7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SlopeChecker
+  groundChecker: {fileID: 1765505383}
+  maxWalkableAngle: 45
 --- !u!1 &1765568415
 GameObject:
   m_ObjectHideFlags: 0
@@ -1657,6 +1641,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d867d973204bc304793a53f0f31857bc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
+  interactor: {fileID: 0}
   checkerCollider: {fileID: 2065886080}
   interactableLayer:
     serializedVersion: 2
