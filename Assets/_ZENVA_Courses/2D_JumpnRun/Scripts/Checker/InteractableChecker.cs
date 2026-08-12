@@ -5,7 +5,7 @@ using UnityEngine;
 public class InteractableChecker : MonoBehaviour, IChecker
 {
     [SerializeField]
-    private PC_Interaction interactor = null;
+    private PCInteraction interactor = null;
     [SerializeField]
     private Collider2D checkerCollider = null;
     [SerializeField]
