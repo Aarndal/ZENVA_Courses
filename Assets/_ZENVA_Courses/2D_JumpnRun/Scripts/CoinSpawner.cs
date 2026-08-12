@@ -1,74 +1,56 @@
 using InteractableSystem;
-using SpawnSystem;
-using System;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace JumpnRun
 {
-    internal class CoinSpawner : MonoBehaviour, ISpawner, IInteractable
+    [RequireComponent(typeof(Collider2D))]
+    internal class CoinSpawner : MonoBehaviour, IInteractable
     {
         [SerializeField]
         private Coin coin = null;
+        [SerializeField, 
+            Min(1), 
+            Tooltip("How many coins this block can spawn before it is exhausted.")]
+        private int numberOfSpawnables = 1;
+        [SerializeField]
+        private Vector3 spawnOffset = Vector3.up;
 
-        public bool CanBeInteractedWith => throw new NotImplementedException();
+        private int _remainingSpawns = 0;
 
-        Queue<ISpawnerInstruction> ISpawner.Instructions => throw new NotImplementedException();
+        public bool CanBeInteractedWith => coin != null && _remainingSpawns > 0;
 
-        event Action ISpawner.SpawningStarted
+
+        private void Awake()
         {
-            add
+            if(coin == null)
             {
-                throw new NotImplementedException();
+                Debug.LogErrorFormat("Coin reference is missing on {0} | ID: {1}" +
+                    "\nDisabling the component.",
+                    this.gameObject.name,
+                    this.gameObject.GetEntityId());
+                this.enabled = false;
+                return;
             }
 
-            remove
-            {
-                throw new NotImplementedException();
-            }
+            _remainingSpawns = numberOfSpawnables;
         }
 
-        event Action ISpawner.SpawningStopped
-        {
-            add
-            {
-                throw new NotImplementedException();
-            }
-
-            remove
-            {
-                throw new NotImplementedException();
-            }
-        }
-
-        public void StartSpawning()
-        {
-            coin.Spawn(this.transform.position + Vector3.up);
-        }
-
-        public void StopSpawning()
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public bool TryInteract<T>(IInteractor interactor, T data = default)
+        public bool TryInteract(IInteractor interactor)
         {
             if ((interactor.InteractorLayer & (1 << LayerMask.NameToLayer("PlayerCharacter"))) == 0)
             {
                 return false;
             }
-            StartSpawning();
+
+            if (!CanBeInteractedWith)
+            {
+                return false;
+            }
+
+            coin.Spawn(this.transform.position + spawnOffset);
+            _remainingSpawns--;
+
             return true;
-        }
-
-        public bool TryInteract(IInteractor interactor)
-        {
-            throw new NotImplementedException();
-        }
-
-        bool ISpawner.TrySetInstructions(IEnumerable<ISpawnerInstruction> instructions)
-        {
-            throw new NotImplementedException();
         }
     }
 }
