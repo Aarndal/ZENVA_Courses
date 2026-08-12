@@ -1,39 +1,51 @@
-﻿using InteractableSystem;
-using UnityEngine;
+﻿using UnityEngine;
 
-[RequireComponent(typeof(Collider2D))]
-public class PCInteraction : MonoBehaviour, IInteractor
+namespace InteractableSystem
 {
-    [SerializeField]
-    private Collider2D interactionCollider = null;
-
-    public LayerMask InteractorLayer => (1 << this.gameObject.layer);
-
-    public GameObject GameObject => this.gameObject;
-
-    private void Awake()
+    [RequireComponent(typeof(Collider2D))]
+    public class PCInteraction : MonoBehaviour, IInteractor
     {
-        if (interactionCollider == null && !TryGetComponent(out interactionCollider))
-        {
-            Debug.LogErrorFormat("No collider found: {0} | ID: {1}" +
-                "\nDisabling the component.",
-                this.gameObject.name,
-                this.gameObject.GetEntityId());
-            this.enabled = false;
-        }
-    }
+        [SerializeField]
+        private Collider2D interactionCollider = null;
 
-    private void OnTriggerEnter2D(Collider2D other)
-    {
-        if (other.gameObject.layer != LayerMask.NameToLayer("Interactable"))
+        private int _interactableLayer = -1;
+
+        public LayerMask InteractorLayer => (1 << this.gameObject.layer);
+
+        public GameObject GameObject => this.gameObject;
+
+        private void Awake()
         {
-            return;
-        }
-        if (!other.gameObject.TryGetComponent(out IInteractable interactable))
-        {
-            return;
+            if (interactionCollider == null && !TryGetComponent(out interactionCollider))
+            {
+                Debug.LogErrorFormat("No collider found: {0} | ID: {1}" +
+                    "\nDisabling the component.",
+                    this.gameObject.name,
+                    this.gameObject.GetEntityId());
+                this.enabled = false;
+                return;
+            }
+
+            interactionCollider.isTrigger = true;
+            _interactableLayer = LayerMask.NameToLayer("Interactable");
         }
 
-        interactable?.TryInteract(this);
+        private void OnTriggerEnter2D(Collider2D other)
+        {
+            if (other.gameObject.layer != _interactableLayer)
+            {
+                return;
+            }
+            if (!other.gameObject.TryGetComponent(out IInteractable interactable))
+            {
+                return;
+            }
+            if (!interactable.CanBeInteractedWith)
+            {
+                return;
+            }
+
+            interactable?.TryInteract(this);
+        }
     }
 }

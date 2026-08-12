@@ -10,7 +10,7 @@ public class InteractableChecker : MonoBehaviour, IChecker
     private Collider2D checkerCollider = null;
     [SerializeField]
     private LayerMask interactableLayer;
-    
+
 
     public LayerMask InteractorLayer => (1 << this.gameObject.layer);
 
@@ -47,6 +47,9 @@ public class InteractableChecker : MonoBehaviour, IChecker
             return false;
 
         if (!gameObject.TryGetComponent<IInteractable>(out var interactableComponent))
+            return false;
+
+        if (!interactableComponent.CanBeInteractedWith)
             return false;
 
         return interactableComponent.TryInteract(interactor);

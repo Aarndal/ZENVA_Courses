@@ -1,5 +1,7 @@
-﻿
-public interface IClickable
+﻿namespace InteractableSystem
 {
-    void Click();
+    public interface IClickable
+    {
+        void Click();
+    }
 }

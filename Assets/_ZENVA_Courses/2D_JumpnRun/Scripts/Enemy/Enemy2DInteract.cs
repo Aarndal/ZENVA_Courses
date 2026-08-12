@@ -11,7 +11,7 @@ namespace JumpnRun
 
         private Collider2D _collider = null;
 
-        public LayerMask InteractorLayer => this.gameObject.layer;
+        public LayerMask InteractorLayer => (1 << this.gameObject.layer);
         public GameObject GameObject => this.gameObject;
 
         private void Awake()

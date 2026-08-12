@@ -1,5 +1,6 @@
 using Cysharp.Threading.Tasks;
 using EventSystem;
+using InteractableSystem;
 using SpawnSystem;
 using System;
 using UnityEngine;
