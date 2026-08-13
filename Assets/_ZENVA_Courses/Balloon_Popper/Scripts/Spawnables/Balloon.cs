@@ -1,3 +1,4 @@
+using Core;
 using Cysharp.Threading.Tasks;
 using EventSystem;
 using InteractableSystem;
@@ -5,7 +6,7 @@ using SpawnSystem;
 using System;
 using UnityEngine;
 
-using static IToggleable;
+using static Core.IToggleable;
 
 namespace BalloonPopper
 {
@@ -25,15 +26,27 @@ namespace BalloonPopper
         public ISpawnableData Data => _data;
         public GameObject GameObject => this.gameObject;
         public string SpawnableType => _data != null ? _data.InstanceName : string.Empty;
-        public ToggleState CurrentState => _toggleState;
+        public ToggleState CurrentState 
+        {
+            get => _toggleState;
+            private set
+            {
+                if (_toggleState != value)
+                {
+                    _toggleState = value;
+                    StateChanged?.Invoke(_toggleState);
+                }
+            }
+        }
         public int ScoreChangeValue => _data != null ? _data.ScoreValue : 0;
 
         public uint EventID => _eventID;
         public bool IsAnonymous => false;
         public string UniqueKey => this.gameObject.name;
-
+        public bool CanToggle => CurrentState == ToggleState.Off;
 
         public event Func<ISpawnable, bool> DespawnRequested;
+        public event Action<ToggleState> StateChanged;
 
 
         #region Unity Lifecycle Methods
@@ -54,7 +67,7 @@ namespace BalloonPopper
         #region Private Methods
         private async UniTask AnimatePopAsync()
         {
-            _toggleState = ToggleState.Pending;
+            CurrentState = ToggleState.Pending;
 
             Vector3 popScale = this.transform.localScale * 1.25f;
             const float scaleSpeed = 0.75f;
@@ -123,32 +136,32 @@ namespace BalloonPopper
             if (!this.gameObject.activeInHierarchy || !_isInitialized)
                 return;
 
-            if (!TryToggle())
+            if (!TryToggle(GameObject))
                 return;
 
             // Check if the balloon should start popping
             if (_counter <= 0)
             {
-                _toggleState = ToggleState.On;
+                CurrentState = ToggleState.On;
                 await PopBalloonAsync();
                 return;
             }
 
-            _toggleState = ToggleState.Off;
+            CurrentState = ToggleState.Off;
         }
 
         public void Despawn()
         {
             if (DespawnRequested?.Invoke(this) == true)
             {
-                _toggleState = ToggleState.On;
+                CurrentState = ToggleState.On;
                 this.gameObject.SetActive(false);
             }
         }
 
         public void Spawn(Vector3 spawnPosition, ISpawnContext context = null)
         {
-            _toggleState = ToggleState.Off;
+            CurrentState = ToggleState.Off;
 
             this.gameObject.SetActive(true);
 
@@ -219,13 +232,12 @@ namespace BalloonPopper
             return _isInitialized = true;
         }
 
-        public bool TryToggle()
+        public bool TryToggle(object requester)
         {
-            // Can only be toggled if currently in the Off state
-            if (_toggleState != ToggleState.Off)
+            if (!CanToggle)
                 return false;
 
-            _toggleState = ToggleState.Pending;
+            CurrentState = ToggleState.Pending;
 
             _counter--;
 

@@ -5051,47 +5051,6 @@ Transform:
   - {fileID: 159265309}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &1293276201 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 3319398458418183660, guid: 86ee05e2bde60d04a8dcc3e2365bf279, type: 3}
-  m_PrefabInstance: {fileID: 1268011143911697309}
-  m_PrefabAsset: {fileID: 0}
---- !u!58 &1293276205
-CircleCollider2D:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1293276201}
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Density: 1
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_ForceSendLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_ForceReceiveLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_ContactCaptureLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_CallbackLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_IsTrigger: 1
-  m_UsedByEffector: 0
-  m_CompositeOperation: 0
-  m_CompositeOrder: 0
-  m_Offset: {x: 0, y: 0}
-  m_Radius: 0.15
 --- !u!1 &1374016559
 GameObject:
   m_ObjectHideFlags: 0
@@ -5820,6 +5779,10 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3013275038648487390, guid: 86ee05e2bde60d04a8dcc3e2365bf279, type: 3}
+      propertyPath: coin
+      value: 
+      objectReference: {fileID: 1268011143911697310}
+    - target: {fileID: 3013275038648487390, guid: 86ee05e2bde60d04a8dcc3e2365bf279, type: 3}
       propertyPath: spawnOffset.y
       value: 0.5
       objectReference: {fileID: 0}
@@ -5831,6 +5794,10 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3805347944699938092, guid: 86ee05e2bde60d04a8dcc3e2365bf279, type: 3}
+      propertyPath: data
+      value: 
+      objectReference: {fileID: 11400000, guid: 9a453f7bf70de184ebbecd97fb1415ae, type: 2}
     - target: {fileID: 3805347944699938092, guid: 86ee05e2bde60d04a8dcc3e2365bf279, type: 3}
       propertyPath: _data
       value: 
@@ -5846,11 +5813,19 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 3319398458418183660, guid: 86ee05e2bde60d04a8dcc3e2365bf279, type: 3}
-      insertIndex: 2
-      addedObject: {fileID: 1293276205}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 86ee05e2bde60d04a8dcc3e2365bf279, type: 3}
+--- !u!114 &1268011143911697310 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3805347944699938092, guid: 86ee05e2bde60d04a8dcc3e2365bf279, type: 3}
+  m_PrefabInstance: {fileID: 1268011143911697309}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2d84d8784d7859e43bda83b13b85206b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::JumpnRun.Coin2D
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

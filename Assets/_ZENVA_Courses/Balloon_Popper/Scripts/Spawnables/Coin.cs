@@ -1,14 +1,15 @@
-﻿using InteractableSystem;
+﻿using Core;
+using InteractableSystem;
 using SpawnSystem;
 using System;
 using UnityEngine;
 
-using static IToggleable;
+using static Core.IToggleable;
 
 namespace BalloonPopper
 {
     [RequireComponent(typeof(Collider))]
-    public class Coin : MonoBehaviour, ISpawnable, IClickable, IScoreChanger
+    public class Coin : MonoBehaviour, ISpawnable, IClickable, IScoreChanger, IToggleable
     {
         private bool _isInitialized = false;
 
@@ -19,9 +20,24 @@ namespace BalloonPopper
         public ISpawnableData Data => _data;
         public GameObject GameObject => this.gameObject;
         public string SpawnableType => _data.InstanceName;
-        public ToggleState CurrentState => _toggleState;
+        public ToggleState CurrentState
+        {
+            get => _toggleState;
+            private set
+            {
+                if (_toggleState != value)
+                {
+                    _toggleState = value;
+                    StateChanged?.Invoke(_toggleState);
+                }
+            }
+        }
+
+        public event Action<ToggleState> StateChanged;
 
         public int ScoreChangeValue => _data.ScoreValue;
+
+        bool IToggleable.CanToggle => throw new NotImplementedException();
 
         public event Func<ISpawnable, bool> DespawnRequested;
 
@@ -50,7 +66,7 @@ namespace BalloonPopper
             // Check if the object is active and initialized
             if (this.gameObject.activeInHierarchy && _isInitialized)
             {
-                if (!TryToggle())
+                if (!TryToggle(GameObject))
                     return;
 
             }
@@ -125,7 +141,7 @@ namespace BalloonPopper
             return _isInitialized = true;
         }
 
-        public bool TryToggle()
+        public bool TryToggle(object requester)
         {
             if(_toggleState != ToggleState.Off)
                 return false;

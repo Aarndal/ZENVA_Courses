@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Core;
+using System;
 using UnityEngine;
 
 namespace SpawnSystem
