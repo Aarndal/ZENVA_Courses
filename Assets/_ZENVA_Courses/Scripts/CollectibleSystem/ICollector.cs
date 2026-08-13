@@ -1,23 +1,20 @@
 ﻿namespace CollectibleSystem
 {
     /// <summary>
-    /// Simple collector interface for any collectible type, allowing for polymorphic collection without type constraints.
-    /// Implementations should handle type checking and casting as needed.
+    /// An entity capable of collecting <see cref="ICollectible"/> items.
+    /// An entity may hold several collectors (inventory, score keeper, key ring, ...),
+    /// each accepting only the collectibles it cares about.
+    /// Called by the collectible during the collect handshake — never the other way around.
     /// </summary>
     public interface ICollector
     {
-        bool CanCollect(ICollectible collectible);
-        void Collect(ICollectible collectible);
+        /// <summary>
+        /// Attempts to take in the given collectible. The collector decides whether it
+        /// accepts it (type, capacity, ...) and what collecting means (add to inventory,
+        /// add points to the score, ...). Rejections may be reported via events, e.g. to
+        /// notify the UI that the inventory is full.
+        /// </summary>
+        /// <returns>true if the collectible was actually taken in; otherwise, false.</returns>
+        bool TryAdd(ICollectible collectible);
     }
-
-    /// <summary>
-    /// Strongly-typed collector interface for a specific collectible type, ensuring type safety and reducing the need for casting.
-    /// </summary>
-    /// <typeparam name="T">The type of collectible this collector can handle.</typeparam>
-    public interface ICollector<in T> : ICollector where T : ICollectible
-    {
-        bool CanCollect(T collectible);
-        void Collect(T collectible);
-    }
-
 }

@@ -19,7 +19,7 @@ namespace BalloonPopper
         public ISpawnableData Data => _data;
         public GameObject GameObject => this.gameObject;
         public string SpawnableType => _data.InstanceName;
-        public ToggleState State => _toggleState;
+        public ToggleState CurrentState => _toggleState;
 
         public int ScoreChangeValue => _data.ScoreValue;
 
